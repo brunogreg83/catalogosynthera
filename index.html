@@ -182,10 +182,10 @@
           if(typeof window.renderLista!=="function" || typeof window.updateSidebar!=="function") return false;
           try{
             window.renderLista();
-            window.updateSidebar();
+            if(typeof window.updateSidebar==="function") window.updateSidebar();
             const n=window.produtos.length;
             status(true,`Firebase conectado — ${n} produtos`);
-            return true;
+            return !!document.getElementById("productList")?.innerHTML;
           }catch(e){ console.error("Erro ao renderizar produtos:",e); return false; }
         };
         if(!tentar()){
@@ -1323,99 +1323,116 @@ function editarProduto(id){
 window.renderLista = function(){
   const list=document.getElementById("productList");
   const title=document.getElementById("listTitle");
-  const prods=window.produtos;
+  const prods=Array.isArray(window.produtos) ? window.produtos : [];
+  if(!list || !title) return;
+
+  // Segurança: a seleção pode não existir em páginas antigas.
+  if(!(window.selecionados instanceof Set)) window.selecionados=new Set();
+  if(!window.precosPersonalizados || typeof window.precosPersonalizados!=="object")
+    window.precosPersonalizados={};
+
   if(!prods.length){
     title.textContent="Nenhum produto cadastrado";
-    list.innerHTML=`<div class="empty-state"><div class="empty-icon">📦</div><p>Adicione o primeiro produto usando o formulário acima.<br/>Será salvo automaticamente no Firebase.</p></div>`;
+    list.innerHTML='<div class="empty-state"><div class="empty-icon">📦</div><p>Adicione o primeiro produto usando o formulário acima.<br/>Será salvo automaticamente no Firebase.</p></div>';
     return;
   }
+
   title.textContent=`${prods.length} produto${prods.length>1?"s":""} no catálogo`;
-  const personalizadoAtivo=document.getElementById("chkPersonalizado")?.checked;
+
   const cats={};
-  prods.forEach(p=>{if(!cats[p.categoria])cats[p.categoria]=[];cats[p.categoria].push(p);});
+  prods.forEach((p,i)=>{
+    const cat=String(p?.categoria || "Sem categoria");
+    if(!cats[cat]) cats[cat]=[];
+    cats[cat].push({...p,__index:i});
+  });
+
   let globalIndex=0;
-  list.innerHTML=Object.entries(cats).map(([cat,ps])=>{
-    const cards=ps.map(p=>{
-      const reverse=globalIndex++%2===1;
-      const code=(String(p.nome||"").match(/^([A-Z]{3}\d{3})/)||[])[1]||"";
-      const cleanName=String(p.nome||"").replace(/^[A-Z]{3}\d{3}\s*[—-]\s*/i,"").trim() || p.nome || "Produto";
-      const attrs=(p.attrs||[]);
-      const subtitle=attrs.length ? attrs[0].v : "SOLUÇÃO PROFISSIONAL SYNTHERA";
-      return `
-      <div class="product-card synthera-product ${reverse?'reverse':''} ${window.selecionados.has(p.id)?'selecionado':''}">
-        <div class="product-card-header">
-          <label class="prod-select-label" title="Selecionar para catálogo personalizado">
-            <input type="checkbox" class="prod-select-chk" ${window.selecionados.has(p.id)?'checked':''} onchange="toggleSelecao('${p.id}',this.checked)"/>
-          </label>
-          <div class="card-actions">
-            <button onclick="editarProduto('${p.id}')">✏️ Editar</button>
-            <button onclick="removerProduto('${p.id}')">🗑 Remover</button>
-          </div>
-        </div>
-        <div class="synthera-product-inner">
-          <div class="synthera-product-media">
-            ${p.imagem?`<img src="${p.imagem}" alt="${cleanName}"/>`:`<div style="font-size:4rem;opacity:.22">🧴</div>`}
-          </div>
-          <div class="synthera-product-content">
-            <div class="synthera-product-code">${code||cleanName}</div>
-            <div class="synthera-product-name">${cleanName}</div>
-            <div class="synthera-product-sub">${subtitle}</div>
-            ${personalizadoAtivo && window.selecionados.has(p.id) ? `
-              <div class="preco-custom-row">
-                <label for="precoCustom-${p.id}">Preço neste PDF</label>
-                <input type="text" id="precoCustom-${p.id}" placeholder="${p.preco||'Consultar'}" value="${window.precosPersonalizados[p.id]||''}" oninput="atualizarPrecoPersonalizado('${p.id}', this.value)"/>
-                ${window.precosPersonalizados[p.id]?`<button type="button" class="preco-custom-clear" onclick="limparPrecoPersonalizado('${p.id}')">limpar</button>`:''}
-              </div>`:''}
-            ${(attrs.length>1)?`<div class="product-attrs">${attrs.slice(1).map(({l,v})=>`<span class="attr-label">${l}</span><span class="attr-value">${v}</span>`).join("")}</div>`:""}
-            <div class="synthera-product-actions">
-              <div class="product-card-preco ${p.preco?'':'consultar'}">
-                ${p.preco
-                  ? `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> PREÇO: ${p.preco}`
-                  : `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> PREÇO: CONSULTAR`}
-              </div>
-              ${p.ficha?`<a class="btn-ficha" href="${p.ficha}" download="${p.fichaNome||'ficha-tecnica.pdf'}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> BAIXAR FICHA TÉCNICA</a>`:""}
+  let out="";
+
+  Object.entries(cats).forEach(([cat,ps])=>{
+    let cards="";
+    ps.forEach(p=>{
+      try{
+        const reverse=(globalIndex++ % 2)===1;
+        const id=String(p.id||"");
+        const nome=String(p.nome||p.codigo||"Produto");
+        const code=(nome.match(/^([A-Z]{3}\d{3})/)||[])[1] || String(p.codigo||"");
+        const cleanName=nome.replace(/^[A-Z]{3}\d{3}\s*[—-]\s*/i,"").trim() || nome;
+        const attrs=Array.isArray(p.attrs) ? p.attrs : [];
+        const subtitle=attrs.length && attrs[0] && attrs[0].v ? String(attrs[0].v) : "SOLUÇÃO PROFISSIONAL SYNTHERA";
+        const selecionado=window.selecionados.has(id);
+
+        const imagem=p.imagem
+          ? `<img src="${String(p.imagem)}" alt="${cleanName.replace(/"/g,"&quot;")}">`
+          : `<div style="font-size:4rem;opacity:.22">🧴</div>`;
+
+        const preco=p.preco
+          ? `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> PREÇO: ${String(p.preco)}`
+          : `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> PREÇO: CONSULTAR`;
+
+        const ficha=p.ficha
+          ? `<a class="btn-ficha" href="${String(p.ficha)}" download="${String(p.fichaNome||"ficha-tecnica.pdf")}">BAIXAR FICHA TÉCNICA</a>`
+          : "";
+
+        cards+=`
+        <div class="product-card synthera-product ${reverse?"reverse":""} ${selecionado?"selecionado":""}">
+          <div class="product-card-header">
+            <label class="prod-select-label" title="Selecionar para catálogo personalizado">
+              <input type="checkbox" class="prod-select-chk" ${selecionado?"checked":""} onchange="toggleSelecao('${id.replace(/'/g,"&#39;")}',this.checked)">
+            </label>
+            <div class="card-actions">
+              <button onclick="editarProduto('${id.replace(/'/g,"&#39;")}')">✏️ Editar</button>
+              <button onclick="removerProduto('${id.replace(/'/g,"&#39;")}')">🗑 Remover</button>
             </div>
           </div>
-        </div>
-      </div>`;
-    }).join("");
-    return `<div style="margin-bottom:18px"><p style="font-size:.66rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted);margin-bottom:7px;padding-left:2px">${cat}</p>${cards}</div>`;
-  }).join("");
-};
+          <div class="synthera-product-inner">
+            <div class="synthera-product-media">${imagem}</div>
+            <div class="synthera-product-content">
+              <div class="synthera-product-code">${code||cleanName}</div>
+              <div class="synthera-product-name">${cleanName}</div>
+              <div class="synthera-product-sub">${subtitle}</div>
+              <div class="synthera-product-actions">
+                <div class="product-card-preco ${p.preco?"":"consultar"}">${preco}</div>
+                ${ficha}
+              </div>
+            </div>
+          </div>
+        </div>`;
+      }catch(cardError){
+        console.error("Erro em um produto do Firebase:",p,cardError);
+      }
+    });
+    out+=`<div style="margin-bottom:18px"><p style="font-size:.66rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted);margin-bottom:7px;padding-left:2px">${cat}</p>${cards}</div>`;
+  });
 
+  list.innerHTML=out || '<div class="empty-state"><div class="empty-icon">📦</div><p>Os produtos foram encontrados, mas não foi possível montar os cards.</p></div>';
+};
 window.updateSidebar = function(){
-  const prods=window.produtos;
-  const cats=[...new Set(prods.map(p=>p.categoria))];
-  document.getElementById("statProd").textContent=prods.length;
-  document.getElementById("statCat").textContent=cats.length;
-  const d=new Date();
-  document.getElementById("statData").textContent=
-    d.toLocaleDateString("pt-BR",{day:"2-digit",month:"short",year:"numeric"});
+  const prods=Array.isArray(window.produtos) ? window.produtos : [];
+  const cats=[...new Set(prods.map(p=>String(p?.categoria||"Sem categoria")))];
 
-  const ok=prods.length>0;
-  document.getElementById("btnGerar").disabled=!ok;
-  const navBtn = document.getElementById("btnNavGerar");
-  if(navBtn) navBtn.disabled=!ok;
+  const statProd=document.getElementById("statProd");
+  const statCat=document.getElementById("statCat");
+  const statData=document.getElementById("statData");
+  if(statProd) statProd.textContent=prods.length;
+  if(statCat) statCat.textContent=cats.length;
+  if(statData) statData.textContent=new Date().toLocaleDateString("pt-BR",{day:"2-digit",month:"short",year:"numeric"});
 
-  // categoria fixa — sem datalist
+  const btn=document.getElementById("btnGerar");
+  const navBtn=document.getElementById("btnNavGerar");
+  if(btn) btn.disabled=!prods.length;
+  if(navBtn) navBtn.disabled=!prods.length;
 
-  // cat card
-  if(cats.length){
-    document.getElementById("catCard").style.display="block";
-    document.getElementById("catList2").innerHTML=cats.map(c=>{
-      const n=prods.filter(p=>p.categoria===c).length;
-      return `<div class="stat">
-        <span class="stat-label">${c}</span>
-        <span class="stat-value" style="font-size:.85rem">${n} prod.</span>
-      </div>`;
-    }).join("");
-  } else {
-    document.getElementById("catCard").style.display="none";
-  }
+  const catCard=document.getElementById("catCard");
+  const catList=document.getElementById("catList2");
+  if(catCard) catCard.style.display=cats.length?"block":"none";
+  if(catList) catList.innerHTML=cats.map(c=>{
+    const n=prods.filter(p=>String(p?.categoria||"Sem categoria")===c).length;
+    return `<div class="stat"><span class="stat-label">${c}</span><span class="stat-value" style="font-size:.85rem">${n} prod.</span></div>`;
+  }).join("");
 
-  updateSelecaoUI();
+  try{ if(typeof updateSelecaoUI==="function") updateSelecaoUI(); }catch(e){ console.warn("UI seleção:",e); }
 };
-
 // ── SELEÇÃO (Catálogo Personalizado) ───────────────────────
 window.toggleSelecao = function(id, checked){
   if(checked) window.selecionados.add(id);
