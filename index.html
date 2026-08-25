@@ -11,7 +11,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import {
   getFirestore, collection, addDoc, updateDoc, deleteDoc,
-  doc, onSnapshot, serverTimestamp, query, orderBy, getDoc, setDoc
+  doc, onSnapshot, serverTimestamp, query, orderBy, getDoc, getDocs, setDoc
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 import {
   getStorage, ref, uploadString, getDownloadURL, deleteObject
@@ -39,6 +39,7 @@ function firebaseErro(err){
   else if(code === "storage/unauthorized") msg = "Firebase conectado — Storage sem permissão";
   const el = document.getElementById("dbStatus");
   if(el){ el.className = "db-status error"; el.innerHTML = "&#9679; " + msg; }
+  if(typeof window.setFirebaseStatus === "function") window.setFirebaseStatus(false, msg);
   if(typeof window.showToast === "function") window.showToast(msg, "error");
 }
 
@@ -51,12 +52,12 @@ try{
 }
 
     // Atualiza o indicador visual de conexão Firebase.
-    window.setFirebaseStatus = function(connected){
+    window.setFirebaseStatus = function(connected, message){
       const el = document.getElementById("firebaseStatus");
       if(!el) return;
       el.classList.toggle("offline", !connected);
       const text = el.querySelector("span:last-child");
-      if(text) text.textContent = connected ? "Firebase conectado" : "Firebase indisponível";
+      if(text) text.textContent = connected ? "Firebase conectado" : (message || "Firebase indisponível");
     };
     window.setFirebaseStatus(false);
 
@@ -173,20 +174,69 @@ window._fb = {
   },
   listen(cb){
     if(!db) return () => {};
-    const q = query(collection(db, COL), orderBy("criadoEm","asc"));
-    return onSnapshot(q, snap => {
-      const docs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+
+    // IMPORTANTE:
+    // Não usamos orderBy("criadoEm") aqui. Produtos antigos ou cadastrados
+    // antes desse campo existir podem não possuir criadoEm e, nesse caso,
+    // ficavam fora da consulta. Primeiro carregamos TODOS os documentos.
+    const q = collection(db, COL);
+
+    const normalizar = snap => {
+      const docs = snap.docs.map(d => ({ id:d.id, ...d.data() }));
+
+      // Ordenação somente no navegador, sem excluir documentos.
+      docs.sort((a,b) => {
+        const ta = a.criadoEm?.seconds ?? a.criadoEm?._seconds ?? 0;
+        const tb = b.criadoEm?.seconds ?? b.criadoEm?._seconds ?? 0;
+        if(ta !== tb) return ta - tb;
+        return String(a.codigo || a.nome || a.id).localeCompare(
+          String(b.codigo || b.nome || b.id),
+          "pt-BR",
+          {numeric:true, sensitivity:"base"}
+        );
+      });
+
       cb(docs);
+
+      const el = document.getElementById("dbStatus");
+      if(el){
+        el.className = "db-status ok";
+        el.innerHTML = `&#9679; Firebase conectado — ${docs.length} produtos`;
+      }
+      if(typeof window.setFirebaseStatus === "function"){
+        window.setFirebaseStatus(true, `Firebase conectado — ${docs.length} produtos`);
+      }
+    };
+
+    // Leitura inicial explícita: garante que a página seja populada mesmo
+    // antes do primeiro evento do listener.
+    getDocs(q).then(normalizar).catch(err => {
+      console.error("Firestore leitura inicial:", err);
+      const msg = err.code === 'permission-denied'
+        ? 'Permissão negada — verifique as regras do Firestore'
+        : err.code === 'unavailable'
+        ? 'Servidor indisponível — verifique a conexão'
+        : `Erro ao ler produtos: ${err.code || err.message}`;
+      const el = document.getElementById("dbStatus");
+      if(el){ el.className = "db-status error"; el.innerHTML = `&#9679; ${msg}`; }
+      if(typeof window.setFirebaseStatus === "function") window.setFirebaseStatus(false, msg);
+      if(typeof window.showToast === "function") window.showToast(msg, "error");
+    });
+
+    // Depois da carga inicial, mantém a página sincronizada em tempo real.
+    return onSnapshot(q, snap => {
+      normalizar(snap);
     }, err => {
-      console.error("Firestore error:", err.code, err.message);
+      console.error("Firestore listener:", err.code, err.message);
       const msg = err.code === 'permission-denied'
         ? 'Permissão negada — verifique as regras do Firestore'
         : err.code === 'unavailable'
         ? 'Servidor indisponível — verifique a conexão'
         : `Erro: ${err.code || err.message}`;
-      if(typeof window.showToast==='function') window.showToast(msg, "error");
       const el = document.getElementById("dbStatus");
       if(el){ el.className = "db-status error"; el.innerHTML = `&#9679; ${msg}`; }
+      if(typeof window.setFirebaseStatus === "function") window.setFirebaseStatus(false, msg);
+      if(typeof window.showToast === "function") window.showToast(msg, "error");
     });
   }
 };
@@ -239,6 +289,7 @@ document.addEventListener("DOMContentLoaded", () => {
       first = false;
       const el = document.getElementById("dbStatus");
       if(el){ el.className = "db-status ok"; el.innerHTML = "&#9679; Firebase conectado"; }
+      if(typeof window.setFirebaseStatus === "function") window.setFirebaseStatus(true);
     }
     });
   }catch(err){
