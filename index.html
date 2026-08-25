@@ -248,25 +248,59 @@ document.addEventListener("DOMContentLoaded", () => {
   const elStatus = document.getElementById("dbStatus");
   if(elStatus) elStatus.innerHTML = "&#9679; Conectando…";
 
-  // buffer de docs recebidos antes das funções de render estarem prontas
+  // Ponte persistente entre o Firebase (module) e o renderizador da página.
+  // O listener pode receber os produtos antes de o código visual terminar
+  // de ser carregado; nesse caso os dados ficam guardados e são renderizados
+  // assim que as funções existirem.
   let pendingDocs = null;
 
-  function tryRender(docs) {
-    if(typeof window.renderLista === 'function' && typeof window.updateSidebar === 'function') {
-      window.produtos = docs;
-      window.renderLista();
-      window.updateSidebar();
-      pendingDocs = null;
-    } else {
-      pendingDocs = docs;
+  window.__syntheraRenderFirebase = function(docs){
+    pendingDocs = Array.isArray(docs) ? docs : [];
+    window.produtos = pendingDocs;
+
+    const tentar = () => {
+      if(typeof window.renderLista !== "function" ||
+         typeof window.updateSidebar !== "function") return false;
+
+      try{
+        window.renderLista();
+        window.updateSidebar();
+
+        const list=document.getElementById("productList");
+        const title=document.getElementById("listTitle");
+        if(list && title && list.children.length >= 0){
+          pendingDocs = null;
+          return true;
+        }
+      }catch(err){
+        console.error("Erro ao renderizar produtos do Firebase:", err);
+        const list=document.getElementById("productList");
+        if(list){
+          list.innerHTML = '<div class="empty-state"><div class="empty-icon">⚠️</div><p>Produtos carregados, mas houve um erro ao exibir a lista. Recarregue a página.</p></div>';
+        }
+      }
+      return false;
+    };
+
+    if(!tentar()){
+      // Continua tentando até a interface estar pronta, sem depender de
+      // uma janela fixa de 3 segundos.
+      let tentativas=0;
+      const timer=setInterval(()=>{
+        tentativas++;
+        if(tentar() || tentativas>=200) clearInterval(timer);
+      },100);
+    }
+  };
+
+  function tryRender(docs){
+    if(typeof window.__syntheraRenderFirebase === "function"){
+      window.__syntheraRenderFirebase(docs);
+    }else{
+      pendingDocs=docs;
+      window.produtos=Array.isArray(docs)?docs:[];
     }
   }
-
-  // polling leve: aguarda até 3s pelas funções de render
-  const poll = setInterval(() => {
-    if(pendingDocs !== null) tryRender(pendingDocs);
-  }, 50);
-  setTimeout(() => clearInterval(poll), 3000);
 
   let first = true;
   if(!db){
@@ -284,7 +318,14 @@ document.addEventListener("DOMContentLoaded", () => {
 
   try{
     window._fb.listen(docs => {
-    tryRender(docs);
+    console.log("Firebase: produtos recebidos:", docs.length);
+    try{
+      tryRender(docs);
+    }catch(renderErr){
+      console.error("Firebase: erro ao popular a página:", renderErr);
+      if(typeof window.showToast === "function")
+        window.showToast("Produtos carregados, mas não foi possível exibir a lista.", "error");
+    }
     if(first){
       first = false;
       const el = document.getElementById("dbStatus");
@@ -1843,6 +1884,21 @@ async function gerarPDF(){
     if(b2)b2.disabled=false;
   }
 }
+</script>
+<script>
+window.addEventListener("load", function(){
+  if(Array.isArray(window.produtos) &&
+     window.produtos.length &&
+     typeof window.renderLista === "function" &&
+     typeof window.updateSidebar === "function"){
+    try{
+      window.renderLista();
+      window.updateSidebar();
+    }catch(e){
+      console.error("Renderização final Synthera:", e);
+    }
+  }
+});
 </script>
 </body>
 </htmlfor(let ci=0; ci<window.produtos.length; ci+=3){
