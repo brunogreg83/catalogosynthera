@@ -11,7 +11,7 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import {
   getFirestore, collection, addDoc, updateDoc, deleteDoc,
-  doc, onSnapshot, serverTimestamp, query, orderBy
+  doc, onSnapshot, serverTimestamp, query, orderBy, getDoc, setDoc
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 import {
   getStorage, ref, uploadString, getDownloadURL, deleteObject
@@ -41,6 +41,58 @@ window._fb = {
   },
   async remove(id){
     return await deleteDoc(doc(db, COL, id));
+  },
+  async cadastrarEstruturaSynthera(){
+    const produtos = [
+      // SGP — Governança
+      {codigo:"SGP101", nome:"SGP101 — Água Sanitária", categoria:"SGP - Governança"},
+      {codigo:"SGP102", nome:"SGP102 — Limpa Piso", categoria:"SGP - Governança"},
+      {codigo:"SGP103", nome:"SGP103 — Removedor de Lodo", categoria:"SGP - Governança"},
+      {codigo:"SGP104", nome:"SGP104 — Limpa Banheiro", categoria:"SGP - Governança"},
+      {codigo:"SGP105", nome:"SGP105 — Odorizador", categoria:"SGP - Governança"},
+
+      // SCP — Limpeza Pesada
+      {codigo:"SCP201", nome:"SCP201 — Hipoclorito", categoria:"SCP - Limpeza Pesada"},
+      {codigo:"SCP202", nome:"SCP202 — Limpador de Superfícies", categoria:"SCP - Limpeza Pesada"},
+      {codigo:"SCP203", nome:"SCP203 — Limpador de Pisos e Paredes", categoria:"SCP - Limpeza Pesada"},
+      {codigo:"SCP204", nome:"SCP204 — Limpador de Máquinas", categoria:"SCP - Limpeza Pesada"},
+
+      // SKP — Cozinha
+      {codigo:"SKP301", nome:"SKP301 — Grill / Desengordurante", categoria:"SKP - Cozinha"},
+      {codigo:"SKP302", nome:"SKP302 — Detergente Lava Louças", categoria:"SKP - Cozinha"},
+      {codigo:"SKP304", nome:"SKP304 — Secante Lava Louças", categoria:"SKP - Cozinha"},
+
+      // SAP — Preparação de Alimentos
+      {codigo:"SAP304", nome:"SAP304 — Desinfetante de Instalações", categoria:"SAP - Preparação de Alimentos"},
+      {codigo:"SAP302", nome:"SAP302 — Desengordurante", categoria:"SAP - Preparação de Alimentos"},
+      {codigo:"SAP306", nome:"SAP306 — Ácido Peracético", categoria:"SAP - Preparação de Alimentos"},
+      {codigo:"SAP301", nome:"SAP301 — Sanitizante para Hortaliças", categoria:"SAP - Preparação de Alimentos"},
+
+      // SLP — Lavanderia
+      {codigo:"SLP401", nome:"SLP401 — Alvejante", categoria:"SLP - Lavanderia"},
+      {codigo:"SLP402", nome:"SLP402 — Detergente", categoria:"SLP - Lavanderia"},
+      {codigo:"SLP403", nome:"SLP403 — Amaciante", categoria:"SLP - Lavanderia"},
+      {codigo:"SLP404", nome:"SLP404 — Neutralizante", categoria:"SLP - Lavanderia"},
+      {codigo:"SLP405", nome:"SLP405 — Desengraxante Tópico", categoria:"SLP - Lavanderia"},
+      {codigo:"SLP406", nome:"SLP406 — Neutralizador de Ferrugem", categoria:"SLP - Lavanderia"},
+      {codigo:"SLP407", nome:"SLP407 — Desengraxante", categoria:"SLP - Lavanderia"},
+      {codigo:"SLP408", nome:"SLP408 — Detergente Umectante", categoria:"SLP - Lavanderia"},
+      {codigo:"SLP409", nome:"SLP409 — Detergente Alcalino", categoria:"SLP - Lavanderia"}
+    ];
+
+    let criados = 0;
+    for(const p of produtos){
+      const refProd = doc(db, COL, p.codigo);
+      const existente = await getDoc(refProd);
+      if(existente.exists()) continue;
+      await setDoc(refProd, {
+        codigo:p.codigo, nome:p.nome, categoria:p.categoria,
+        attrs:[], preco:null, imagem:null, ficha:null, fichaPath:null, fichaNome:null,
+        criadoEm:serverTimestamp()
+      });
+      criados++;
+    }
+    return criados;
   },
   async uploadFicha(base64DataUrl, fileName, prevPath){
     // remove arquivo anterior, se existir
@@ -132,6 +184,15 @@ document.addEventListener("DOMContentLoaded", () => {
   setTimeout(() => clearInterval(poll), 3000);
 
   let first = true;
+  window._fb.cadastrarEstruturaSynthera().then(criados => {
+    if(criados > 0 && typeof window.showToast === 'function') {
+      window.showToast(`${criados} produtos Synthera cadastrados`, 'success');
+    }
+  }).catch(err => {
+    console.error('Erro ao cadastrar estrutura Synthera:', err);
+    if(typeof window.showToast === 'function') window.showToast('Não foi possível cadastrar a estrutura Synthera', 'error');
+  });
+
   window._fb.listen(docs => {
     tryRender(docs);
     if(first){
@@ -513,14 +574,11 @@ document.addEventListener("DOMContentLoaded", () => {
           <label>Categoria *</label>
           <select id="fCategoria" onchange="validarForm()">
             <option value="" disabled selected>Selecione uma categoria…</option>
-            <option value="Detergentes">Detergentes</option>
-            <option value="Desengordurantes">Desengordurantes</option>
-            <option value="Desinfetantes">Desinfetantes</option>
-            <option value="Limpeza Geral">Limpeza Geral</option>
-            <option value="Tratamento de Piso">Tratamento de Piso</option>
-            <option value="Lavanderia">Lavanderia</option>
-            <option value="Lava Car">Lava Car</option>
-            <option value="Descartáveis">Descartáveis</option>
+            <option value="SGP - Governança">SGP - Governança</option>
+            <option value="SCP - Limpeza Pesada">SCP - Limpeza Pesada</option>
+            <option value="SKP - Cozinha">SKP - Cozinha</option>
+            <option value="SAP - Preparação de Alimentos">SAP - Preparação de Alimentos</option>
+            <option value="SLP - Lavanderia">SLP - Lavanderia</option>
           </select>
         </div>
       </div>
