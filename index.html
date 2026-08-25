@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
 <title>Synthera — Gerador de Catálogo</title>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800;900&family=Montserrat:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/3.0.3/jspdf.umd.min.js"></script>
 <!-- Firebase -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
@@ -1326,11 +1326,12 @@ async function gerarPDF(){
     const ICE=[245,249,251], TEXT=[10,31,44], MUTED=[96,116,126];
     const LINE=[205,222,229], GREEN=[20,133,91], GREENBG=[231,248,240];
 
-    function fill(c){doc.setFillColor(c[0],c[1],c[2]);}
-    function textColor(c){doc.setTextColor(c[0],c[1],c[2]);}
-    function stroke(c){doc.setDrawColor(c[0],c[1],c[2]);}
+    const n=(v,d=0)=>Number.isFinite(Number(v))?Number(v):d;
+    function fill(c){doc.setFillColor(n(c[0]),n(c[1]),n(c[2]));}
+    function textColor(c){doc.setTextColor(n(c[0]),n(c[1]),n(c[2]));}
+    function stroke(c){doc.setDrawColor(n(c[0]),n(c[1]),n(c[2]));}
     function font(f,s,weight="normal"){
-      doc.setFont(f,weight);doc.setFontSize(s);
+      doc.setFont(f,weight);doc.setFontSize(n(s,12));
     }
     function pill(txt,x,y,w,h,bg,fg,fs){
       fill(bg);doc.rect(x,y,w,h,"F");
