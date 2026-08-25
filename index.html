@@ -257,6 +257,11 @@ document.addEventListener("DOMContentLoaded", () => {
   window.__syntheraRenderFirebase = function(docs){
     pendingDocs = Array.isArray(docs) ? docs : [];
     window.produtos = pendingDocs;
+    try{
+      window.dispatchEvent(new CustomEvent("synthera:produtos", {
+        detail: { produtos: pendingDocs }
+      }));
+    }catch(e){}
 
     const tentar = () => {
       if(typeof window.renderLista !== "function" ||
@@ -1887,16 +1892,47 @@ async function gerarPDF(){
 </script>
 <script>
 window.addEventListener("load", function(){
-  if(Array.isArray(window.produtos) &&
-     window.produtos.length &&
-     typeof window.renderLista === "function" &&
-     typeof window.updateSidebar === "function"){
-    try{
-      window.renderLista();
-      window.updateSidebar();
-    }catch(e){
-      console.error("Renderização final Synthera:", e);
+  // Última sincronização obrigatória após TODA a página ter sido carregada.
+  // Isso evita a corrida entre o módulo Firebase e os scripts da interface.
+  const sincronizar = () => {
+    const docs = Array.isArray(window.produtos) ? window.produtos : [];
+    const list = document.getElementById("productList");
+    const title = document.getElementById("listTitle");
+
+    if(typeof window.renderLista === "function" &&
+       typeof window.updateSidebar === "function"){
+      try{
+        window.renderLista();
+        window.updateSidebar();
+
+        const qtd = Array.isArray(window.produtos) ? window.produtos.length : 0;
+        const st = document.getElementById("dbStatus");
+        if(st && qtd){
+          st.className = "db-status ok";
+          st.innerHTML = "&#9679; Firebase conectado — " + qtd + " produtos";
+        }
+        if(typeof window.setFirebaseStatus === "function" && qtd){
+          window.setFirebaseStatus(true, "Firebase conectado — " + qtd + " produtos");
+        }
+        return true;
+      }catch(e){
+        console.error("Renderização final Synthera:", e);
+        if(list){
+          list.innerHTML = '<div class="empty-state"><div class="empty-icon">⚠️</div><p>Erro ao exibir os produtos carregados.</p></div>';
+        }
+      }
     }
+
+    // Se o script visual ainda não terminou, tenta novamente.
+    return false;
+  };
+
+  if(!sincronizar()){
+    let n=0;
+    const t=setInterval(()=>{
+      n++;
+      if(sincronizar() || n>=100) clearInterval(t);
+    },100);
   }
 });
 </script>
