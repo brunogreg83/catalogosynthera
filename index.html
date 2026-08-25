@@ -1681,58 +1681,6 @@ async function gerarPDF(){
     // ==========================
     // PÁGINAS INTERNAS
     // ==========================
-    const groups={};
-    prods.forEach(p=>{if(!groups[p.categoria])groups[p.categoria]=[];groups[p.categoria].push(p);});
-    const order=["SGP - Governança","SCP - Limpeza Pesada","SKP - Cozinha","SAP - Preparação de Alimentos","SLP - Lavanderia"];
-    const entries=Object.entries(groups).sort(([a],[b])=>{
-      const ia=order.indexOf(a),ib=order.indexOf(b);
-      if(ia<0&&ib<0)return a.localeCompare(b); if(ia<0)return 1;if(ib<0)return -1;return ia-ib;
-    });
-
-    let page=1;
-    const MG=0,GAP=4,TOP=8,FOOT=4;
-    const CW=PW-MG*2;
-    const CH=88;
-
-    function base(){
-      fill(ICE);doc.rect(0,0,PW,PH,"F");
-      // Barra superior inspirada diretamente na capa aprovada.
-      fill(NAVY);doc.rect(0,0,PW,7,"F");
-      fill(CYAN);doc.rect(0,0,PW,2.2,"F");
-      fill([231,246,249]);doc.rect(0,7,4,PH-7,"F");
-      // detalhe vertical azul/ciano no lado direito
-      fill([224,244,248]);doc.rect(PW-4,7,4,PH-7,"F");
-    }
-    function footer(){
-      stroke([24,73,91]);doc.setLineWidth(.45);doc.line(MG,PH-14,PW-MG,PH-14);
-      textColor(NAVY);font("helvetica",6.8,"bold");doc.text("SYNTHERA",MG,PH-7);
-      textColor(MUTED);font("helvetica",6.0,"normal");doc.text("Química profissional • Performance • Resultado",MG+27,PH-7);
-      textColor(CYAN);font("helvetica",6.2,"bold");doc.text("www.syntherabr.com.br",PW/2,PH-7,{align:"center"});
-      textColor(CYAN);font("helvetica",6.8,"bold");doc.text(String(page).padStart(2,"0"),PW-MG,PH-7,{align:"right"});
-    }
-    function catHeader(cat,count){
-      base();
-      fill(NAVY);doc.rect(MG,12,PW-MG*2,29,"F");
-      fill(CYAN);doc.rect(MG,12,5,29,"F");
-      pill(catCode(cat),MG+10,18,22,9,CYAN,NAVY,6.2);
-      textColor(WHITE);font("helvetica",15,"bold");
-      doc.text(cat.replace(/^[A-Z]{3}\s*-\s*/,"").toUpperCase(),MG+38,25);
-      textColor([165,205,213]);font("helvetica",6.7,"normal");
-      doc.text("Linha Synthera • soluções profissionais",MG+38,32);
-      pill(`${count} ${count===1?"PRODUTO":"PRODUTOS"}`,PW-MG-42,20,34,8,BLUE,WHITE,5.8);
-      textColor(CYAN);font("helvetica",6.7,"bold");
-      doc.text("PERFORMANCE QUE TRANSFORMA A ROTINA PROFISSIONAL",MG,45);
-      return TOP;
-    }
-    function contHeader(cat){
-      base();
-      pill(catCode(cat),MG,9,21,8,NAVY,CYAN,6);
-      textColor(NAVY);font("helvetica",9.5,"bold");
-      doc.text(cat.replace(/^[A-Z]{3}\s*-\s*/,"").toUpperCase(),MG+27,15);
-      stroke(CYAN);doc.setLineWidth(.8);doc.line(MG+27,19,PW-MG,19);
-      return 27;
-    }
-
     // ==========================================================
     // CARDS DO PDF — MODELO APROVADO
     // 3 cards por página, alternados:
@@ -1970,28 +1918,4 @@ window.addEventListener("load", function(){
 })();
 </script>
 </body>
-</htmlfor(let ci=0; ci<window.produtos.length; ci+=3){
-      doc.addPage(); page++;
-
-      // Página limpa: somente os cards, como na imagem aprovada.
-      fill([255,255,255]);
-      doc.rect(0,0,PW,PH,"F");
-
-      const chunk=window.produtos.slice(ci,ci+3);
-      const cardH=88, gap=4;
-      const totalH=cardH*3+gap*2;
-      const startY=(PH-totalH)/2;
-
-      for(let i=0;i<chunk.length;i++){
-        await card(
-          chunk[i],
-          0,
-          startY+i*(cardH+gap),
-          PW,
-          cardH,
-          (i%2)===1
-        );
-      }
-    }
-
-    >
+</html>
