@@ -744,7 +744,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     <div class="preview-strip">
       <h3>📄 Gerar Catálogo PDF</h3>
-      <p>PDF com o visual da plataforma Synthera, pronto para enviar a clientes ou imprimir.</p>
+      <p>PDF com o visual da plataforma Synthera, pronto para enviar a clientes ou imprimir. Cada produto pode incluir o download da ficha técnica.</p>
       <div class="preco-pdf-row">
         <label>
           <input type="checkbox" id="chkPreco"/>
@@ -1439,14 +1439,34 @@ async function gerarPDF(){
       });
 
       const fy=y+h-19;
-      if(p.ficha){pill("FICHA TÉCNICA",x+5,fy,30,8,[226,247,251],BLUE,5.5);doc.link(x+5,fy,30,8,{url:p.ficha});}
-      if(mostrarPreco){
-        const raw=p.preco?String(p.preco).trim():"";
-        const txt=raw?(raw.startsWith("R$")?raw:"R$ "+raw):"Consultar";
-        font("helvetica",7.1,"bold");
-        const pw=doc.getTextWidth(txt)+10;
-        pill(txt,x+w-pw-5,fy,pw,8,txt==="Consultar"?[235,244,247]:GREENBG,txt==="Consultar"?BLUE:GREEN,6.6);
+      if(p.ficha){
+        const fichaLabel="BAIXAR FICHA TÉCNICA";
+        font("helvetica",5.8,"bold");
+        const fichaW=Math.min(46,Math.max(34,doc.getTextWidth(fichaLabel)+9));
+        pill(fichaLabel,x+5,fy,fichaW,8,[226,247,251],BLUE,5.2);
+        doc.link(x+5,fy,fichaW,8,{url:p.ficha});
       }
+      // Preço comercial: depende da opção escolhida na geração.
+      // Marcado "Exibir preços": mostra o preço cadastrado/aplicado.
+      // Desmarcado: mostra "PREÇO: CONSULTAR".
+      const raw=p.preco?String(p.preco).trim():"";
+      let precoTxt;
+      let precoBg;
+      let precoFg;
+      if(mostrarPreco){
+        precoTxt = raw
+          ? (raw.startsWith("R$") ? raw : "R$ "+raw)
+          : "PREÇO: CONSULTAR";
+        precoBg = raw ? GREENBG : [235,244,247];
+        precoFg = raw ? GREEN : BLUE;
+      }else{
+        precoTxt = "PREÇO: CONSULTAR";
+        precoBg = [235,244,247];
+        precoFg = BLUE;
+      }
+      font("helvetica",6.8,"bold");
+      const precoW=Math.max(31,doc.getTextWidth(precoTxt)+11);
+      pill(precoTxt,x+w-precoW-5,fy,precoW,8,precoBg,precoFg,6.2);
     }
 
     for(const [cat,gprods] of entries){
