@@ -1823,7 +1823,9 @@ async function gerarPDF(){
 
       // A ficha técnica fica clicável no card, sem alterar a arte.
       if(p.ficha) doc.link(imgX,y+2,imgW,h-4,{url:p.ficha});
-    }(const [cat,gprods] of entries){
+    }
+
+    for(const [cat,gprods] of entries){
       for(let ci=0;ci<gprods.length;ci+=2){
         doc.addPage();page++;
         const sy=ci===0?catHeader(cat,gprods.length):contHeader(cat);
