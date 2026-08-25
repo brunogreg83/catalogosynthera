@@ -1432,104 +1432,104 @@ async function gerarPDF(){
     }
 
     async function card(p,x,y,w,h,reverse=false){
-      // MODELO APROVADO PARA O PDF:
-      // 1º produto: texto à esquerda / galão à direita
-      // 2º produto: galão à esquerda / texto à direita
-      // e assim sucessivamente.
-      fill([3,14,28]);doc.roundedRect(x,y,w,h,4,4,"F");
-      stroke([28,78,112]);doc.setLineWidth(.5);doc.roundedRect(x,y,w,h,4,4,"S");
+      // CARD PDF — MODELO APROVADO
+      // Alternância: texto à esquerda/galão à direita,
+      // depois galão à esquerda/texto à direita.
+      fill([2,13,27]);doc.roundedRect(x,y,w,h,4,4,"F");
+      stroke([32,77,111]);doc.setLineWidth(.55);doc.roundedRect(x,y,w,h,4,4,"S");
 
       const splitX = reverse ? x+w*.53 : x+w*.47;
-      // Área visual do galão
-      const imgX0 = reverse ? x+8 : splitX+4;
-      const imgW  = reverse ? splitX-x-16 : x+w-splitX-12;
-      const imgY  = y+7;
-      const imgH  = h-14;
+      const textX = reverse ? splitX+10 : x+10;
+      const textW = reverse ? x+w-splitX-20 : splitX-x-20;
 
-      // Fundo tecnológico do lado da imagem.
-      fill([4,28,50]);
-      if(reverse) doc.roundedRect(x+4,y+4,splitX-x-8,h-8,3,3,"F");
-      else doc.roundedRect(splitX+4,y+4,x+w-splitX-8,h-8,3,3,"F");
-
-      // Linha divisória angular/ciano.
-      stroke(CYAN);doc.setLineWidth(1.0);
+      // Área da imagem ocupa integralmente metade do card.
+      fill([3,22,40]);
       if(reverse){
-        doc.line(splitX+7,y+4,splitX-10,y+h/2);
-        doc.line(splitX-10,y+h/2,splitX+7,y+h-4);
+        doc.rect(x+3,y+3,splitX-x-6,h-6,"F");
       }else{
-        doc.line(splitX-7,y+4,splitX+10,y+h/2);
-        doc.line(splitX+10,y+h/2,splitX-7,y+h-4);
+        doc.rect(splitX+3,y+3,x+w-splitX-6,h-6,"F");
       }
 
-      // Produto / ilustração.
+      // Divisor angular neon, igual ao modelo aprovado.
+      stroke(CYAN);doc.setLineWidth(1.15);
+      if(reverse){
+        doc.line(splitX+8,y+5,splitX-10,y+h/2);
+        doc.line(splitX-10,y+h/2,splitX+8,y+h-5);
+      }else{
+        doc.line(splitX-8,y+5,splitX+10,y+h/2);
+        doc.line(splitX+10,y+h/2,splitX-8,y+h-5);
+      }
+
+      // Produto.
       if(p.imagem){
         const sz=await imgSize(p.imagem);
         if(sz){
-          const maxW=imgW,maxH=imgH,r=sz.w/sz.h;
-          let iw=maxW,ih=iw/r;
-          if(ih>maxH){ih=maxH;iw=ih*r;}
-          const ix=reverse ? x+(splitX-x-iw)/2 : splitX+(x+w-splitX-iw)/2;
-          const iy=y+(h-ih)/2;
+          const areaX=reverse?x+6:splitX+5;
+          const areaW=reverse?(splitX-x-12):(x+w-splitX-12);
+          const areaY=y+5, areaH=h-10, r=sz.w/sz.h;
+          let iw=areaW*.82, ih=iw/r;
+          if(ih>areaH*.90){ih=areaH*.90;iw=ih*r;}
+          const ix=areaX+(areaW-iw)/2;
+          const iy=areaY+(areaH-ih)/2;
           addImg(p.imagem,ix,iy,iw,ih);
         }
       }else{
-        textColor([60,105,130]);font("helvetica",7,"bold");
         const px=reverse ? x+(splitX-x)/2 : splitX+(x+w-splitX)/2;
+        textColor([52,105,132]);font("helvetica","bold",7);
         doc.text("IMAGEM DO PRODUTO",px,y+h/2,{align:"center"});
       }
 
-      // Conteúdo textual.
-      const tx = reverse ? splitX+8 : x+9;
-      const tw = reverse ? x+w-splitX-17 : splitX-x-17;
-
+      // Código — título principal.
       const code=codeOf(p);
       if(code){
-        textColor(WHITE);font("helvetica",25,"bold");
-        doc.text(code,tx,y+28);
+        textColor(WHITE);font("helvetica","bold",25);
+        doc.text(code,textX,y+30);
       }
 
+      // Nome — subtítulo.
       const title=shortName(p.nome);
-      textColor(CYAN);font("helvetica",13.5,"bold");
-      let titleLines=doc.splitTextToSize(title.toUpperCase(),tw);
-      if(titleLines.length>2) titleLines=titleLines.slice(0,2);
-      titleLines.forEach((ln,i)=>doc.text(ln,tx,y+43+i*6.2));
+      textColor(CYAN);font("helvetica","bold",13.5);
+      let titleLines=doc.splitTextToSize(String(title).toUpperCase(),textW);
+      titleLines=titleLines.slice(0,2);
+      titleLines.forEach((ln,i)=>doc.text(ln,textX,y+46+i*6.4));
 
-      // Linha de destaque.
+      // Linha luminosa.
+      const lineY=y+64;
       stroke(CYAN);doc.setLineWidth(.8);
-      doc.line(tx,y+59,tx+Math.min(52,tw*.45),y+59);
+      doc.line(textX,lineY,textX+Math.min(58,textW*.42),lineY);
 
-      // Atributos existentes do cadastro, sem o texto "Solução profissional Synthera".
-      let ay=y+69;
-      const attrs=p.attrs||[];
-      attrs.slice(0,4).forEach(a=>{
-        textColor(CYAN);font("helvetica",5.8,"bold");
-        doc.text(String(a.l||"").toUpperCase(),tx,ay);
-        textColor([220,232,237]);font("helvetica",7.2,"normal");
-        const ls=doc.splitTextToSize(String(a.v||""),tw);
-        ls.slice(0,2).forEach((ln,j)=>doc.text(ln,tx,ay+4+j*3.8));
-        ay += 11 + Math.min(ls.length,2)*3.8;
+      // Conteúdo comercial essencial; sem "Solução profissional Synthera".
+      let ay=lineY+13;
+      const attrs=(p.attrs||[]).slice(0,2);
+      attrs.forEach(a=>{
+        if(!a || !String(a.v||"").trim()) return;
+        textColor([176,207,219]);font("helvetica","normal",7);
+        const ls=doc.splitTextToSize(String(a.v),textW);
+        ls.slice(0,2).forEach((ln,j)=>doc.text(ln,textX,ay+j*4.2));
+        ay += 9 + Math.min(2,ls.length)*4.2;
       });
 
-      const fy=y+h-17;
+      const fy=y+h-18;
 
+      // Ficha técnica.
       if(p.ficha){
         const fichaLabel="BAIXAR FICHA TÉCNICA";
-        font("helvetica",6.2,"bold");
-        const fichaW=Math.min(51,Math.max(40,doc.getTextWidth(fichaLabel)+10));
-        pill(fichaLabel,tx,fy,fichaW,9,[5,39,61],CYAN,5.5);
-        doc.link(tx,fy,fichaW,9,{url:p.ficha});
+        font("helvetica","bold",6.0);
+        const fichaW=Math.min(52,Math.max(40,doc.getTextWidth(fichaLabel)+12));
+        pill(fichaLabel,textX,fy,fichaW,10,[4,39,62],CYAN,5.4);
+        doc.link(textX,fy,fichaW,10,{url:p.ficha});
       }
 
+      // Preço.
       const raw=p.preco?String(p.preco).trim():"";
       const precoTxt=mostrarPreco
         ? (raw ? (raw.startsWith("R$")?raw:"R$ "+raw) : "PREÇO: CONSULTAR")
         : "PREÇO: CONSULTAR";
-      const precoBg=mostrarPreco && raw ? [6,63,86] : [5,39,61];
-      const precoFg=mostrarPreco && raw ? CYAN : [190,225,232];
-
-      font("helvetica",7.2,"bold");
-      const precoW=Math.max(39,doc.getTextWidth(precoTxt)+14);
-      pill(precoTxt,tx+tw-precoW,fy,precoW,9,precoBg,precoFg,6.5);
+      const precoW=Math.max(42,doc.getTextWidth(precoTxt)+16);
+      const precoX=x+w-10-precoW;
+      pill(precoTxt,precoX,fy,precoW,10,
+        mostrarPreco&&raw?[5,54,78]:[4,39,62],
+        mostrarPreco&&raw?CYAN:[190,225,232],6.7);
     }
 
     for(const [cat,gprods] of entries){
