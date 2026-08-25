@@ -1175,7 +1175,8 @@ window.updateSidebar = function(){
 
   const ok=prods.length>0;
   document.getElementById("btnGerar").disabled=!ok;
-  document.getElementById("btnNavGerar").disabled=!ok;
+  const navBtn = document.getElementById("btnNavGerar");
+  if(navBtn) navBtn.disabled=!ok;
 
   // categoria fixa — sem datalist
 
@@ -1277,9 +1278,10 @@ async function gerarPDF(){
 
   const b1=document.getElementById("btnGerar");
   const b2=document.getElementById("btnNavGerar");
-  b1.disabled=b2.disabled=true;
+  b1.disabled=true;
+  if(b2) b2.disabled=true;
   b1.innerHTML=`<span class="spinner"></span> Gerando…`;
-  b2.innerHTML=`<span class="spinner"></span> Gerando…`;
+  if(b2) b2.innerHTML=`<span class="spinner"></span> Gerando…`;
   await new Promise(r=>setTimeout(r,80));
 
   try{
@@ -1311,7 +1313,7 @@ async function gerarPDF(){
     const T = c => doc.setTextColor(...c);
     const D = c => doc.setDrawColor(...c);
 
-    const logoData = "data:image/png;base64," + LOGO_B64;
+    const logoData = "data:image/jpeg;base64," + LOGO_B64;
 
     function gradient(x,y,w,h,a,b,steps=32){
       for(let i=0;i<steps;i++){
@@ -1377,7 +1379,7 @@ async function gerarPDF(){
 
       // Logo
       const lw=88, lh=lw*(1210/1648);
-      doc.addImage(logoData,"PNG",(PW-lw)/2,42,lw,lh);
+      doc.addImage(logoData,"JPEG",(PW-lw)/2,42,lw,lh);
 
       // assinatura da marca
       doc.setFont("helvetica","bold");
@@ -1673,9 +1675,10 @@ async function gerarPDF(){
 
   }catch(e){
     console.error(e);
-    showToast("Erro ao gerar PDF.","error");
+    showToast("Erro ao gerar PDF: "+(e?.message || "verifique o console"),"error");
   }finally{
-    b1.disabled=b2.disabled=false;
+    b1.disabled=false;
+    if(b2) b2.disabled=false;
     b1.innerHTML=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/></svg> Gerar e Baixar PDF`;
     b2.innerHTML=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/></svg> Gerar PDF`;
   }
