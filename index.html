@@ -26,10 +26,29 @@ const firebaseConfig = {
   appId: "1:46345196031:web:3362e60ca02f8efd0517ca"
 };
 
-const app     = initializeApp(firebaseConfig);
-const db      = getFirestore(app);
-const storage = getStorage(app);
-const COL     = "produtos";
+let app, db, storage;
+const COL = "produtos";
+
+function firebaseErro(err){
+  console.error("Firebase:", err);
+  const code = err?.code || "";
+  let msg = "Firebase indisponível";
+  if(code === "permission-denied") msg = "Firebase conectado — Firestore sem permissão";
+  else if(code === "failed-precondition") msg = "Firebase conectado — Firestore precisa ser configurado";
+  else if(code === "unavailable") msg = "Firebase indisponível — verifique a internet";
+  else if(code === "storage/unauthorized") msg = "Firebase conectado — Storage sem permissão";
+  const el = document.getElementById("dbStatus");
+  if(el){ el.className = "db-status error"; el.innerHTML = "&#9679; " + msg; }
+  if(typeof window.showToast === "function") window.showToast(msg, "error");
+}
+
+try{
+  app = initializeApp(firebaseConfig);
+  db = getFirestore(app);
+  storage = getStorage(app);
+}catch(err){
+  firebaseErro(err);
+}
 
     // Atualiza o indicador visual de conexão Firebase.
     window.setFirebaseStatus = function(connected){
@@ -39,18 +58,22 @@ const COL     = "produtos";
       const text = el.querySelector("span:last-child");
       if(text) text.textContent = connected ? "Firebase conectado" : "Firebase indisponível";
     };
-    window.setFirebaseStatus(true);
+    window.setFirebaseStatus(false);
 
 
 // ── Expõe funções ao escopo global ──────────────────────
 window._fb = {
   async add(data){
+    if(!db) throw new Error("Firebase não foi inicializado.");
+
     return await addDoc(collection(db, COL), { ...data, criadoEm: serverTimestamp() });
   },
   async update(id, data){
+    if(!db) throw new Error("Firebase não foi inicializado.");
     return await updateDoc(doc(db, COL, id), data);
   },
   async remove(id){
+    if(!db) throw new Error("Firebase não foi inicializado.");
     return await deleteDoc(doc(db, COL, id));
   },
   async cadastrarEstruturaSynthera(){
@@ -149,6 +172,7 @@ window._fb = {
     return {total, migrados, erros};
   },
   listen(cb){
+    if(!db) return () => {};
     const q = query(collection(db, COL), orderBy("criadoEm","asc"));
     return onSnapshot(q, snap => {
       const docs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
@@ -195,6 +219,10 @@ document.addEventListener("DOMContentLoaded", () => {
   setTimeout(() => clearInterval(poll), 3000);
 
   let first = true;
+  if(!db){
+    return;
+  }
+
   window._fb.cadastrarEstruturaSynthera().then(criados => {
     if(criados > 0 && typeof window.showToast === 'function') {
       window.showToast(`${criados} produtos Synthera cadastrados`, 'success');
@@ -204,14 +232,18 @@ document.addEventListener("DOMContentLoaded", () => {
     if(typeof window.showToast === 'function') window.showToast('Não foi possível cadastrar a estrutura Synthera', 'error');
   });
 
-  window._fb.listen(docs => {
+  try{
+    window._fb.listen(docs => {
     tryRender(docs);
     if(first){
       first = false;
       const el = document.getElementById("dbStatus");
       if(el){ el.className = "db-status ok"; el.innerHTML = "&#9679; Firebase conectado"; }
     }
-  });
+    });
+  }catch(err){
+    firebaseErro(err);
+  }
 });
 </script>
 <style>
