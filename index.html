@@ -1604,9 +1604,9 @@ async function gerarPDF(){
     });
 
     let page=1;
-    const MG=10,GAP=5,TOP=50,FOOT=18;
+    const MG=0,GAP=4,TOP=8,FOOT=4;
     const CW=PW-MG*2;
-    const CH=68;
+    const CH=88;
 
     function base(){
       fill(ICE);doc.rect(0,0,PW,PH,"F");
@@ -1647,115 +1647,97 @@ async function gerarPDF(){
       return 27;
     }
 
-    async function card(p,x,y,w,h,reverse=false){
-      // CARD PDF — MODELO APROVADO
-      // 1º card: texto à esquerda / galão à direita
-      // 2º card: galão à esquerda / texto à direita
-      const CARD=[2,13,27], IMAGEBG=[3,22,40], BORDER=[32,77,111];
+    asyasync function card(p,x,y,w,h,reverse=false){
+      // CARD PDF — FIEL AO MODELO APROVADO
+      const CARD=[1,11,27], PANEL=[2,20,42], WHITE=[248,249,252];
+      const BLUE=[0,128,255], CYAN2=[0,210,255];
 
-      fill(CARD);
-      doc.roundedRect(x,y,w,h,4,4,"F");
-      stroke(BORDER);doc.setLineWidth(.55);
-      doc.roundedRect(x,y,w,h,4,4,"S");
+      fill(CARD); doc.roundedRect(x,y,w,h,3.5,3.5,"F");
+      stroke([18,43,76]); doc.setLineWidth(.45);
+      doc.roundedRect(x,y,w,h,3.5,3.5,"S");
 
-      const splitX = reverse ? x+w*.53 : x+w*.47;
+      const split=reverse ? x+w*.515 : x+w*.485;
+      const textX=reverse ? split+11 : x+11;
+      const textW=reverse ? x+w-split-21 : split-x-21;
 
-      // Painel da imagem.
-      fill(IMAGEBG);
+      const imgX=reverse ? x+1.5 : split+1.5;
+      const imgW=reverse ? split-x-3 : x+w-split-3;
+
+      fill(PANEL);
+      doc.roundedRect(imgX,y+1.5,imgW,h-3,2.5,2.5,"F");
+
+      // Divisor angular luminoso, como na imagem aprovada.
+      stroke(CYAN2); doc.setLineWidth(1.15);
       if(reverse){
-        doc.roundedRect(x+3,y+3,splitX-x-6,h-6,2.5,2.5,"F");
+        doc.line(split+8,y+1,split-10,y+h/2);
+        doc.line(split-10,y+h/2,split+8,y+h-1);
       }else{
-        doc.roundedRect(splitX+3,y+3,x+w-splitX-6,h-6,2.5,2.5,"F");
+        doc.line(split-8,y+1,split+10,y+h/2);
+        doc.line(split+10,y+h/2,split-8,y+h-1);
       }
 
-      // Divisor angular neon.
-      stroke(CYAN);doc.setLineWidth(1.15);
-      if(reverse){
-        doc.line(splitX+8,y+4,splitX-10,y+h/2);
-        doc.line(splitX-10,y+h/2,splitX+8,y+h-4);
-      }else{
-        doc.line(splitX-8,y+4,splitX+10,y+h/2);
-        doc.line(splitX+10,y+h/2,splitX-8,y+h-4);
-      }
-
-      // Área do texto.
-      const textX = reverse ? splitX+10 : x+10;
-      const textW = reverse ? x+w-splitX-20 : splitX-x-20;
-
-      // Imagem do produto — grande e centralizada no painel.
+      // Imagem real cadastrada.
       if(p.imagem){
         const sz=await imgSize(p.imagem);
         if(sz){
-          const areaX=reverse?x+6:splitX+5;
-          const areaW=reverse?(splitX-x-12):(x+w-splitX-12);
-          const areaY=y+4, areaH=h-8, r=sz.w/sz.h;
-          let iw=areaW*.86, ih=iw/r;
-          if(ih>areaH*.94){ih=areaH*.94;iw=ih*r;}
-          const ix=areaX+(areaW-iw)/2;
-          const iy=areaY+(areaH-ih)/2;
+          const r=sz.w/sz.h;
+          let iw=imgW*.86, ih=iw/r;
+          const maxH=(h-6)*.94;
+          if(ih>maxH){ih=maxH;iw=ih*r;}
+          const ix=imgX+(imgW-iw)/2;
+          const iy=y+(h-ih)/2;
           await addImg(p.imagem,ix,iy,iw,ih);
         }
       }else{
-        const px=reverse ? x+(splitX-x)/2 : splitX+(x+w-splitX)/2;
-        textColor([52,105,132]);font("helvetica","bold",7);
-        doc.text("IMAGEM DO PRODUTO",px,y+h/2,{align:"center"});
+        textColor([45,90,120]); font("helvetica","bold",7);
+        doc.text("IMAGEM DO PRODUTO",imgX+imgW/2,y+h/2,{align:"center"});
       }
 
-      // TÍTULO — código do produto.
+      // Título = código.
       const code=codeOf(p);
-      if(code){
-        textColor(WHITE);font("helvetica","bold",25);
-        doc.text(code,textX,y+25);
-      }
+      textColor(WHITE); font("helvetica","bold",31);
+      if(code) doc.text(code,textX,y+31);
 
-      // SUBTÍTULO — nome do produto.
-      const title=shortName(p.nome);
-      textColor(CYAN);font("helvetica","bold",13.2);
-      let titleLines=doc.splitTextToSize(String(title).toUpperCase(),textW);
-      titleLines=titleLines.slice(0,2);
-      titleLines.forEach((ln,i)=>doc.text(ln,textX,y+41+i*5.8));
+      // Subtítulo = nome.
+      const title=shortName(p.nome).toUpperCase();
+      textColor(BLUE); font("helvetica","bold",15.5);
+      const lines=doc.splitTextToSize(title,textW).slice(0,2);
+      lines.forEach((ln,i)=>doc.text(ln,textX,y+48+i*7));
 
-      // Linha luminosa.
-      const lineY=y+54;
-      stroke(CYAN);doc.setLineWidth(.7);
-      doc.line(textX,lineY,textX+Math.min(54,textW*.55),lineY);
+      // Linha neon.
+      const lineY=y+60+(lines.length-1)*7;
+      stroke(CYAN2); doc.setLineWidth(.65);
+      doc.line(textX,lineY,textX+Math.min(58,textW*.70),lineY);
 
-      // Preço — exatamente na área inferior do bloco de texto.
+      // Preço.
       const raw=p.preco?String(p.preco).trim():"";
-      const precoTxt=mostrarPreco
-        ? (raw ? (raw.startsWith("R$")?raw:"R$ "+raw) : "PREÇO: CONSULTAR")
-        : "PREÇO: CONSULTAR";
+      const value=mostrarPreco && raw
+        ? (raw.startsWith("R$")?raw:"R$ "+raw)
+        : "CONSULTAR";
 
-      font("helvetica","bold",6.8);
-      const precoW=Math.min(textW,Math.max(52,doc.getTextWidth(precoTxt)+22));
-      const precoX=reverse ? x+w-10-precoW : textX;
-      const precoY=y+h-17;
+      const boxY=y+h-21, boxX=textX;
+      const boxW=Math.min(textW,Math.max(73,textW*.92));
 
-      // Caixa do preço.
-      stroke(CYAN);doc.setLineWidth(.55);
-      doc.roundedRect(precoX,precoY,precoW,10,2.2,2.2,"S");
+      stroke(CYAN2); doc.setLineWidth(.5);
+      doc.roundedRect(boxX,boxY,boxW,13,2.2,2.2,"S");
 
-      // Ícone de etiqueta simples.
-      stroke(WHITE);doc.setLineWidth(.55);
-      const tx=precoX+5, ty=precoY+5;
-      doc.line(tx-2,ty,tx+2,ty-4);
-      doc.line(tx+2,ty-4,tx+5,ty-1);
-      doc.line(tx+5,ty-1,tx+1,ty+3);
-      doc.circle(tx-1.5,ty-1.8,.7,"S");
+      // Ícone de etiqueta.
+      stroke(WHITE); doc.setLineWidth(.65);
+      const tx=boxX+7, ty=boxY+6.5;
+      doc.line(tx-3,ty,tx+2,ty-5);
+      doc.line(tx+2,ty-5,tx+6,ty-1);
+      doc.line(tx+6,ty-1,tx+1,ty+4);
+      doc.circle(tx-1.2,ty-1.9,.8,"S");
 
-      textColor(WHITE);font("helvetica","bold",7.5);
-      doc.text("PREÇO:",precoX+12,precoY+6.6);
+      textColor(WHITE); font("helvetica","bold",8.7);
+      doc.text("PREÇO:",boxX+17,boxY+8.6);
 
-      const valueX=precoX+34;
-      textColor(CYAN);font("helvetica","bold",10.8);
-      doc.text(precoTxt.replace(/^PREÇO:\s*/i,""),valueX,precoY+6.8);
+      textColor(BLUE); font("helvetica","bold",13.2);
+      doc.text(value,boxX+42,boxY+9);
 
-      // Ficha técnica: mantém o download sem inserir texto adicional no card.
-      if(p.ficha){
-        doc.link(precoX,precoY,precoW,10,{url:p.ficha});
-      }
-    }
-    for(const [cat,gprods] of entries){
+      // A ficha técnica fica clicável no card, sem alterar a arte.
+      if(p.ficha) doc.link(imgX,y+2,imgW,h-4,{url:p.ficha});
+    }(const [cat,gprods] of entries){
       for(let ci=0;ci<gprods.length;ci+=2){
         doc.addPage();page++;
         const sy=ci===0?catHeader(cat,gprods.length):contHeader(cat);
@@ -1780,4 +1762,28 @@ async function gerarPDF(){
 }
 </script>
 </body>
-</html>
+</htmlfor(let ci=0; ci<window.produtos.length; ci+=3){
+      doc.addPage(); page++;
+
+      // Página limpa: somente os cards, como na imagem aprovada.
+      fill([255,255,255]);
+      doc.rect(0,0,PW,PH,"F");
+
+      const chunk=window.produtos.slice(ci,ci+3);
+      const cardH=88, gap=4;
+      const totalH=cardH*3+gap*2;
+      const startY=(PH-totalH)/2;
+
+      for(let i=0;i<chunk.length;i++){
+        await card(
+          chunk[i],
+          0,
+          startY+i*(cardH+gap),
+          PW,
+          cardH,
+          (i%2)===1
+        );
+      }
+    }
+
+    >
