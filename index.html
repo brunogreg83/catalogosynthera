@@ -627,6 +627,189 @@ document.addEventListener("DOMContentLoaded", () => {
   @media(max-width:600px){
     .firebase-status-float{right:12px;bottom:12px;font-size:11px;padding:7px 10px}
   }
+
+  /* ============================================================
+     GERADOR — LAYOUT SIMPLES
+     Somente a interface dos cards do gerador.
+     NÃO altera o layout/estilo do PDF.
+     ============================================================ */
+  .product-card.synthera-product{
+    background:#fff !important;
+    color:#102331 !important;
+    border:1px solid #dbe3e8 !important;
+    border-radius:12px !important;
+    box-shadow:0 2px 8px rgba(10,31,44,.07) !important;
+    min-height:0 !important;
+    margin-bottom:10px !important;
+    transition:none !important;
+  }
+  .product-card.synthera-product:hover{
+    transform:none !important;
+    border-color:#c7d4dc !important;
+    box-shadow:0 3px 10px rgba(10,31,44,.09) !important;
+  }
+  .synthera-product-inner{
+    display:grid !important;
+    grid-template-columns:130px 1fr !important;
+    min-height:145px !important;
+  }
+  .synthera-product.reverse .synthera-product-inner{
+    grid-template-columns:130px 1fr !important;
+  }
+  .synthera-product-media,
+  .synthera-product.reverse .synthera-product-media{
+    grid-column:1 !important;
+    grid-row:1 !important;
+    min-height:145px !important;
+    background:#f4f7f9 !important;
+    background-image:none !important;
+    border-right:1px solid #e2e8ec !important;
+  }
+  .synthera-product-media:before,
+  .synthera-product-media:after{
+    display:none !important;
+  }
+  .synthera-product-media img{
+    width:88px !important;
+    height:120px !important;
+    filter:none !important;
+  }
+  .synthera-product-content,
+  .synthera-product.reverse .synthera-product-content{
+    grid-column:2 !important;
+    grid-row:1 !important;
+    padding:22px 20px 18px !important;
+    justify-content:center !important;
+  }
+  .synthera-product-code{
+    font-family:"Montserrat",sans-serif !important;
+    font-size:1rem !important;
+    line-height:1.1 !important;
+    font-weight:800 !important;
+    letter-spacing:.4px !important;
+    color:#1789aa !important;
+    margin-bottom:5px !important;
+  }
+  .synthera-product-name{
+    font-family:"Montserrat",sans-serif !important;
+    font-size:1.25rem !important;
+    font-weight:800 !important;
+    line-height:1.12 !important;
+    color:#102331 !important;
+    margin-bottom:5px !important;
+  }
+  .synthera-product-sub{
+    font-size:.82rem !important;
+    line-height:1.35 !important;
+    color:#667782 !important;
+    margin-bottom:11px !important;
+  }
+  .synthera-product .product-attrs{
+    margin:0 0 10px !important;
+  }
+  .synthera-product .attr-label{
+    color:#1789aa !important;
+    font-size:.72rem !important;
+  }
+  .synthera-product .attr-value{
+    color:#596b75 !important;
+    font-size:.78rem !important;
+  }
+  .synthera-product-actions{
+    display:flex !important;
+    gap:7px !important;
+    flex-wrap:wrap !important;
+    align-items:center !important;
+  }
+  .synthera-product .product-card-preco{
+    margin:0 !important;
+    padding:7px 10px !important;
+    background:#f4f8fa !important;
+    border:1px solid #cbdce4 !important;
+    border-radius:7px !important;
+    color:#147d99 !important;
+    font-size:.78rem !important;
+  }
+  .synthera-product .product-card-preco.consultar{
+    background:#f4f8fa !important;
+    border-color:#cbdce4 !important;
+    color:#147d99 !important;
+  }
+  .synthera-product .product-card-preco svg{
+    stroke:#147d99 !important;
+  }
+  .synthera-product .btn-ficha{
+    margin:0 !important;
+    padding:7px 10px !important;
+    background:#fff !important;
+    border:1px solid #cbdce4 !important;
+    border-radius:7px !important;
+    color:#147d99 !important;
+    font-size:.72rem !important;
+  }
+  .synthera-product .btn-ficha:hover{
+    background:#f4f8fa !important;
+  }
+  .synthera-product .product-card-header{
+    top:8px !important;
+    left:8px !important;
+    right:8px !important;
+  }
+  .synthera-product .card-actions button{
+    background:#fff !important;
+    color:#52646e !important;
+    border:1px solid #d7e0e5 !important;
+    border-radius:6px !important;
+    padding:4px 7px !important;
+    font-size:.68rem !important;
+  }
+  .synthera-product .prod-select-label{
+    background:#fff !important;
+    border-radius:5px !important;
+  }
+  .synthera-product .preco-custom-row{
+    background:#fffaf0 !important;
+    border-color:#e2c86a !important;
+    color:#765d08 !important;
+    padding:8px !important;
+    border-radius:7px !important;
+  }
+
+  @media(max-width:760px){
+    .synthera-product-inner,
+    .synthera-product.reverse .synthera-product-inner{
+      grid-template-columns:92px 1fr !important;
+      min-height:120px !important;
+    }
+    .synthera-product-media,
+    .synthera-product.reverse .synthera-product-media{
+      min-height:120px !important;
+    }
+    .synthera-product-media img{
+      width:65px !important;
+      height:95px !important;
+    }
+    .synthera-product-content,
+    .synthera-product.reverse .synthera-product-content{
+      padding:18px 12px 14px !important;
+    }
+    .synthera-product-code{
+      font-size:.82rem !important;
+    }
+    .synthera-product-name{
+      font-size:1rem !important;
+    }
+    .synthera-product-sub{
+      font-size:.72rem !important;
+      margin-bottom:8px !important;
+    }
+    .synthera-product .product-card-preco,
+    .synthera-product .btn-ficha{
+      font-size:.66rem !important;
+      padding:6px 8px !important;
+    }
+  }
+
 </style>
 
 <div id="firebaseStatus" class="firebase-status-float" aria-live="polite">
