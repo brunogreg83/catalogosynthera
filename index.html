@@ -1256,8 +1256,8 @@ function updateSelecaoUI(){
 
 // ── PDF ───────────────────────────────────────────────────
 async function gerarPDF(){
-  const mostrarPreco = document.getElementById("chkPreco").checked;
-  const personalizado = document.getElementById("chkPersonalizado").checked;
+  const mostrarPreco = document.getElementById("chkPreco")?.checked || false;
+  const personalizado = document.getElementById("chkPersonalizado")?.checked || false;
 
   const prods = personalizado
     ? window.produtos
@@ -1267,77 +1267,43 @@ async function gerarPDF(){
           : p)
     : window.produtos;
 
-  if(!window.produtos.length){
-    showToast("Nenhum produto cadastrado.","error");
-    return;
-  }
-  if(personalizado && !prods.length){
-    showToast("Selecione ao menos um produto para o catálogo personalizado.","error");
-    return;
-  }
+  if(!window.produtos.length){ showToast("Nenhum produto cadastrado.","error"); return; }
+  if(personalizado && !prods.length){ showToast("Selecione ao menos um produto.","error"); return; }
 
   const b1=document.getElementById("btnGerar");
   const b2=document.getElementById("btnNavGerar");
-  if(b1) b1.disabled=true;
-  if(b2) b2.disabled=true;
-  if(b1) b1.innerHTML=`<span class="spinner"></span> Gerando…`;
-  if(b2) b2.innerHTML=`<span class="spinner"></span> Gerando…`;
+  if(b1){b1.disabled=true;b1.innerHTML=`<span class="spinner"></span> Gerando…`;}
+  if(b2){b2.disabled=true;}
 
   try{
     const {jsPDF}=window.jspdf;
     const doc=new jsPDF({orientation:"portrait",unit:"mm",format:"a4"});
     const PW=210, PH=297;
 
-    const C={
-      navy:[4,20,33],
-      navy2:[6,39,60],
-      blue:[8,88,126],
-      cyan:[12,194,222],
-      cyan2:[28,220,237],
-      white:[255,255,255],
-      ice:[245,249,251],
-      text:[10,31,44],
-      muted:[92,111,123],
-      line:[207,222,229],
-      green:[20,133,91],
-      greenSoft:[231,248,240],
-      paleBlue:[226,247,251]
-    };
-    const F=c=>doc.setFillColor(...c);
-    const T=c=>doc.setTextColor(...c);
-    const D=c=>doc.setDrawColor(...c);
-    const logoData="data:image/png;base64,"+LOGO_B64;
+    // PALETA SYNTHERA — OPÇÃO C COMERCIAL
+    const NAVY=[4,20,33], NAVY2=[6,42,64], BLUE=[7,91,128];
+    const CYAN=[12,194,222], WHITE=[255,255,255];
+    const ICE=[245,249,251], TEXT=[10,31,44], MUTED=[96,116,126];
+    const LINE=[205,222,229], GREEN=[20,133,91], GREENBG=[231,248,240];
 
-    function gradient(x,y,w,h,a,b,steps=30){
-      for(let i=0;i<steps;i++){
-        const t=i/(steps-1);
-        doc.setFillColor(
-          Math.round(a[0]+(b[0]-a[0])*t),
-          Math.round(a[1]+(b[1]-a[1])*t),
-          Math.round(a[2]+(b[2]-a[2])*t)
-        );
-        doc.rect(x+i*w/steps,y,w/steps+0.7,h,"F");
-      }
+    function fill(c){doc.setFillColor(c[0],c[1],c[2]);}
+    function textColor(c){doc.setTextColor(c[0],c[1],c[2]);}
+    function stroke(c){doc.setDrawColor(c[0],c[1],c[2]);}
+    function font(f,s,weight="normal"){
+      doc.setFont(f,weight);doc.setFontSize(s);
     }
-
-    function pill(text,x,y,w,h,fill,textColor,font=6.5){
-      F(fill); doc.roundedRect(x,y,w,h,h/2,h/2,"F");
-      doc.setFont("helvetica","bold"); doc.setFontSize(font); T(text);
-      doc.text(text,x+w/2,y+h/2+font*.27,{align:"center"});
+    function pill(txt,x,y,w,h,bg,fg,fs){
+      fill(bg);doc.rect(x,y,w,h,"F");
+      textColor(fg);font("helvetica",fs,"bold");
+      doc.text(txt,x+w/2,y+h/2+fs*.27,{align:"center"});
     }
-
-    function codeOf(p){
-      return (String(p.nome||"").match(/^([A-Z]{3}\d{3})/)||[])[1] || "";
+    function safeImageType(src){
+      const v=String(src||"").toLowerCase();
+      if(v.startsWith("data:image/png")) return "PNG";
+      if(v.startsWith("data:image/webp")) return "WEBP";
+      return "JPEG";
     }
-    function catCode(cat){
-      const m=String(cat||"").match(/^([A-Z]{3})/);
-      return m?m[1]:"SYN";
-    }
-    function shortName(name){
-      return String(name||"").replace(/^[A-Z]{3}\d{3}\s*[—-]\s*/,"").trim();
-    }
-
-    async function imageSize(src){
+    async function imgSize(src){
       return await new Promise(resolve=>{
         const im=new Image();
         im.onload=()=>resolve({w:im.naturalWidth||1,h:im.naturalHeight||1});
@@ -1345,252 +1311,221 @@ async function gerarPDF(){
         im.src=src;
       });
     }
-
-    function drawOptionCWave(y){
-      D([22,174,204]); doc.setLineWidth(.45);
-      for(let k=0;k<5;k++){
-        let prev=null;
-        for(let x=0;x<=PW;x+=6){
-          const yy=y+k*3+Math.sin(x/27+k)*1.4;
-          if(prev) doc.line(prev[0],prev[1],x,yy);
-          prev=[x,yy];
-        }
+    function addImg(src,x,y,w,h){
+      if(!src) return false;
+      try{
+        doc.addImage(src,safeImageType(src),x,y,w,h,undefined,"FAST",0);
+        return true;
+      }catch(e){
+        console.warn("Imagem ignorada no PDF:",e);
+        return false;
       }
     }
+    function codeOf(p){return (String(p.nome||"").match(/^([A-Z]{3}\d{3})/)||[])[1]||"";}
+    function catCode(cat){return (String(cat||"").match(/^([A-Z]{3})/)||[])[1]||"SYN";}
+    function shortName(n){return String(n||"").replace(/^[A-Z]{3}\d{3}\s*[—-]\s*/,"").trim();}
 
-    async function drawCover(){
-      // Opção C fiel ao conceito escolhido:
-      // bloco editorial à esquerda + vitrine de produtos à direita.
-      F(C.navy); doc.rect(0,0,PW,PH,"F");
+    // Logo oficial: usa o Base64 já existente na plataforma.
+    const logoData="data:image/jpeg;base64,"+LOGO_B64;
 
-      // Painel esquerdo
-      gradient(0,0,104,220,C.navy,C.navy2,32);
-      // Painel direito / vitrine
-      gradient(104,0,106,220,[8,76,112],[4,28,45],32);
+    // ==========================
+    // CAPA — OPÇÃO C
+    // ==========================
+    fill(NAVY);doc.rect(0,0,PW,PH,"F");
 
-      // Divisão diagonal limpa
-      D(C.cyan2); doc.setLineWidth(1.15);
-      doc.line(112,0,77,220);
+    // painel esquerdo
+    fill(NAVY2);doc.rect(0,0,108,220,"F");
+    // painel direito
+    fill([7,73,106]);doc.rect(108,0,102,220,"F");
+    // blocos verticais sutis
+    fill([5,58,84]);doc.rect(157,0,18,220,"F");
+    fill([6,66,94]);doc.rect(178,0,12,220,"F");
 
-      // Microtextura discreta
-      D([15,75,99]); doc.setLineWidth(.22);
-      for(let x=108;x<210;x+=10) doc.line(x,0,x,220);
+    // divisão diagonal: somente linha, sem polígonos/estilos problemáticos
+    stroke(CYAN);doc.setLineWidth(1.2);doc.line(111,0,76,220);
 
-      // Logo transparente, sem caixa preta
-      doc.addImage(logoData,"PNG",15,22,61,44);
+    // Logo: em um cartão branco discreto para preservar a arte original
+    fill(WHITE);doc.rect(14,20,66,46,"F");
+    addImg(logoData,18,23,58,40);
 
-      doc.setFont("helvetica","bold"); doc.setFontSize(7.2); T(C.cyan2);
-      doc.text("QUÍMICA PROFISSIONAL",15,69,{charSpace:1.1});
+    textColor(CYAN);font("helvetica",7,"bold");
+    doc.text("QUÍMICA PROFISSIONAL",14,76);
 
-      doc.setFont("helvetica","bold"); doc.setFontSize(24); T(C.white);
-      doc.text("CATÁLOGO DE",15,96);
-      doc.setFontSize(30); T(C.cyan2);
-      doc.text("PRODUTOS",15,114);
+    textColor(WHITE);font("helvetica",24,"bold");
+    doc.text("CATÁLOGO DE",14,104);
+    textColor(CYAN);font("helvetica",30,"bold");
+    doc.text("PRODUTOS",14,122);
 
-      F(C.cyan2); doc.rect(15,122,31,1.4,"F");
+    fill(CYAN);doc.rect(14,130,32,1.5,"F");
+    textColor(WHITE);font("helvetica",9.5,"normal");
+    doc.text("Performance que transforma",14,145);
+    doc.text("a rotina profissional.",14,152);
 
-      doc.setFont("helvetica","normal"); doc.setFontSize(9.5); T([225,241,246]);
-      doc.text("Performance que transforma",15,137);
-      doc.text("a rotina profissional.",15,144);
+    pill("CATÁLOGO 2026",14,166,44,10,CYAN,NAVY,6.2);
 
-      pill("CATÁLOGO 2026",15,158,43,9,C.cyan2,C.navy,6);
+    // vitrine direita
+    fill([3,27,43]);doc.rect(123,42,72,128,"F");
+    stroke([27,111,142]);doc.setLineWidth(.5);
+    doc.rect(123,42,72,128,"S");
 
-      // Benefícios, como na referência comercial
-      const benefits=[
-        ["FÓRMULAS","AVANÇADAS"],
-        ["MÁXIMA","EFICIÊNCIA"],
-        ["SEGURANÇA","E QUALIDADE"],
-        ["RESULTADOS","PROFISSIONAIS"]
+    const coverImgs=prods.filter(p=>p.imagem).slice(0,3);
+    if(coverImgs.length){
+      const slots=[
+        {x:129,y:91,w:18,h:61},
+        {x:150,y:63,w:27,h:89},
+        {x:181,y:94,w:10,h:58}
       ];
-      F([3,13,23]); doc.rect(0,220,PW,77,"F");
-      benefits.forEach((b,i)=>{
-        const x=15+i*47;
-        F(C.cyan2); doc.circle(x+2,237,2,"F");
-        doc.setFont("helvetica","bold"); doc.setFontSize(5.9); T(C.white);
-        doc.text(b[0],x+7,236);
-        doc.setFont("helvetica","normal"); doc.setFontSize(5.4); T([160,200,210]);
-        doc.text(b[1],x+7,243);
-      });
-
-      D([22,73,91]); doc.setLineWidth(.45);
-      doc.line(15,256,195,256);
-      doc.setFont("helvetica","normal"); doc.setFontSize(6.8); T([170,204,212]);
-      doc.text("Soluções químicas de alta performance",15,269);
-      doc.setFont("helvetica","bold"); doc.setFontSize(6.8); T(C.cyan2);
-      doc.text("www.synthera.com.br",195,269,{align:"right"});
-      doc.setFont("helvetica","normal"); doc.setFontSize(5.8); T([112,150,160]);
-      doc.text("Química profissional • Performance • Resultado",105,284,{align:"center"});
-
-      // Vitrine de produtos: usa imagens reais do catálogo quando disponíveis.
-      const coverImgs=prods.filter(p=>p.imagem).slice(0,4);
-      const frameX=122, frameY=39, frameW=74, frameH=142;
-      F([3,26,42]); doc.roundedRect(frameX,frameY,frameW,frameH,6,6,"F");
-      D([28,117,148]); doc.setLineWidth(.5);
-      // Borda segura para versões diferentes do jsPDF: desenhada como faixa.
-      doc.rect(frameX,frameY,frameW,.55,"F");
-      doc.rect(frameX,frameY+frameH-.55,frameW,.55,"F");
-      doc.rect(frameX,frameY,.55,frameH,"F");
-      doc.rect(frameX+frameW-.55,frameY,.55,frameH,"F");
-
-      if(coverImgs.length){
-        const slots=[
-          {x:128,y:91,w:18,h:65},
-          {x:151,y:61,w:27,h:96},
-          {x:181,y:96,w:12,h:60}
-        ];
-        for(let i=0;i<Math.min(3,coverImgs.length);i++){
-          const p=coverImgs[i], s=slots[i], sz=await imageSize(p.imagem);
-          if(!sz) continue;
-          const ratio=sz.w/sz.h;
-          let iw=s.w, ih=s.w/ratio;
-          if(ih>s.h){ih=s.h;iw=s.h*ratio;}
-          F([9,39,57]); doc.roundedRect(s.x-2,s.y-2,s.w+4,s.h+4,3,3,"F");
-          doc.addImage(p.imagem,imageFormat(p.imagem),s.x+(s.w-iw)/2,s.y+(s.h-ih)/2,iw,ih,undefined,"FAST",0);
-        }
-      }else{
-        // sem imagens: vitrine abstrata limpa, não inventa rótulos
-        F([9,39,57]); doc.roundedRect(131,82,18,69,3,3,"F");
-        F([239,246,248]); doc.roundedRect(153,61,27,90,4,4,"F");
-        F([9,39,57]); doc.roundedRect(184,94,10,57,3,3,"F");
-        pill("SYNTHERA",156,99,21,8,C.navy,C.cyan2,4.5);
+      for(let i=0;i<coverImgs.length;i++){
+        const sz=await imgSize(coverImgs[i].imagem);
+        if(!sz) continue;
+        const sl=slots[i],r=sz.w/sz.h;
+        let iw=sl.w,ih=iw/r;
+        if(ih>sl.h){ih=sl.h;iw=ih*r;}
+        fill([8,40,58]);doc.rect(sl.x-2,sl.y-2,sl.w+4,sl.h+4,"F");
+        addImg(coverImgs[i].imagem,sl.x+(sl.w-iw)/2,sl.y+(sl.h-ih)/2,iw,ih);
       }
-
-      // linha de assinatura da marca na vitrine
-      D(C.cyan); doc.setLineWidth(.7);
-      doc.line(132,169,186,169);
-      F(C.cyan2); doc.circle(159,178,1.7,"F");
+    }else{
+      // mockups somente se ainda não houver imagens cadastradas
+      fill([9,40,58]);doc.rect(130,86,17,67,"F");
+      fill([240,247,249]);doc.rect(151,61,27,92,"F");
+      fill([9,40,58]);doc.rect(182,95,10,58,"F");
+      pill("SYNTHERA",154,99,21,8,NAVY,CYAN,4.3);
     }
 
-    drawCover();
+    // detalhe químico minimalista
+    stroke(CYAN);doc.setLineWidth(.7);doc.line(136,176,184,176);
+    fill(CYAN);doc.circle(160,184,1.7,"F");
 
+    // faixa inferior comercial
+    fill([2,13,22]);doc.rect(0,220,PW,77,"F");
+    const benefits=[["FÓRMULAS","AVANÇADAS"],["MÁXIMA","EFICIÊNCIA"],["SEGURANÇA","E QUALIDADE"],["RESULTADOS","PROFISSIONAIS"]];
+    benefits.forEach((b,i)=>{
+      const x=14+i*47;
+      fill(CYAN);doc.circle(x+2,237,2,"F");
+      textColor(WHITE);font("helvetica",5.8,"bold");doc.text(b[0],x+7,236);
+      textColor([160,200,210]);font("helvetica",5.3,"normal");doc.text(b[1],x+7,243);
+    });
+    stroke([24,73,91]);doc.setLineWidth(.4);doc.line(14,257,196,257);
+    textColor([170,204,212]);font("helvetica",6.8,"normal");
+    doc.text("Soluções químicas de alta performance",14,270);
+    textColor(CYAN);font("helvetica",6.8,"bold");
+    doc.text("www.synthera.com.br",196,270,{align:"right"});
+    textColor([112,150,160]);font("helvetica",5.8,"normal");
+    doc.text("Química profissional • Performance • Resultado",105,284,{align:"center"});
+
+    // ==========================
+    // PÁGINAS INTERNAS
+    // ==========================
     const groups={};
-    prods.forEach(p=>{
-      if(!groups[p.categoria]) groups[p.categoria]=[];
-      groups[p.categoria].push(p);
-    });
-    const CAT_ORDER=["SGP - Governança","SCP - Limpeza Pesada","SKP - Cozinha","SAP - Preparação de Alimentos","SLP - Lavanderia"];
+    prods.forEach(p=>{if(!groups[p.categoria])groups[p.categoria]=[];groups[p.categoria].push(p);});
+    const order=["SGP - Governança","SCP - Limpeza Pesada","SKP - Cozinha","SAP - Preparação de Alimentos","SLP - Lavanderia"];
     const entries=Object.entries(groups).sort(([a],[b])=>{
-      const ia=CAT_ORDER.indexOf(a),ib=CAT_ORDER.indexOf(b);
-      if(ia<0&&ib<0)return a.localeCompare(b);
-      if(ia<0)return 1;if(ib<0)return -1;return ia-ib;
+      const ia=order.indexOf(a),ib=order.indexOf(b);
+      if(ia<0&&ib<0)return a.localeCompare(b); if(ia<0)return 1;if(ib<0)return -1;return ia-ib;
     });
 
-    let pgNum=1;
-    const MG=12,GAP=6,TOP=49,FOOT=17;
+    let page=1;
+    const MG=12,GAP=6,TOP=50,FOOT=18;
     const CW=(PW-MG*2-GAP)/2;
     const CH=(PH-TOP-FOOT-6)/2;
 
-    function pageBase(){
-      F(C.ice); doc.rect(0,0,PW,PH,"F");
-      gradient(0,0,PW,3,C.blue,C.cyan2,28);
-      F([232,246,249]); doc.rect(0,3,4,PH-3,"F");
-      drawOptionCWave(PH-10);
+    function base(){
+      fill(ICE);doc.rect(0,0,PW,PH,"F");
+      fill(CYAN);doc.rect(0,0,PW,3,"F");
+      fill([231,246,249]);doc.rect(0,3,4,PH-3,"F");
     }
-
     function footer(){
-      doc.setFont("helvetica","bold");doc.setFontSize(6.8);T(C.navy);
-      doc.text("SYNTHERA",MG,PH-8);
-      doc.setFont("helvetica","normal");doc.setFontSize(6.2);T(C.muted);
-      doc.text("Soluções químicas de alta performance",MG+22,PH-8);
-      doc.setFont("helvetica","bold");doc.setFontSize(6.8);T(C.cyan);
-      doc.text(String(pgNum).padStart(2,"0"),PW-MG,PH-8,{align:"right"});
+      stroke(LINE);doc.setLineWidth(.35);doc.line(MG,PH-14,PW-MG,PH-14);
+      textColor(NAVY);font("helvetica",6.8,"bold");doc.text("SYNTHERA",MG,PH-7);
+      textColor(MUTED);font("helvetica",6.2,"normal");doc.text("Soluções químicas de alta performance",MG+22,PH-7);
+      textColor(CYAN);font("helvetica",6.8,"bold");doc.text(String(page).padStart(2,"0"),PW-MG,PH-7,{align:"right"});
     }
-
-    function categoryHeader(cat,count){
-      pageBase();
-      F(C.navy); doc.roundedRect(MG,12,PW-MG*2,27,4,4,"F");
-      F(C.cyan2); doc.rect(MG,12,4,27,"F");
-      pill(catCode(cat),MG+10,18,22,9,C.cyan2,C.navy,6.2);
-      doc.setFont("helvetica","bold");doc.setFontSize(15);T(C.white);
+    function catHeader(cat,count){
+      base();
+      fill(NAVY);doc.rect(MG,12,PW-MG*2,27,"F");
+      fill(CYAN);doc.rect(MG,12,4,27,"F");
+      pill(catCode(cat),MG+10,18,22,9,CYAN,NAVY,6.2);
+      textColor(WHITE);font("helvetica",15,"bold");
       doc.text(cat.replace(/^[A-Z]{3}\s*-\s*/,"").toUpperCase(),MG+38,25);
-      doc.setFont("helvetica","normal");doc.setFontSize(6.7);T([165,205,213]);
+      textColor([165,205,213]);font("helvetica",6.7,"normal");
       doc.text("Linha Synthera • soluções profissionais",MG+38,32);
-      pill(`${count} ${count===1?"PRODUTO":"PRODUTOS"}`,PW-MG-42,20,34,8,C.blue,C.white,5.8);
-      doc.setFont("helvetica","bold");doc.setFontSize(6.7);T(C.cyan);
+      pill(`${count} ${count===1?"PRODUTO":"PRODUTOS"}`,PW-MG-42,20,34,8,BLUE,WHITE,5.8);
+      textColor(CYAN);font("helvetica",6.7,"bold");
       doc.text("PERFORMANCE QUE TRANSFORMA A ROTINA PROFISSIONAL",MG,45);
       return TOP;
     }
-
-    function continuationHeader(cat){
-      pageBase();
-      pill(catCode(cat),MG,9,21,8,C.navy,C.cyan2,6);
-      doc.setFont("helvetica","bold");doc.setFontSize(9.5);T(C.navy);
+    function contHeader(cat){
+      base();
+      pill(catCode(cat),MG,9,21,8,NAVY,CYAN,6);
+      textColor(NAVY);font("helvetica",9.5,"bold");
       doc.text(cat.replace(/^[A-Z]{3}\s*-\s*/,"").toUpperCase(),MG+27,15);
-      D(C.cyan);doc.setLineWidth(.8);doc.line(MG+27,19,PW-MG,19);
+      stroke(CYAN);doc.setLineWidth(.8);doc.line(MG+27,19,PW-MG,19);
       return 27;
     }
 
-    async function drawCard(p,x,y,w,h){
-      F([216,228,233]);doc.roundedRect(x+1.2,y+1.5,w,h,5,5,"F");
-      F(C.white);D(C.line);doc.setLineWidth(.35);doc.roundedRect(x,y,w,h,5,5,"FD");
-      gradient(x,y,w,25,C.navy,C.navy2,20);
-      F(C.cyan2);doc.rect(x,y+23.5,w,1.5,"F");
+    async function card(p,x,y,w,h){
+      fill([218,229,234]);doc.rect(x+1.2,y+1.5,w,h,"F");
+      fill(WHITE);doc.rect(x,y,w,h,"F");
+      stroke(LINE);doc.setLineWidth(.35);doc.rect(x,y,w,h,"S");
 
-      const code=codeOf(p);
-      if(code)pill(code,x+5,y+5,26,8,C.cyan2,C.navy,5.8);
+      fill(NAVY);doc.rect(x,y,w,25,"F");
+      fill(CYAN);doc.rect(x,y+23.5,w,1.5,"F");
+      const code=codeOf(p);if(code)pill(code,x+5,y+5,26,8,CYAN,NAVY,5.8);
+
       const title=shortName(p.nome);
-      let fs=10.4;doc.setFont("helvetica","bold");doc.setFontSize(fs);
+      let fs=10.4;font("helvetica",fs,"bold");
       let lines=doc.splitTextToSize(title,w-12);
-      while(lines.length>2&&fs>7.5){fs-=.45;doc.setFontSize(fs);lines=doc.splitTextToSize(title,w-12);}
-      T(C.white);lines.slice(0,2).forEach((ln,i)=>doc.text(ln,x+6,y+16+i*4.8));
+      while(lines.length>2&&fs>7.5){fs-=.45;font("helvetica",fs,"bold");lines=doc.splitTextToSize(title,w-12);}
+      textColor(WHITE);lines.slice(0,2).forEach((ln,i)=>doc.text(ln,x+6,y+16+i*4.8));
 
       let by=y+31;
       if(p.imagem){
-        try{
-          const sz=await imageSize(p.imagem);
-          if(sz){
-            const maxW=w-10,maxH=43,r=sz.w/sz.h;
-            let iw=maxW,ih=maxW/r;
-            if(ih>maxH){ih=maxH;iw=maxH*r;}
-            F([242,248,250]);doc.roundedRect(x+5,by,w-10,maxH,3,3,"F");
-            doc.addImage(p.imagem,imageFormat(p.imagem),x+(w-iw)/2,by+(maxH-ih)/2,iw,ih,undefined,"FAST",0);
-            by+=maxH+4;
-          }
-        }catch(e){}
+        const sz=await imgSize(p.imagem);
+        if(sz){
+          const maxW=w-10,maxH=43,r=sz.w/sz.h;
+          let iw=maxW,ih=iw/r;
+          if(ih>maxH){ih=maxH;iw=ih*r;}
+          fill(ICE);doc.rect(x+5,by,w-10,maxH,"F");
+          addImg(p.imagem,x+(w-iw)/2,by+(maxH-ih)/2,iw,ih);
+          by+=maxH+4;
+        }
       }else{
-        F(C.ice);doc.roundedRect(x+5,by,w-10,30,3,3,"F");
-        D(C.cyan);doc.setLineWidth(.7);
-        // Substitui a elipse "S" por um marcador circular compatível.
-        F(C.ice); doc.circle(x+w/2,by+15,7,"F");
-        F(C.cyan2); doc.circle(x+w/2,by+15,1.5,"F");
-        F(C.cyan2);doc.circle(x+w/2,by+15,1.5,"F");
+        fill(ICE);doc.rect(x+5,by,w-10,30,"F");
+        stroke(CYAN);doc.setLineWidth(.5);doc.line(x+w/2-8,by+15,x+w/2+8,by+15);
+        fill(CYAN);doc.circle(x+w/2,by+15,1.5,"F");
         by+=34;
       }
 
       const attrs=p.attrs||[];
-      let fsVal=7.1,lh=3.55;
       let ay=by;
-      attrs.slice(0,6).forEach((a,i)=>{
-        F(i===0?C.cyan2:C.cyan);doc.circle(x+7,ay-1,1,"F");
-        doc.setFont("helvetica","bold");doc.setFontSize(5.8);T(C.muted);
-        doc.text(String(a.l||"").toUpperCase(),x+10,ay);
-        doc.setFont("helvetica","normal");doc.setFontSize(fsVal);T(C.text);
-        const la=doc.splitTextToSize(String(a.v||""),w-38);
-        la.forEach((ln,j)=>doc.text(ln,x+10,ay+3.6+j*lh));
-        ay+=3.6+la.length*lh+1.3;
+      attrs.slice(0,6).forEach(a=>{
+        fill(CYAN);doc.circle(x+7,ay-1,1,"F");
+        textColor(MUTED);font("helvetica",5.8,"bold");doc.text(String(a.l||"").toUpperCase(),x+10,ay);
+        textColor(TEXT);font("helvetica",7.0,"normal");
+        const ls=doc.splitTextToSize(String(a.v||""),w-38);
+        ls.forEach((ln,j)=>doc.text(ln,x+10,ay+3.6+j*3.5));
+        ay+=3.6+ls.length*3.5+1.3;
       });
 
       const fy=y+h-19;
-      if(p.ficha){pill("FICHA TÉCNICA",x+5,fy,30,8,C.paleBlue,C.blue,5.5);doc.link(x+5,fy,30,8,{url:p.ficha});}
+      if(p.ficha){pill("FICHA TÉCNICA",x+5,fy,30,8,[226,247,251],BLUE,5.5);doc.link(x+5,fy,30,8,{url:p.ficha});}
       if(mostrarPreco){
         const raw=p.preco?String(p.preco).trim():"";
         const txt=raw?(raw.startsWith("R$")?raw:"R$ "+raw):"Consultar";
-        doc.setFont("helvetica","bold");doc.setFontSize(7.1);
+        font("helvetica",7.1,"bold");
         const pw=doc.getTextWidth(txt)+10;
-        pill(txt,x+w-pw-5,fy,pw,8,txt==="Consultar"?[235,244,247]:C.greenSoft,txt==="Consultar"?C.blue:C.green,6.6);
+        pill(txt,x+w-pw-5,fy,pw,8,txt==="Consultar"?[235,244,247]:GREENBG,txt==="Consultar"?BLUE:GREEN,6.6);
       }
     }
 
     for(const [cat,gprods] of entries){
-      const chunks=[];
-      for(let i=0;i<gprods.length;i+=4)chunks.push(gprods.slice(i,i+4));
-      for(let ci=0;ci<chunks.length;ci++){
-        doc.addPage();pgNum++;
-        const chunk=chunks[ci];
-        const sy=ci===0?categoryHeader(cat,gprods.length):continuationHeader(cat);
-        for(let s=0;s<chunk.length;s++){
-          const row=Math.floor(s/2),col=s%2;
-          await drawCard(chunk[s],MG+col*(CW+GAP),sy+row*(CH+GAP),CW,CH);
+      for(let ci=0;ci<gprods.length;ci+=4){
+        doc.addPage();page++;
+        const sy=ci===0?catHeader(cat,gprods.length):contHeader(cat);
+        const chunk=gprods.slice(ci,ci+4);
+        for(let i=0;i<chunk.length;i++){
+          const row=Math.floor(i/2),col=i%2;
+          await card(chunk[i],MG+col*(CW+GAP),sy+row*(CH+GAP),CW,CH);
         }
         footer();
       }
@@ -1600,12 +1535,10 @@ async function gerarPDF(){
     showToast("Catálogo Synthera gerado com sucesso!");
   }catch(e){
     console.error(e);
-    showToast("Erro ao gerar PDF: "+(e?.message||"verifique o console"),"error");
+    showToast("Erro ao gerar PDF: "+(e?.message||"erro desconhecido"),"error");
   }finally{
-    if(b1)b1.disabled=false;
+    if(b1){b1.disabled=false;b1.innerHTML=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/></svg> Gerar e Baixar PDF`;}
     if(b2)b2.disabled=false;
-    if(b1)b1.innerHTML=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/></svg> Gerar e Baixar PDF`;
-    if(b2)b2.innerHTML=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/></svg> Gerar PDF`;
   }
 }
 </script>
