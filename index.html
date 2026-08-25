@@ -1315,6 +1315,14 @@ async function gerarPDF(){
     const D=c=>doc.setDrawColor(...c);
 
     const logoData="data:image/jpeg;base64,"+LOGO_B64;
+    function imageFormat(data){
+      const m=String(data||"").match(/^data:image\/([a-zA-Z0-9+.-]+);base64,/);
+      const f=(m?m[1]:"jpeg").toLowerCase();
+      if(f==="jpg") return "JPEG";
+      if(f==="jpeg") return "JPEG";
+      if(f==="png") return "PNG";
+      return "JPEG";
+    }
 
     function gradient(x,y,w,h,a,b,steps=36){
       for(let i=0;i<steps;i++){
@@ -1385,7 +1393,7 @@ async function gerarPDF(){
       // bloco diagonal azul
       const poly=doc;
       F([6,56,84]);
-      poly.lines([[0,25],[PW*0.54,-25],[PW,58],[PW,205],[0,205]],0,0,["F"]);
+      poly.lines([[0,25],[PW*0.54,-25],[PW,58],[PW,205],[0,205]],0,0,1,"F",true);
 
       // área ciano/azul do lado direito, simulando vitrine de produto
       gradient(PW*0.54,28,PW*0.46,177,[8,73,108],[5,23,38],28);
@@ -1588,7 +1596,7 @@ async function gerarPDF(){
             let iw=maxW,ih=maxW/ratio;
             if(ih>maxH){ih=maxH;iw=maxH*ratio;}
             F([242,248,250]); doc.roundedRect(x+5,by,w-10,maxH,3,3,"F");
-            doc.addImage(p.imagem,x+(w-iw)/2,by+(maxH-ih)/2,iw,ih,undefined,"FAST",0);
+            doc.addImage(p.imagem,imageFormat(p.imagem),x+(w-iw)/2,by+(maxH-ih)/2,iw,ih,undefined,"FAST",0);
             by+=maxH+4;
           }
         }catch(e){}
