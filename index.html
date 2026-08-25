@@ -7,78 +7,49 @@
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@300;400;600;700;800;900&family=Montserrat:wght@400;600;700;800;900&display=swap" rel="stylesheet"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/3.0.3/jspdf.umd.min.js"></script>
 <!-- Firebase -->
-<script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import {
-  getFirestore, collection, addDoc, updateDoc, deleteDoc,
-  doc, onSnapshot, serverTimestamp, query, orderBy, getDoc, getDocs, setDoc
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-import {
-  getStorage, ref, uploadString, getDownloadURL, deleteObject
-} from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+<!-- Firebase: versão compatível, sem módulos ES.
+     Evita falhas silenciosas de importação no GitHub Pages. -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage-compat.js"></script>
+<script>
+(function(){
+  const firebaseConfig = {
+    apiKey: "AIzaSyCbhrBJsWRz-inbbeAahg-7OQQDZ0stk7Y",
+    authDomain: "catalogosynthera.firebaseapp.com",
+    projectId: "catalogosynthera",
+    storageBucket: "catalogosynthera.firebasestorage.app",
+    messagingSenderId: "46345196031",
+    appId: "1:46345196031:web:3362e60ca02f8efd0517ca"
+  };
+  const COL = "produtos";
+  let app=null, db=null, storage=null;
 
-const firebaseConfig = {
-  apiKey: "AIzaSyCbhrBJsWRz-inbbeAahg-7OQQDZ0stk7Y",
-  authDomain: "catalogosynthera.firebaseapp.com",
-  projectId: "catalogosynthera",
-  storageBucket: "catalogosynthera.firebasestorage.app",
-  messagingSenderId: "46345196031",
-  appId: "1:46345196031:web:3362e60ca02f8efd0517ca"
-};
+  function status(connected, message){
+    const el=document.getElementById("firebaseStatus");
+    if(!el) return;
+    el.classList.toggle("offline", !connected);
+    const t=el.querySelector("span:last-child");
+    if(t) t.textContent=message || (connected ? "Firebase conectado" : "Firebase indisponível");
+    const dbs=document.getElementById("dbStatus");
+    if(dbs){
+      dbs.className=connected ? "db-status ok" : "db-status error";
+      dbs.innerHTML="&#9679; "+(message || (connected ? "Firebase conectado" : "Firebase indisponível"));
+    }
+  }
 
-let app, db, storage;
-const COL = "produtos";
+  function erro(err){
+    console.error("Firebase:",err);
+    const code=err && err.code || "";
+    let msg="Firebase indisponível";
+    if(code==="permission-denied") msg="Firestore sem permissão";
+    else if(code==="unavailable") msg="Firebase indisponível — verifique a conexão";
+    else if(code) msg="Erro Firebase: "+code;
+    status(false,msg);
+    if(typeof window.showToast==="function") window.showToast(msg,"error");
+  }
 
-function firebaseErro(err){
-  console.error("Firebase:", err);
-  const code = err?.code || "";
-  let msg = "Firebase indisponível";
-  if(code === "permission-denied") msg = "Firebase conectado — Firestore sem permissão";
-  else if(code === "failed-precondition") msg = "Firebase conectado — Firestore precisa ser configurado";
-  else if(code === "unavailable") msg = "Firebase indisponível — verifique a internet";
-  else if(code === "storage/unauthorized") msg = "Firebase conectado — Storage sem permissão";
-  const el = document.getElementById("dbStatus");
-  if(el){ el.className = "db-status error"; el.innerHTML = "&#9679; " + msg; }
-  if(typeof window.setFirebaseStatus === "function") window.setFirebaseStatus(false, msg);
-  if(typeof window.showToast === "function") window.showToast(msg, "error");
-}
-
-try{
-  app = initializeApp(firebaseConfig);
-  db = getFirestore(app);
-  storage = getStorage(app);
-}catch(err){
-  firebaseErro(err);
-}
-
-    // Atualiza o indicador visual de conexão Firebase.
-    window.setFirebaseStatus = function(connected, message){
-      const el = document.getElementById("firebaseStatus");
-      if(!el) return;
-      el.classList.toggle("offline", !connected);
-      const text = el.querySelector("span:last-child");
-      if(text) text.textContent = connected ? "Firebase conectado" : (message || "Firebase indisponível");
-    };
-    window.setFirebaseStatus(false);
-
-
-// ── Expõe funções ao escopo global ──────────────────────
-window._fb = {
-  async add(data){
-    if(!db) throw new Error("Firebase não foi inicializado.");
-
-    return await addDoc(collection(db, COL), { ...data, criadoEm: serverTimestamp() });
-  },
-  async update(id, data){
-    if(!db) throw new Error("Firebase não foi inicializado.");
-    return await updateDoc(doc(db, COL, id), data);
-  },
-  async remove(id){
-    if(!db) throw new Error("Firebase não foi inicializado.");
-    return await deleteDoc(doc(db, COL, id));
-  },
-  async cadastrarEstruturaSynthera(){
-    const produtos = [
+      const produtos = [
       // SGP — Governança
       {codigo:"SGP101", nome:"SGP101 — Água Sanitária", categoria:"SGP - Governança"},
       {codigo:"SGP102", nome:"SGP102 — Limpa Piso", categoria:"SGP - Governança"},
@@ -115,272 +86,128 @@ window._fb = {
       {codigo:"SLP409", nome:"SLP409 — Detergente Alcalino", categoria:"SLP - Lavanderia"}
     ];
 
-    let criados = 0;
-    for(const p of produtos){
-      const refProd = doc(db, COL, p.codigo);
-      const existente = await getDoc(refProd);
-      if(existente.exists()) continue;
-      await setDoc(refProd, {
-        codigo:p.codigo, nome:p.nome, categoria:p.categoria,
-        attrs:[], preco:null, imagem:null, ficha:null, fichaPath:null, fichaNome:null,
-        criadoEm:serverTimestamp()
-      });
-      criados++;
-    }
-    return criados;
-  },
-  async uploadFicha(base64DataUrl, fileName, prevPath){
-    // remove arquivo anterior, se existir
-    if(prevPath){
-      try{ await deleteObject(ref(storage, prevPath)); }catch(e){ /* ignora se não existir */ }
-    }
-    const path = `fichas/${Date.now()}_${fileName}`;
-    const sref = ref(storage, path);
-    // uploadString espera o data URL completo (com prefixo data:application/pdf;base64,...)
-    await uploadString(sref, base64DataUrl, "data_url");
-    const url = await getDownloadURL(sref);
-    return { url, path };
-  },
-  async deleteFicha(path){
-    if(!path) return;
-    try{ await deleteObject(ref(storage, path)); }catch(e){ /* ignora */ }
-  },
-  // ── MIGRAÇÃO: converte fichas base64 antigas para URLs do Storage ──
-  async migrarFichasAntigas(){
-    const snap = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js")
-      .then(({getDocs}) => getDocs(collection(db, COL)));
-    let total=0, migrados=0, erros=0;
-    for(const d of snap.docs){
-      const data = d.data();
-      total++;
-      // já migrado (URL http) ou sem ficha
-      if(!data.ficha || data.ficha.startsWith('http')) continue;
-      // formato antigo: data.ficha é base64 ("data:application/pdf;base64,...")
-      try{
-        const nome = data.fichaNome || `ficha_${d.id}.pdf`;
-        const up = await this.uploadFicha(data.ficha, nome, null);
-        await updateDoc(doc(db, COL, d.id), { ficha: up.url, fichaPath: up.path });
-        migrados++;
-        console.log(`✓ Migrado: ${data.nome} → ${up.url}`);
-      } catch(e){
-        erros++;
-        console.error(`✗ Erro ao migrar ${data.nome}:`, e);
-      }
-    }
-    const msg = `Migração concluída: ${migrados} migrados, ${erros} erros, ${total} produtos no total.`;
-    console.log(msg);
-    if(typeof window.showToast==='function') window.showToast(msg, erros>0?'error':'success');
-    return {total, migrados, erros};
-  },
-  listen(cb){
-    if(!db) return () => {};
-
-    // IMPORTANTE:
-    // Não usamos orderBy("criadoEm") aqui. Produtos antigos ou cadastrados
-    // antes desse campo existir podem não possuir criadoEm e, nesse caso,
-    // ficavam fora da consulta. Primeiro carregamos TODOS os documentos.
-    const q = collection(db, COL);
-
-    const normalizar = snap => {
-      const docs = snap.docs.map(d => ({ id:d.id, ...d.data() }));
-
-      // Ordenação somente no navegador, sem excluir documentos.
-      docs.sort((a,b) => {
-        const ta = a.criadoEm?.seconds ?? a.criadoEm?._seconds ?? 0;
-        const tb = b.criadoEm?.seconds ?? b.criadoEm?._seconds ?? 0;
-        if(ta !== tb) return ta - tb;
-        return String(a.codigo || a.nome || a.id).localeCompare(
-          String(b.codigo || b.nome || b.id),
-          "pt-BR",
-          {numeric:true, sensitivity:"base"}
-        );
-      });
-
-      cb(docs);
-
-      const el = document.getElementById("dbStatus");
-      if(el){
-        el.className = "db-status ok";
-        el.innerHTML = `&#9679; Firebase conectado — ${docs.length} produtos`;
-      }
-      if(typeof window.setFirebaseStatus === "function"){
-        window.setFirebaseStatus(true, `Firebase conectado — ${docs.length} produtos`);
-      }
-    };
-
-    // Leitura inicial explícita: garante que a página seja populada mesmo
-    // antes do primeiro evento do listener.
-    getDocs(q).then(normalizar).catch(err => {
-      console.error("Firestore leitura inicial:", err);
-      const msg = err.code === 'permission-denied'
-        ? 'Permissão negada — verifique as regras do Firestore'
-        : err.code === 'unavailable'
-        ? 'Servidor indisponível — verifique a conexão'
-        : `Erro ao ler produtos: ${err.code || err.message}`;
-      const el = document.getElementById("dbStatus");
-      if(el){ el.className = "db-status error"; el.innerHTML = `&#9679; ${msg}`; }
-      if(typeof window.setFirebaseStatus === "function") window.setFirebaseStatus(false, msg);
-      if(typeof window.showToast === "function") window.showToast(msg, "error");
-    });
-
-    // Depois da carga inicial, mantém a página sincronizada em tempo real.
-    return onSnapshot(q, snap => {
-      normalizar(snap);
-    }, err => {
-      console.error("Firestore listener:", err.code, err.message);
-      const msg = err.code === 'permission-denied'
-        ? 'Permissão negada — verifique as regras do Firestore'
-        : err.code === 'unavailable'
-        ? 'Servidor indisponível — verifique a conexão'
-        : `Erro: ${err.code || err.message}`;
-      const el = document.getElementById("dbStatus");
-      if(el){ el.className = "db-status error"; el.innerHTML = `&#9679; ${msg}`; }
-      if(typeof window.setFirebaseStatus === "function") window.setFirebaseStatus(false, msg);
-      if(typeof window.showToast === "function") window.showToast(msg, "error");
-    });
-  }
-};
-
-// O módulo Firebase é deferido e executa após o HTML.
- // Inicializamos diretamente, sem depender de DOMContentLoaded.
-(() => {
-  const elStatus = document.getElementById("dbStatus");
-  if(elStatus) elStatus.innerHTML = "&#9679; Conectando…";
-
-  // Ponte persistente entre o Firebase (module) e o renderizador da página.
-  // O listener pode receber os produtos antes de o código visual terminar
-  // de ser carregado; nesse caso os dados ficam guardados e são renderizados
-  // assim que as funções existirem.
-  let pendingDocs = null;
-
-  window.__syntheraRenderFirebase = function(docs){
-    pendingDocs = Array.isArray(docs) ? docs : [];
-    window.produtos = pendingDocs;
+  async function init(){
     try{
-      window.dispatchEvent(new CustomEvent("synthera:produtos", {
-        detail: { produtos: pendingDocs }
-      }));
-    }catch(e){}
+      if(!window.firebase) throw new Error("Biblioteca Firebase não carregou.");
+      if(!firebase.apps.length) app=firebase.initializeApp(firebaseConfig);
+      else app=firebase.app();
+      db=firebase.firestore();
+      storage=firebase.storage();
 
-    const tentar = () => {
-      if(typeof window.renderLista !== "function" ||
-         typeof window.updateSidebar !== "function") return false;
+      window.setFirebaseStatus=function(connected,message){
+        status(connected,message);
+      };
 
-      try{
-        window.renderLista();
-        window.updateSidebar();
-
-        const list=document.getElementById("productList");
-        const title=document.getElementById("listTitle");
-        if(list && title && list.children.length >= 0){
-          pendingDocs = null;
-          return true;
-        }
-      }catch(err){
-        console.error("Erro ao renderizar produtos do Firebase:", err);
-        const list=document.getElementById("productList");
-        if(list){
-          list.innerHTML = '<div class="empty-state"><div class="empty-icon">⚠️</div><p>Produtos carregados, mas houve um erro ao exibir a lista. Recarregue a página.</p></div>';
-        }
-      }
-      return false;
-    };
-
-    if(!tentar()){
-      // Continua tentando até a interface estar pronta, sem depender de
-      // uma janela fixa de 3 segundos.
-      let tentativas=0;
-      const timer=setInterval(()=>{
-        tentativas++;
-        if(tentar() || tentativas>=200) clearInterval(timer);
-      },100);
-    }
-  };
-
-  function tryRender(docs){
-    if(typeof window.__syntheraRenderFirebase === "function"){
-      window.__syntheraRenderFirebase(docs);
-    }else{
-      pendingDocs=docs;
-      window.produtos=Array.isArray(docs)?docs:[];
-    }
-  }
-
-  let first = true;
-  if(!db){
-    return;
-  }
-
-  // Leitura do Firestore começa antes de qualquer cadastro automático.
-  // Assim, os produtos existentes aparecem imediatamente na página.
-  try{
-    window._fb.listen(docs => {
-      console.log("Firebase: produtos recebidos:", docs.length);
-      window.produtos = Array.isArray(docs) ? docs : [];
-
-      const renderAgora = () => {
-        if(typeof window.renderLista !== "function" ||
-           typeof window.updateSidebar !== "function") return false;
-        try{
-          window.renderLista();
-          window.updateSidebar();
-
-          const el = document.getElementById("dbStatus");
-          if(el){
-            el.className = "db-status ok";
-            el.innerHTML = "&#9679; Firebase conectado — " + window.produtos.length + " produtos";
+      window._fb={
+        async add(data){
+          if(!db) throw new Error("Firebase não foi inicializado.");
+          const ref=await db.collection(COL).add({...data,criadoEm:firebase.firestore.FieldValue.serverTimestamp()});
+          return {id:ref.id};
+        },
+        async update(id,data){
+          if(!db) throw new Error("Firebase não foi inicializado.");
+          return db.collection(COL).doc(id).update(data);
+        },
+        async remove(id){
+          if(!db) throw new Error("Firebase não foi inicializado.");
+          return db.collection(COL).doc(id).delete();
+        },
+        async cadastrarEstruturaSynthera(){
+          let criados=0;
+          for(const p of produtos){
+            const ref=db.collection(COL).doc(p.codigo);
+            const existente=await ref.get();
+            if(existente.exists) continue;
+            await ref.set({
+              codigo:p.codigo,nome:p.nome,categoria:p.categoria,
+              attrs:[],preco:null,imagem:null,ficha:null,fichaPath:null,fichaNome:null,
+              criadoEm:firebase.firestore.FieldValue.serverTimestamp()
+            });
+            criados++;
           }
-          if(typeof window.setFirebaseStatus === "function"){
-            window.setFirebaseStatus(true, "Firebase conectado");
+          return criados;
+        },
+        async uploadFicha(base64DataUrl,fileName,prevPath){
+          if(prevPath){ try{ await storage.ref(prevPath).delete(); }catch(e){} }
+          const path=`fichas/${Date.now()}_${fileName}`;
+          const ref=storage.ref(path);
+          await ref.putString(base64DataUrl,"data_url");
+          const url=await ref.getDownloadURL();
+          return {url,path};
+        },
+        async deleteFicha(path){
+          if(!path) return;
+          try{ await storage.ref(path).delete(); }catch(e){}
+        },
+        async migrarFichasAntigas(){
+          const snap=await db.collection(COL).get();
+          let total=0,migrados=0,erros=0;
+          for(const d of snap.docs){
+            const data=d.data(); total++;
+            if(!data.ficha || String(data.ficha).startsWith("http")) continue;
+            try{
+              const nome=data.fichaNome || `ficha_${d.id}.pdf`;
+              const up=await window._fb.uploadFicha(data.ficha,nome,null);
+              await db.collection(COL).doc(d.id).update({ficha:up.url,fichaPath:up.path});
+              migrados++;
+            }catch(e){ erros++; console.error("Erro ao migrar",data.nome,e); }
           }
-          return true;
-        }catch(e){
-          console.error("Firebase: erro ao desenhar produtos:", e);
-          return false;
+          const msg=`Migração concluída: ${migrados} migrados, ${erros} erros, ${total} produtos no total.`;
+          if(typeof window.showToast==="function") window.showToast(msg,erros?"error":"success");
+          return {total,migrados,erros};
+        },
+        listen(cb){
+          if(!db){ status(false,"Firebase não inicializado"); return ()=>{}; }
+          const col=db.collection(COL);
+          const normalizar=snap=>{
+            const docs=snap.docs.map(d=>({id:d.id,...d.data()}));
+            docs.sort((a,b)=>{
+              const ta=a.criadoEm?.seconds ?? a.criadoEm?._seconds ?? 0;
+              const tb=b.criadoEm?.seconds ?? b.criadoEm?._seconds ?? 0;
+              if(ta!==tb) return ta-tb;
+              return String(a.codigo||a.nome||a.id).localeCompare(String(b.codigo||b.nome||b.id),"pt-BR",{numeric:true,sensitivity:"base"});
+            });
+            cb(docs);
+            status(true,`Firebase conectado — ${docs.length} produtos`);
+          };
+          col.get().then(normalizar).catch(erro);
+          return col.onSnapshot(normalizar,erro);
         }
       };
 
-      if(!renderAgora()){
-        let tentativas=0;
-        const timer=setInterval(()=>{
-          tentativas++;
-          if(renderAgora() || tentativas>=100) clearInterval(timer);
-        },100);
-      }
-    });
-  }catch(err){
-    firebaseErro(err);
+      status(true,"Firebase conectado — aguardando produtos");
+      window._fb.listen(docs=>{
+        window.produtos=Array.isArray(docs)?docs:[];
+        const tentar=()=>{
+          if(typeof window.renderLista!=="function" || typeof window.updateSidebar!=="function") return false;
+          try{
+            window.renderLista();
+            window.updateSidebar();
+            const n=window.produtos.length;
+            status(true,`Firebase conectado — ${n} produtos`);
+            return true;
+          }catch(e){ console.error("Erro ao renderizar produtos:",e); return false; }
+        };
+        if(!tentar()){
+          let i=0;
+          const timer=setInterval(()=>{ i++; if(tentar()||i>=100) clearInterval(timer); },100);
+        }
+      });
+
+      setTimeout(()=>{
+        window._fb.cadastrarEstruturaSynthera().then(criados=>{
+          if(criados && typeof window.showToast==="function")
+            window.showToast(`${criados} produtos Synthera cadastrados`,"success");
+        }).catch(e=>console.error("Estrutura Synthera:",e));
+      },1500);
+
+    }catch(e){ erro(e); }
   }
 
-  // Watchdog: se o Firestore não responder, informa isso claramente.
-  setTimeout(() => {
-    if(!Array.isArray(window.produtos) || window.produtos.length === 0){
-      const loading = document.querySelector("#productList .loading-state");
-      if(loading){
-        loading.innerHTML =
-          '<div class="empty-icon">⚠️</div><p>O Firebase não retornou os produtos.</p>' +
-          '<small>Verifique as regras do Firestore e o projeto conectado.</small>';
-      }
-      const status=document.getElementById("firebaseStatus");
-      if(status){
-        status.classList.add("offline");
-        const t=status.querySelector("span:last-child");
-        if(t) t.textContent="Firebase sem resposta";
-      }
-    }
-  },10000);
-
-  // Cadastro da estrutura padrão somente em segundo plano.
-  // Ele nunca mais bloqueia a leitura dos produtos já existentes.
-  setTimeout(()=>{
-    window._fb.cadastrarEstruturaSynthera().then(criados=>{
-      if(criados>0 && typeof window.showToast==="function"){
-        window.showToast(`${criados} produtos Synthera cadastrados`,"success");
-      }
-    }).catch(err=>{
-      console.error("Estrutura Synthera não cadastrada automaticamente:",err);
-    });
-  },1500);
+  // Aguarda o HTML existir antes de tocar nos indicadores da página.
+  if(document.readyState==="loading") document.addEventListener("DOMContentLoaded",init);
+  else init();
+})();
 </script>
 <style>
   :root{
@@ -1973,23 +1800,6 @@ window.addEventListener("load", function(){
       if(sincronizar() || n>=100) clearInterval(t);
     },100);
   }
-})();
-</script>
-<script>
-(function(){
-  function forceProductsRender(){
-    if(!Array.isArray(window.produtos) || !window.produtos.length) return;
-    try{
-      if(typeof window.renderLista==="function") window.renderLista();
-      if(typeof window.updateSidebar==="function") window.updateSidebar();
-    }catch(e){ console.error("Synthera render fallback:",e); }
-  }
-  window.addEventListener("synthera:produtos",forceProductsRender);
-  window.addEventListener("load",function(){
-    setTimeout(forceProductsRender,50);
-    setTimeout(forceProductsRender,500);
-    setTimeout(forceProductsRender,1500);
-  });
 })();
 </script>
 </body>
