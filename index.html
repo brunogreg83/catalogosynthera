@@ -1678,89 +1678,209 @@ async function gerarPDF(){
       fill(NAVY);doc.rect(0,0,PW,PH,"F");
     }
 
-    // ==========================
-    // PÁGINAS INTERNAS
-    // ==========================
     // ==========================================================
-    // CARDS DO PDF — MODELO APROVADO
-    // 3 cards por página, alternados:
-    // 1º texto esquerda / produto direita
-    // 2º produto esquerda / texto direita
-    // 3º texto esquerda / produto direita
+    // CATÁLOGO PDF — OPÇÃO C / INDUSTRIAL PREMIUM
+    // Estrutura:
+    // 1. Capa
+    // 2. Índice
+    // 3. Produtos por categoria
+    // 4. Ficha técnica clicável
+    // 5. Rodapé e numeração
     // ==========================================================
-    async function card(p,x,y,w,h,reverse=false){
-      const CARD=[1,10,24];
-      const PANEL=[2,18,38];
-      const WHITE=[250,250,252];
-      const BLUE=[0,132,255];
-      const CYAN2=[0,210,255];
+
+    const groups={};
+    prods.forEach(p=>{
+      const cat=String(p.categoria||"Sem categoria");
+      if(!groups[cat]) groups[cat]=[];
+      groups[cat].push(p);
+    });
+
+    const categoryOrder=[
+      "SGP - Governança",
+      "SCP - Limpeza Pesada",
+      "SKP - Cozinha",
+      "SAP - Preparação de Alimentos",
+      "SLP - Lavanderia"
+    ];
+
+    const entries=Object.entries(groups).sort(([a],[b])=>{
+      const ia=categoryOrder.indexOf(a), ib=categoryOrder.indexOf(b);
+      if(ia<0&&ib<0) return a.localeCompare(b);
+      if(ia<0) return 1;
+      if(ib<0) return -1;
+      return ia-ib;
+    });
+
+    let page=1;
+
+    function pageBg(){
+      fill(ICE); doc.rect(0,0,PW,PH,"F");
+      fill(NAVY); doc.rect(0,0,PW,7,"F");
+      fill(CYAN); doc.rect(0,0,PW,2.2,"F");
+      fill([8,35,51]); doc.rect(0,PH-5,PW,5,"F");
+      fill(CYAN); doc.rect(0,PH-2.2,PW,2.2,"F");
+    }
+
+    function footer(){
+      stroke([52,92,108]); doc.setLineWidth(.35);
+      doc.line(10,PH-14,PW-10,PH-14);
+      textColor(NAVY); font("helvetica",6.5,"bold");
+      doc.text("SYNTHERA",10,PH-7);
+      textColor(MUTED); font("helvetica",6,"normal");
+      doc.text("Soluções químicas de alta performance",38,PH-7);
+      textColor(CYAN); font("helvetica",6.2,"bold");
+      doc.text("www.synthera.com.br",PW/2,PH-7,{align:"center"});
+      textColor(CYAN); font("helvetica",6.5,"bold");
+      doc.text(String(page).padStart(2,"0"),PW-10,PH-7,{align:"right"});
+    }
+
+    function sectionHeader(cat,count){
+      pageBg();
+      fill(NAVY2); doc.roundedRect(10,13,PW-20,27,2.5,2.5,"F");
+      fill(CYAN); doc.rect(10,13,5,27,"F");
+
+      pill(catCode(cat),21,19,24,9,CYAN,NAVY,6.5);
+      textColor(WHITE); font("helvetica",14,"bold");
+      doc.text(cat.replace(/^[A-Z]{3}\s*-\s*/,"").toUpperCase(),52,25);
+
+      textColor([167,203,211]); font("helvetica",6.3,"normal");
+      doc.text("QUÍMICOS PROFISSIONAIS • INDUSTRIAL PREMIUM",52,32);
+
+      pill(`${count} ${count===1?"PRODUTO":"PRODUTOS"}`,PW-51,20,31,8,BLUE,WHITE,5.2);
+      textColor(CYAN); font("helvetica",6.4,"bold");
+      doc.text("PERFORMANCE QUE TRANSFORMA A ROTINA PROFISSIONAL",10,48);
+    }
+
+    function drawIndex(){
+      pageBg();
+
+      textColor(WHITE); font("helvetica",24,"bold");
+      doc.text("ÍNDICE DE PRODUTOS",12,25);
+
+      textColor(CYAN); font("helvetica",8,"normal");
+      doc.text("CATÁLOGO SYNTHERA • INDUSTRIAL PREMIUM",12,33);
+
+      stroke(CYAN); doc.setLineWidth(.7);
+      doc.line(12,39,PW-12,39);
+
+      let y=51;
+      const left=13, right=PW/2+3;
+      let col=0;
+
+      entries.forEach(([cat,list])=>{
+        const x=col===0?left:right;
+
+        fill(NAVY2); doc.roundedRect(x,y-5,83,9,1.5,1.5,"F");
+        textColor(CYAN); font("helvetica",7,"bold");
+        doc.text(catCode(cat),x+4,y+1);
+        textColor(WHITE); font("helvetica",7.5,"bold");
+        doc.text(cat.replace(/^[A-Z]{3}\s*-\s*/,"").toUpperCase(),x+18,y+1);
+
+        y+=10;
+
+        list.forEach(p=>{
+          const code=codeOf(p);
+          const name=shortName(p.nome).toUpperCase();
+          textColor(TEXT); font("helvetica",6.7,"bold");
+          doc.text(code,x+3,y);
+          textColor(MUTED); font("helvetica",6.5,"normal");
+          const max=72;
+          const nm=doc.splitTextToSize(name,max)[0];
+          doc.text(nm,x+19,y);
+          y+=6.5;
+        });
+
+        y+=8;
+
+        if(y>PH-25 && col===0){
+          col=1; y=51;
+        }
+      });
+
+      // Faixa institucional
+      fill(NAVY2); doc.roundedRect(12,PH-38,PW-24,18,2.5,2.5,"F");
+      textColor(CYAN); font("helvetica",7,"bold");
+      doc.text("CATÁLOGO PROFISSIONAL",18,PH-30);
+      textColor(WHITE); font("helvetica",7,"normal");
+      doc.text("Imagens reais • preços opcionais • fichas técnicas disponíveis",18,PH-24);
+
+      footer();
+    }
+
+    // Capa já aprovada como abertura visual do catálogo.
+    // Agora a segunda página é o índice.
+    doc.addPage();
+    page=2;
+    drawIndex();
+
+    async function productCard(p,x,y,w,h,reverse){
+      const CARD=[2,13,25];
+      const PANEL=[4,26,45];
+      const WHITE=[250,251,253];
+      const BLUE2=[10,112,190];
+      const CYAN2=[8,205,231];
 
       fill(CARD);
-      doc.roundedRect(x,y,w,h,3.8,3.8,"F");
-      stroke([28,56,92]);
-      doc.setLineWidth(.45);
-      doc.roundedRect(x,y,w,h,3.8,3.8,"S");
+      doc.roundedRect(x,y,w,h,4,4,"F");
+      stroke([35,67,91]); doc.setLineWidth(.45);
+      doc.roundedRect(x,y,w,h,4,4,"S");
 
       const split=reverse ? x+w*.515 : x+w*.485;
-      const textX=reverse ? split+11 : x+11;
-      const textW=reverse ? x+w-split-20 : split-x-20;
 
-      const imgX=reverse ? x+1.5 : split+1.5;
+      const textX=reverse ? split+10 : x+10;
+      const textW=reverse ? x+w-split-19 : split-x-19;
+
+      const imgX=reverse ? x+2 : split+2;
       const imgW=reverse ? split-x-3 : x+w-split-3;
 
-      // Área da imagem
       fill(PANEL);
-      doc.roundedRect(imgX,y+1.5,imgW,h-3,2.7,2.7,"F");
+      doc.roundedRect(imgX,y+2,imgW,h-4,3,3,"F");
 
-      // Divisor angular luminoso
-      stroke(CYAN2);
-      doc.setLineWidth(1.05);
+      // Corte angular industrial
+      stroke(CYAN2); doc.setLineWidth(1.05);
       if(reverse){
-        doc.line(split+8,y+1,split-10,y+h/2);
-        doc.line(split-10,y+h/2,split+8,y+h-1);
+        doc.line(split+8,y+2,split-9,y+h/2);
+        doc.line(split-9,y+h/2,split+8,y+h-2);
       }else{
-        doc.line(split-8,y+1,split+10,y+h/2);
-        doc.line(split+10,y+h/2,split-8,y+h-1);
+        doc.line(split-8,y+2,split+9,y+h/2);
+        doc.line(split+9,y+h/2,split-8,y+h-2);
       }
 
-      // Produto real cadastrado
+      // Imagem real do cadastro
       if(p.imagem){
         const sz=await imgSize(p.imagem);
         if(sz){
-          const r=sz.w/sz.h;
-          let iw=imgW*.88;
-          let ih=iw/r;
-          const maxH=(h-5)*.94;
-          if(ih>maxH){
-            ih=maxH;
-            iw=ih*r;
-          }
-          const ix=imgX+(imgW-iw)/2;
-          const iy=y+(h-ih)/2;
-          await addImg(p.imagem,ix,iy,iw,ih);
+          const ratio=sz.w/sz.h;
+          let iw=imgW*.84;
+          let ih=iw/ratio;
+          const maxH=(h-8)*.88;
+          if(ih>maxH){ih=maxH;iw=ih*ratio;}
+          await addImg(
+            p.imagem,
+            imgX+(imgW-iw)/2,
+            y+(h-ih)/2,
+            iw,
+            ih
+          );
         }
+      }else{
+        textColor([78,119,139]); font("helvetica",7,"bold");
+        doc.text("IMAGEM DO PRODUTO",imgX+imgW/2,y+h/2,{align:"center"});
       }
 
-      // Código — título principal
-      const code=codeOf(p);
-      if(code){
-        textColor(WHITE);
-        font("helvetica",30,"bold");
-        doc.text(code,textX,y+31);
-      }
+      // Código
+      textColor(WHITE); font("helvetica",28,"bold");
+      doc.text(codeOf(p),textX,y+32);
 
-      // Nome — subtítulo
+      // Nome
       const title=shortName(p.nome).toUpperCase();
-      textColor(BLUE);
-      font("helvetica",15.5,"bold");
-      const lines=doc.splitTextToSize(title,textW).slice(0,2);
-      lines.forEach((ln,i)=>doc.text(ln,textX,y+48+i*7));
+      textColor(BLUE2); font("helvetica",15,"bold");
+      const lines=doc.splitTextToSize(title,textW).slice(0,3);
+      lines.forEach((ln,i)=>doc.text(ln,textX,y+49+i*7));
 
-      // Linha luminosa
-      const lineY=y+61+(lines.length-1)*7;
-      stroke(CYAN2);
-      doc.setLineWidth(.65);
-      doc.line(textX,lineY,textX+Math.min(62,textW*.72),lineY);
+      const lineY=y+63+(lines.length-1)*7;
+      stroke(CYAN2); doc.setLineWidth(.7);
+      doc.line(textX,lineY,textX+Math.min(60,textW*.72),lineY);
 
       // Preço
       const raw=p.preco?String(p.preco).trim():"";
@@ -1768,32 +1888,27 @@ async function gerarPDF(){
         ? (raw.startsWith("R$")?raw:"R$ "+raw)
         : "CONSULTAR";
 
-      const boxY=y+h-21;
-      const boxX=textX;
-      const boxW=Math.min(textW,Math.max(75,textW*.94));
+      const boxY=y+h-22;
+      const boxW=Math.min(textW,Math.max(72,textW*.92));
 
-      stroke(CYAN2);
-      doc.setLineWidth(.5);
-      doc.roundedRect(boxX,boxY,boxW,13,2.2,2.2,"S");
+      stroke(CYAN2); doc.setLineWidth(.55);
+      doc.roundedRect(textX,boxY,boxW,14,2.5,2.5,"S");
 
-      // Ícone de etiqueta
-      stroke(WHITE);
-      doc.setLineWidth(.65);
-      const tx=boxX+7, ty=boxY+6.5;
+      // Etiqueta
+      stroke(WHITE); doc.setLineWidth(.65);
+      const tx=textX+7, ty=boxY+7;
       doc.line(tx-3,ty,tx+2,ty-5);
       doc.line(tx+2,ty-5,tx+6,ty-1);
       doc.line(tx+6,ty-1,tx+1,ty+4);
-      doc.circle(tx-1.2,ty-1.9,.8,"S");
+      doc.circle(tx-1,ty-2,.8,"S");
 
-      textColor(WHITE);
-      font("helvetica",8.7,"bold");
-      doc.text("PREÇO:",boxX+17,boxY+8.6);
+      textColor(WHITE); font("helvetica",8.5,"bold");
+      doc.text("PREÇO:",textX+17,boxY+9);
 
-      textColor(BLUE);
-      font("helvetica",13.2,"bold");
-      doc.text(value,boxX+42,boxY+9);
+      textColor(BLUE2); font("helvetica",12.5,"bold");
+      doc.text(value,textX+42,boxY+9.3);
 
-      // Link clicável para ficha técnica
+      // Ficha técnica clicável
       if(p.ficha){
         try{
           doc.link(imgX,y+2,imgW,h-4,{url:String(p.ficha)});
@@ -1801,66 +1916,35 @@ async function gerarPDF(){
       }
     }
 
-    // Agrupa todos os produtos mantendo a ordem do catálogo.
-    const entries=[];
-    const seenCats=new Map();
-    for(const p of prods){
-      const cat=String(p.categoria||"Sem categoria");
-      if(!seenCats.has(cat)){
-        const arr=[];
-        seenCats.set(cat,arr);
-        entries.push([cat,arr]);
-      }
-      seenCats.get(cat).push(p);
-    }
+    // Produtos: duas unidades por página, mais espaço e acabamento premium.
+    const GAP=6, TOP=55, BOTTOM=20;
+    const CARD_H=(PH-TOP-BOTTOM-GAP)/2;
 
-    // Cada página reproduz o modelo aprovado: 3 cards verticais.
-    const CARD_GAP=4;
-    const CARD_TOP=8;
-    const CARD_BOTTOM=8;
-    const CARD_H=(PH-CARD_TOP-CARD_BOTTOM-CARD_GAP*2)/3;
+    for(const [cat,list] of entries){
+      let idx=0;
 
-    let page=1;
-    let pageItems=[];
+      while(idx<list.length){
+        doc.addPage();
+        page++;
 
-    for(const [,group] of entries){
-      for(const p of group){
-        pageItems.push(p);
+        sectionHeader(cat,list.length);
 
-        if(pageItems.length===3){
-          if(page>1) doc.addPage();
-          for(let i=0;i<3;i++){
-            await card(
-              pageItems[i],
-              2,
-              CARD_TOP+i*(CARD_H+CARD_GAP),
-              PW-4,
-              CARD_H,
-              i%2===1
-            );
-          }
-          pageItems=[];
-          page++;
+        const first=list[idx];
+        await productCard(first,10,TOP,PW-20,CARD_H,false);
+
+        if(idx+1<list.length){
+          const second=list[idx+1];
+          await productCard(second,10,TOP+CARD_H+GAP,PW-20,CARD_H,true);
         }
-      }
-    }
 
-    // Última página com 1 ou 2 produtos, sem quebrar o layout.
-    if(pageItems.length){
-      if(page>1) doc.addPage();
-      for(let i=0;i<pageItems.length;i++){
-        await card(
-          pageItems[i],
-          2,
-          CARD_TOP+i*(CARD_H+CARD_GAP),
-          PW-4,
-          CARD_H,
-          i%2===1
-        );
+        footer();
+        idx+=2;
       }
     }
 
     doc.save("catalogo-synthera.pdf");
+    showToast("Catálogo Synthera — Opção C gerado com sucesso!");
+
     showToast("Catálogo Synthera gerado com sucesso!");
   }catch(e){
     console.error(e);
@@ -1918,4 +2002,28 @@ window.addEventListener("load", function(){
 })();
 </script>
 </body>
-</html>
+</htmlfor(let ci=0; ci<window.produtos.length; ci+=3){
+      doc.addPage(); page++;
+
+      // Página limpa: somente os cards, como na imagem aprovada.
+      fill([255,255,255]);
+      doc.rect(0,0,PW,PH,"F");
+
+      const chunk=window.produtos.slice(ci,ci+3);
+      const cardH=88, gap=4;
+      const totalH=cardH*3+gap*2;
+      const startY=(PH-totalH)/2;
+
+      for(let i=0;i<chunk.length;i++){
+        await card(
+          chunk[i],
+          0,
+          startY+i*(cardH+gap),
+          PW,
+          cardH,
+          (i%2)===1
+        );
+      }
+    }
+
+    >
