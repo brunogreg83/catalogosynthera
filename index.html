@@ -357,6 +357,53 @@ document.addEventListener("DOMContentLoaded", () => {
   .empty-icon{font-size:2.2rem;opacity:.4}
   .empty-state p{font-size:.88rem;color:var(--text-muted);margin-top:7px;line-height:1.6}
 
+
+  /* MODELO SYNTHERA — CARDS ALTERNADOS APROVADOS */
+  .product-card.synthera-product{
+    background:#020b17;border:1px solid rgba(24,155,255,.32);border-radius:18px;
+    overflow:hidden;box-shadow:0 10px 35px rgba(0,0,0,.22);color:#fff;
+    position:relative;min-height:235px;margin-bottom:14px;transition:.2s;
+  }
+  .product-card.synthera-product:hover{transform:translateY(-2px);border-color:#16b8ff;box-shadow:0 14px 42px rgba(0,130,255,.18)}
+  .synthera-product-inner{display:grid;grid-template-columns:1fr 1fr;min-height:235px;position:relative}
+  .synthera-product.reverse .synthera-product-inner{grid-template-columns:1fr 1fr}
+  .synthera-product-content{padding:27px 30px 25px;display:flex;flex-direction:column;justify-content:center;position:relative;z-index:2}
+  .synthera-product.reverse .synthera-product-content{grid-column:2;grid-row:1}
+  .synthera-product-media{min-height:235px;position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden;background:radial-gradient(circle at 50% 50%,rgba(0,105,255,.18),transparent 55%),#03101f}
+  .synthera-product:not(.reverse) .synthera-product-media{grid-column:2;grid-row:1}
+  .synthera-product.reverse .synthera-product-media{grid-column:1;grid-row:1}
+  .synthera-product-media:before{content:"";position:absolute;inset:0;background:repeating-radial-gradient(circle at 50% 50%,rgba(0,140,255,.16) 0 1px,transparent 1px 13px);opacity:.45}
+  .synthera-product-media:after{content:"";position:absolute;bottom:15px;width:70%;height:22px;background:rgba(0,174,255,.45);filter:blur(16px);border-radius:50%}
+  .synthera-product-media img{position:relative;z-index:2;width:min(62%,270px);height:210px;object-fit:contain;filter:drop-shadow(0 14px 20px rgba(0,0,0,.5))}
+  .synthera-product-code{font-family:"Montserrat",sans-serif;font-size:clamp(2.2rem,5vw,4rem);line-height:.92;font-weight:900;letter-spacing:1px;color:#fff;margin-bottom:7px}
+  .synthera-product-name{font-family:"Montserrat",sans-serif;font-size:clamp(1.2rem,2.5vw,1.9rem);font-weight:900;color:#08aaf4;text-transform:uppercase;line-height:1.05;margin-bottom:10px}
+  .synthera-product-sub{font-size:.86rem;line-height:1.45;color:rgba(255,255,255,.88);margin-bottom:17px;max-width:560px}
+  .synthera-product-actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+  .synthera-product .product-card-preco{margin:0;background:rgba(1,11,23,.82);border:1px solid #0ab9ff;color:#fff;border-radius:9px;padding:9px 15px;font-size:.9rem}
+  .synthera-product .product-card-preco.consultar{color:#08aaf4;background:rgba(1,11,23,.82);border-color:#087eb5}
+  .synthera-product .product-card-preco svg{stroke:#fff}
+  .synthera-product .btn-ficha{margin:0;background:rgba(2,12,24,.9);border:1px solid #0ab9ff;color:#fff;border-radius:9px;padding:9px 15px;display:inline-flex;align-items:center;gap:7px;font-size:.76rem;font-weight:800;text-decoration:none;text-transform:uppercase;letter-spacing:.3px}
+  .synthera-product .btn-ficha:hover{background:#06304c}
+  .synthera-product .product-card-header{position:absolute;top:10px;left:12px;right:12px;z-index:5;background:transparent;padding:0;pointer-events:none}
+  .synthera-product .product-card-header-name{display:none}
+  .synthera-product .prod-select-label{pointer-events:auto}
+  .synthera-product .card-actions{pointer-events:auto;margin-left:auto}
+  .synthera-product .card-actions button{background:rgba(0,0,0,.42);border:1px solid rgba(0,180,255,.35)}
+  .synthera-product .product-attrs{margin:0 0 13px;max-width:520px}
+  .synthera-product .attr-label{color:#09b7ff}
+  .synthera-product .attr-value{color:rgba(255,255,255,.9)}
+  .synthera-product .preco-custom-row{background:rgba(30,22,0,.65);border-color:#caa72c;color:#ffe58a}
+  .synthera-product .preco-custom-row label{color:#ffe58a}
+  .synthera-product .product-card-body{padding:0}
+  @media(max-width:760px){
+    .synthera-product-inner{grid-template-columns:1fr;min-height:0}
+    .synthera-product .synthera-product-content,.synthera-product.reverse .synthera-product-content{grid-column:1;grid-row:2;padding:24px 20px 22px}
+    .synthera-product .synthera-product-media,.synthera-product.reverse .synthera-product-media{grid-column:1;grid-row:1;min-height:190px}
+    .synthera-product-media img{width:45%;height:175px}
+    .synthera-product-code{font-size:2.5rem}
+    .synthera-product-name{font-size:1.35rem}
+  }
+
   /* PRODUCT CARD */
   .product-card{background:#fff;border-radius:14px;overflow:hidden;
     border:1.5px solid rgba(26,79,160,.1);box-shadow:0 3px 14px rgba(26,79,160,.06);
@@ -1098,70 +1145,63 @@ window.renderLista = function(){
   const list=document.getElementById("productList");
   const title=document.getElementById("listTitle");
   const prods=window.produtos;
-
   if(!prods.length){
     title.textContent="Nenhum produto cadastrado";
-    list.innerHTML=`<div class="empty-state">
-      <div class="empty-icon">📦</div>
-      <p>Adicione o primeiro produto usando o formulário acima.<br/>Será salvo automaticamente no Firebase.</p>
-    </div>`;
+    list.innerHTML=`<div class="empty-state"><div class="empty-icon">📦</div><p>Adicione o primeiro produto usando o formulário acima.<br/>Será salvo automaticamente no Firebase.</p></div>`;
     return;
   }
   title.textContent=`${prods.length} produto${prods.length>1?"s":""} no catálogo`;
-
-  const personalizadoAtivo = document.getElementById("chkPersonalizado")?.checked;
-
+  const personalizadoAtivo=document.getElementById("chkPersonalizado")?.checked;
   const cats={};
-  prods.forEach(p=>{ if(!cats[p.categoria]) cats[p.categoria]=[]; cats[p.categoria].push(p); });
-
-  list.innerHTML=Object.entries(cats).map(([cat,ps])=>`
-    <div style="margin-bottom:6px">
-      <p style="font-size:.66rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;
-        color:var(--text-muted);margin-bottom:7px;padding-left:2px">${cat}</p>
-      ${ps.map(p=>`
-        <div class="product-card ${window.selecionados.has(p.id)?'selecionado':''}" style="margin-bottom:9px">
-          <div class="product-card-header">
-            <label class="prod-select-label" title="Selecionar para catálogo personalizado">
-              <input type="checkbox" class="prod-select-chk" ${window.selecionados.has(p.id)?'checked':''} onchange="toggleSelecao('${p.id}',this.checked)"/>
-            </label>
-            <span class="product-card-header-name">${p.nome}</span>
-            <div class="card-actions">
-              <button onclick="editarProduto('${p.id}')">✏️ Editar</button>
-              <button onclick="removerProduto('${p.id}')">🗑 Remover</button>
-            </div>
-          </div>
-          ${p.imagem?`<div class="prod-img-wrap"><img class="prod-img" src="${p.imagem}" alt="${p.nome}"/></div>`:""}
-          <div class="product-card-body">
-            ${personalizadoAtivo && window.selecionados.has(p.id) ? `
-            <div class="preco-custom-row">
-              <label for="precoCustom-${p.id}">Preço neste PDF</label>
-              <input type="text" id="precoCustom-${p.id}"
-                placeholder="${p.preco || 'Consultar'}"
-                value="${window.precosPersonalizados[p.id] || ''}"
-                oninput="atualizarPrecoPersonalizado('${p.id}', this.value)"/>
-              ${window.precosPersonalizados[p.id] ? `<button type="button" class="preco-custom-clear" onclick="limparPrecoPersonalizado('${p.id}')">limpar</button>` : ''}
-            </div>` : ''}
-            <div class="product-card-preco ${p.preco?'':'consultar'}">
-              ${p.preco
-                ? `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> ${p.preco}`
-                : `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> Consultar`
-              }
-            </div>
-            ${(p.attrs||[]).length?`<div class="product-attrs">
-              ${(p.attrs||[]).map(({l,v})=>`
-                <span class="attr-label">${l}</span>
-                <span class="attr-value">${v}</span>
-              `).join("")}
-            </div>`:""}
-            ${p.ficha?`<a class="btn-ficha" href="${p.ficha}" download="${p.fichaNome||'ficha-tecnica.pdf'}">
-              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-              Baixar Ficha Técnica
-            </a>`:""}
+  prods.forEach(p=>{if(!cats[p.categoria])cats[p.categoria]=[];cats[p.categoria].push(p);});
+  let globalIndex=0;
+  list.innerHTML=Object.entries(cats).map(([cat,ps])=>{
+    const cards=ps.map(p=>{
+      const reverse=globalIndex++%2===1;
+      const code=(String(p.nome||"").match(/^([A-Z]{3}\d{3})/)||[])[1]||"";
+      const cleanName=String(p.nome||"").replace(/^[A-Z]{3}\d{3}\s*[—-]\s*/i,"").trim() || p.nome || "Produto";
+      const attrs=(p.attrs||[]);
+      const subtitle=attrs.length ? attrs[0].v : "SOLUÇÃO PROFISSIONAL SYNTHERA";
+      return `
+      <div class="product-card synthera-product ${reverse?'reverse':''} ${window.selecionados.has(p.id)?'selecionado':''}">
+        <div class="product-card-header">
+          <label class="prod-select-label" title="Selecionar para catálogo personalizado">
+            <input type="checkbox" class="prod-select-chk" ${window.selecionados.has(p.id)?'checked':''} onchange="toggleSelecao('${p.id}',this.checked)"/>
+          </label>
+          <div class="card-actions">
+            <button onclick="editarProduto('${p.id}')">✏️ Editar</button>
+            <button onclick="removerProduto('${p.id}')">🗑 Remover</button>
           </div>
         </div>
-      `).join("")}
-    </div>
-  `).join("");
+        <div class="synthera-product-inner">
+          <div class="synthera-product-media">
+            ${p.imagem?`<img src="${p.imagem}" alt="${cleanName}"/>`:`<div style="font-size:4rem;opacity:.22">🧴</div>`}
+          </div>
+          <div class="synthera-product-content">
+            <div class="synthera-product-code">${code||cleanName}</div>
+            <div class="synthera-product-name">${cleanName}</div>
+            <div class="synthera-product-sub">${subtitle}</div>
+            ${personalizadoAtivo && window.selecionados.has(p.id) ? `
+              <div class="preco-custom-row">
+                <label for="precoCustom-${p.id}">Preço neste PDF</label>
+                <input type="text" id="precoCustom-${p.id}" placeholder="${p.preco||'Consultar'}" value="${window.precosPersonalizados[p.id]||''}" oninput="atualizarPrecoPersonalizado('${p.id}', this.value)"/>
+                ${window.precosPersonalizados[p.id]?`<button type="button" class="preco-custom-clear" onclick="limparPrecoPersonalizado('${p.id}')">limpar</button>`:''}
+              </div>`:''}
+            ${(attrs.length>1)?`<div class="product-attrs">${attrs.slice(1).map(({l,v})=>`<span class="attr-label">${l}</span><span class="attr-value">${v}</span>`).join("")}</div>`:""}
+            <div class="synthera-product-actions">
+              <div class="product-card-preco ${p.preco?'':'consultar'}">
+                ${p.preco
+                  ? `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg> PREÇO: ${p.preco}`
+                  : `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> PREÇO: CONSULTAR`}
+              </div>
+              ${p.ficha?`<a class="btn-ficha" href="${p.ficha}" download="${p.fichaNome||'ficha-tecnica.pdf'}"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> BAIXAR FICHA TÉCNICA</a>`:""}
+            </div>
+          </div>
+        </div>
+      </div>`;
+    }).join("");
+    return `<div style="margin-bottom:18px"><p style="font-size:.66rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted);margin-bottom:7px;padding-left:2px">${cat}</p>${cards}</div>`;
+  }).join("");
 };
 
 window.updateSidebar = function(){
