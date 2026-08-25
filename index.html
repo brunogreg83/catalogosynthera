@@ -1027,6 +1027,7 @@ window.showToast = function(msg, type="success"){
 
 function showSaving(){
   const b = document.getElementById("savingBadge");
+  if(!b) return;
   b.classList.add("show");
   clearTimeout(b._t);
   b._t = setTimeout(()=> b.classList.remove("show"), 2000);
@@ -1098,7 +1099,7 @@ function handleImageSelect(input){
 
 function handleDrop(e){
   e.preventDefault();
-  document.getElementById("uploadArea").classList.remove("drag");
+  document.getElementById("uploadArea")?.classList.remove("drag");
   const file = e.dataTransfer.files[0];
   if(!file || !file.type.startsWith("image/")) return;
   processarImagem(file);
@@ -1152,7 +1153,7 @@ function handleFichaSelect(input){
     document.getElementById('fichaPrompt').style.display = 'none';
     document.getElementById('fichaNomeTexto').textContent = file.name;
     document.getElementById('fichaNome').style.display = 'flex';
-    document.getElementById('fichaUploadArea').classList.add('has-file');
+    document.getElementById('fichaUploadArea')?.classList.add('has-file');
   };
   reader.readAsDataURL(file);
 }
@@ -1169,7 +1170,7 @@ function resetFichaForm(){
   document.getElementById('fFicha').value = '';
   document.getElementById('fichaPrompt').style.display = 'block';
   document.getElementById('fichaNome').style.display = 'none';
-  document.getElementById('fichaUploadArea').classList.remove('has-file');
+  document.getElementById('fichaUploadArea')?.classList.remove('has-file');
 }
 
 // reset completo de estado (usado por limparForm — não marca como alterado)
@@ -1301,7 +1302,7 @@ function editarProduto(id){
     document.getElementById('fichaPrompt').style.display = 'none';
     document.getElementById('fichaNomeTexto').textContent = fichaNomeArq;
     document.getElementById('fichaNome').style.display = 'flex';
-    document.getElementById('fichaUploadArea').classList.add('has-file');
+    document.getElementById('fichaUploadArea')?.classList.add('has-file');
   }
 
   // load existing image
