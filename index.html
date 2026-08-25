@@ -1604,9 +1604,9 @@ async function gerarPDF(){
     });
 
     let page=1;
-    const MG=12,GAP=6,TOP=50,FOOT=18;
+    const MG=10,GAP=5,TOP=50,FOOT=18;
     const CW=PW-MG*2;
-    const CH=(PH-TOP-FOOT-6)/2;
+    const CH=68;
 
     function base(){
       fill(ICE);doc.rect(0,0,PW,PH,"F");
@@ -1649,42 +1649,48 @@ async function gerarPDF(){
 
     async function card(p,x,y,w,h,reverse=false){
       // CARD PDF — MODELO APROVADO
-      // Alternância: texto à esquerda/galão à direita,
-      // depois galão à esquerda/texto à direita.
-      fill([2,13,27]);doc.roundedRect(x,y,w,h,4,4,"F");
-      stroke([32,77,111]);doc.setLineWidth(.55);doc.roundedRect(x,y,w,h,4,4,"S");
+      // 1º card: texto à esquerda / galão à direita
+      // 2º card: galão à esquerda / texto à direita
+      const CARD=[2,13,27], IMAGEBG=[3,22,40], BORDER=[32,77,111];
+
+      fill(CARD);
+      doc.roundedRect(x,y,w,h,4,4,"F");
+      stroke(BORDER);doc.setLineWidth(.55);
+      doc.roundedRect(x,y,w,h,4,4,"S");
 
       const splitX = reverse ? x+w*.53 : x+w*.47;
+
+      // Painel da imagem.
+      fill(IMAGEBG);
+      if(reverse){
+        doc.roundedRect(x+3,y+3,splitX-x-6,h-6,2.5,2.5,"F");
+      }else{
+        doc.roundedRect(splitX+3,y+3,x+w-splitX-6,h-6,2.5,2.5,"F");
+      }
+
+      // Divisor angular neon.
+      stroke(CYAN);doc.setLineWidth(1.15);
+      if(reverse){
+        doc.line(splitX+8,y+4,splitX-10,y+h/2);
+        doc.line(splitX-10,y+h/2,splitX+8,y+h-4);
+      }else{
+        doc.line(splitX-8,y+4,splitX+10,y+h/2);
+        doc.line(splitX+10,y+h/2,splitX-8,y+h-4);
+      }
+
+      // Área do texto.
       const textX = reverse ? splitX+10 : x+10;
       const textW = reverse ? x+w-splitX-20 : splitX-x-20;
 
-      // Área da imagem ocupa integralmente metade do card.
-      fill([3,22,40]);
-      if(reverse){
-        doc.rect(x+3,y+3,splitX-x-6,h-6,"F");
-      }else{
-        doc.rect(splitX+3,y+3,x+w-splitX-6,h-6,"F");
-      }
-
-      // Divisor angular neon, igual ao modelo aprovado.
-      stroke(CYAN);doc.setLineWidth(1.15);
-      if(reverse){
-        doc.line(splitX+8,y+5,splitX-10,y+h/2);
-        doc.line(splitX-10,y+h/2,splitX+8,y+h-5);
-      }else{
-        doc.line(splitX-8,y+5,splitX+10,y+h/2);
-        doc.line(splitX+10,y+h/2,splitX-8,y+h-5);
-      }
-
-      // Produto.
+      // Imagem do produto — grande e centralizada no painel.
       if(p.imagem){
         const sz=await imgSize(p.imagem);
         if(sz){
           const areaX=reverse?x+6:splitX+5;
           const areaW=reverse?(splitX-x-12):(x+w-splitX-12);
-          const areaY=y+5, areaH=h-10, r=sz.w/sz.h;
-          let iw=areaW*.82, ih=iw/r;
-          if(ih>areaH*.90){ih=areaH*.90;iw=ih*r;}
+          const areaY=y+4, areaH=h-8, r=sz.w/sz.h;
+          let iw=areaW*.86, ih=iw/r;
+          if(ih>areaH*.94){ih=areaH*.94;iw=ih*r;}
           const ix=areaX+(areaW-iw)/2;
           const iy=areaY+(areaH-ih)/2;
           await addImg(p.imagem,ix,iy,iw,ih);
@@ -1695,66 +1701,67 @@ async function gerarPDF(){
         doc.text("IMAGEM DO PRODUTO",px,y+h/2,{align:"center"});
       }
 
-      // Código — título principal.
+      // TÍTULO — código do produto.
       const code=codeOf(p);
       if(code){
         textColor(WHITE);font("helvetica","bold",25);
-        doc.text(code,textX,y+30);
+        doc.text(code,textX,y+25);
       }
 
-      // Nome — subtítulo.
+      // SUBTÍTULO — nome do produto.
       const title=shortName(p.nome);
-      textColor(CYAN);font("helvetica","bold",13.5);
+      textColor(CYAN);font("helvetica","bold",13.2);
       let titleLines=doc.splitTextToSize(String(title).toUpperCase(),textW);
       titleLines=titleLines.slice(0,2);
-      titleLines.forEach((ln,i)=>doc.text(ln,textX,y+46+i*6.4));
+      titleLines.forEach((ln,i)=>doc.text(ln,textX,y+41+i*5.8));
 
       // Linha luminosa.
-      const lineY=y+64;
-      stroke(CYAN);doc.setLineWidth(.8);
-      doc.line(textX,lineY,textX+Math.min(58,textW*.42),lineY);
+      const lineY=y+54;
+      stroke(CYAN);doc.setLineWidth(.7);
+      doc.line(textX,lineY,textX+Math.min(54,textW*.55),lineY);
 
-      // Conteúdo comercial essencial; sem "Solução profissional Synthera".
-      let ay=lineY+13;
-      const attrs=(p.attrs||[]).slice(0,2);
-      attrs.forEach(a=>{
-        if(!a || !String(a.v||"").trim()) return;
-        textColor([176,207,219]);font("helvetica","normal",7);
-        const ls=doc.splitTextToSize(String(a.v),textW);
-        ls.slice(0,2).forEach((ln,j)=>doc.text(ln,textX,ay+j*4.2));
-        ay += 9 + Math.min(2,ls.length)*4.2;
-      });
-
-      const fy=y+h-18;
-
-      // Ficha técnica.
-      if(p.ficha){
-        const fichaLabel="BAIXAR FICHA TÉCNICA";
-        font("helvetica","bold",6.0);
-        const fichaW=Math.min(52,Math.max(40,doc.getTextWidth(fichaLabel)+12));
-        pill(fichaLabel,textX,fy,fichaW,10,[4,39,62],CYAN,5.4);
-        doc.link(textX,fy,fichaW,10,{url:p.ficha});
-      }
-
-      // Preço.
+      // Preço — exatamente na área inferior do bloco de texto.
       const raw=p.preco?String(p.preco).trim():"";
       const precoTxt=mostrarPreco
         ? (raw ? (raw.startsWith("R$")?raw:"R$ "+raw) : "PREÇO: CONSULTAR")
         : "PREÇO: CONSULTAR";
-      const precoW=Math.max(42,doc.getTextWidth(precoTxt)+16);
-      const precoX=x+w-10-precoW;
-      pill(precoTxt,precoX,fy,precoW,10,
-        mostrarPreco&&raw?[5,54,78]:[4,39,62],
-        mostrarPreco&&raw?CYAN:[190,225,232],6.7);
-    }
 
+      font("helvetica","bold",6.8);
+      const precoW=Math.min(textW,Math.max(52,doc.getTextWidth(precoTxt)+22));
+      const precoX=reverse ? x+w-10-precoW : textX;
+      const precoY=y+h-17;
+
+      // Caixa do preço.
+      stroke(CYAN);doc.setLineWidth(.55);
+      doc.roundedRect(precoX,precoY,precoW,10,2.2,2.2,"S");
+
+      // Ícone de etiqueta simples.
+      stroke(WHITE);doc.setLineWidth(.55);
+      const tx=precoX+5, ty=precoY+5;
+      doc.line(tx-2,ty,tx+2,ty-4);
+      doc.line(tx+2,ty-4,tx+5,ty-1);
+      doc.line(tx+5,ty-1,tx+1,ty+3);
+      doc.circle(tx-1.5,ty-1.8,.7,"S");
+
+      textColor(WHITE);font("helvetica","bold",7.5);
+      doc.text("PREÇO:",precoX+12,precoY+6.6);
+
+      const valueX=precoX+34;
+      textColor(CYAN);font("helvetica","bold",10.8);
+      doc.text(precoTxt.replace(/^PREÇO:\s*/i,""),valueX,precoY+6.8);
+
+      // Ficha técnica: mantém o download sem inserir texto adicional no card.
+      if(p.ficha){
+        doc.link(precoX,precoY,precoW,10,{url:p.ficha});
+      }
+    }
     for(const [cat,gprods] of entries){
-      for(let ci=0;ci<gprods.length;ci+=4){
+      for(let ci=0;ci<gprods.length;ci+=2){
         doc.addPage();page++;
         const sy=ci===0?catHeader(cat,gprods.length):contHeader(cat);
         const chunk=gprods.slice(ci,ci+2);
         for(let i=0;i<chunk.length;i++){
-          const reverse = ((ci+i) % 2) === 1;
+          const reverse = (i % 2) === 1;
           await card(chunk[i],MG,sy+i*(CH+GAP),CW,CH,reverse);
         }
         footer();
