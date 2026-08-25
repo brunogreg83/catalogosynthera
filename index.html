@@ -11,19 +11,19 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
 import {
   getFirestore, collection, addDoc, updateDoc, deleteDoc,
-  doc, onSnapshot, serverTimestamp, query, orderBy, getDocs
+  doc, onSnapshot, serverTimestamp, query, orderBy
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 import {
   getStorage, ref, uploadString, getDownloadURL, deleteObject
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyC8oIu9BJBmM2QMQHPKqIEegYtUny1uDJE",
-  authDomain: "catalogo-68e13.firebaseapp.com",
-  projectId: "catalogo-68e13",
-  storageBucket: "catalogo-68e13.firebasestorage.app",
-  messagingSenderId: "946056802788",
-  appId: "1:946056802788:web:a9d30721fb48a7a85f57f1"
+  apiKey: "AIzaSyCbhrBJsWRz-inbbeAahg-7OQQDZ0stk7Y",
+  authDomain: "catalogosynthera.firebaseapp.com",
+  projectId: "catalogosynthera",
+  storageBucket: "catalogosynthera.firebasestorage.app",
+  messagingSenderId: "46345196031",
+  appId: "1:46345196031:web:3362e60ca02f8efd0517ca"
 };
 
 const app     = initializeApp(firebaseConfig);
@@ -31,72 +31,8 @@ const db      = getFirestore(app);
 const storage = getStorage(app);
 const COL     = "produtos";
 
-// ── CATÁLOGO PADRÃO SYNTHERA ─────────────────────────────
-const SYNTHERA_CATALOGO = [
-  { categoria:"SGP - Governança", codigo:"SGP101", nome:"SGP101 — Água Sanitária" },
-  { categoria:"SGP - Governança", codigo:"SGP102", nome:"SGP102 — Limpa Piso" },
-  { categoria:"SGP - Governança", codigo:"SGP103", nome:"SGP103 — Removedor de Lodo" },
-  { categoria:"SGP - Governança", codigo:"SGP104", nome:"SGP104 — Limpa Banheiro" },
-  { categoria:"SGP - Governança", codigo:"SGP105", nome:"SGP105 — Odorizador" },
-
-  { categoria:"SCP - Limpeza Pesada", codigo:"SCP201", nome:"SCP201 — Hipoclorito" },
-  { categoria:"SCP - Limpeza Pesada", codigo:"SCP202", nome:"SCP202 — Limpador de Superfícies" },
-  { categoria:"SCP - Limpeza Pesada", codigo:"SCP203", nome:"SCP203 — Limpador de Pisos e Paredes" },
-  { categoria:"SCP - Limpeza Pesada", codigo:"SCP204", nome:"SCP204 — Limpador de Máquinas" },
-
-  { categoria:"SKP - Cozinha", codigo:"SKP301", nome:"SKP301 — Grill / Desengordurante" },
-  { categoria:"SKP - Cozinha", codigo:"SKP302", nome:"SKP302 — Detergente Lava Louças" },
-  { categoria:"SKP - Cozinha", codigo:"SKP304", nome:"SKP304 — Secante Lava Louças" },
-
-  { categoria:"SAP - Preparação de Alimentos", codigo:"SAP304", nome:"SAP304 — Desinfetante de Instalações" },
-  { categoria:"SAP - Preparação de Alimentos", codigo:"SAP302", nome:"SAP302 — Desengordurante" },
-  { categoria:"SAP - Preparação de Alimentos", codigo:"SAP306", nome:"SAP306 — Ácido Peracético" },
-  { categoria:"SAP - Preparação de Alimentos", codigo:"SAP301", nome:"SAP301 — Sanitizante para Hortaliças" },
-
-  { categoria:"SLP - Lavanderia", codigo:"SLP401", nome:"SLP401 — Alvejante" },
-  { categoria:"SLP - Lavanderia", codigo:"SLP402", nome:"SLP402 — Detergente" },
-  { categoria:"SLP - Lavanderia", codigo:"SLP403", nome:"SLP403 — Amaciante" },
-  { categoria:"SLP - Lavanderia", codigo:"SLP404", nome:"SLP404 — Neutralizante" },
-  { categoria:"SLP - Lavanderia", codigo:"SLP405", nome:"SLP405 — Desengraxante Tópico" },
-  { categoria:"SLP - Lavanderia", codigo:"SLP406", nome:"SLP406 — Neutralizador de Ferrugem" },
-  { categoria:"SLP - Lavanderia", codigo:"SLP407", nome:"SLP407 — Desengraxante" },
-  { categoria:"SLP - Lavanderia", codigo:"SLP408", nome:"SLP408 — Detergente Umectante" },
-  { categoria:"SLP - Lavanderia", codigo:"SLP409", nome:"SLP409 — Detergente Alcalino" }
-];
-const SYNTHERA_CATEGORIAS = [
-  "SGP - Governança",
-  "SCP - Limpeza Pesada",
-  "SKP - Cozinha",
-  "SAP - Preparação de Alimentos",
-  "SLP - Lavanderia"
-];
-
 // ── Expõe funções ao escopo global ──────────────────────
 window._fb = {
-  async resetAndSeedSynthera(){
-    const snap = await getDocs(collection(db, COL));
-    const docs = snap.docs;
-    const hasSynthera = docs.some(d => /^S[GKALCP]P?\d{3}$/.test(d.data()?.codigo || ""));
-    if(hasSynthera) return { skipped:true, total:docs.length };
-
-    // Remove o catálogo anterior e cria exclusivamente o catálogo padrão Synthera.
-    for(const d of docs) await deleteDoc(doc(db, COL, d.id));
-    for(const p of SYNTHERA_CATALOGO){
-      await addDoc(collection(db, COL), {
-        nome:p.nome,
-        codigo:p.codigo,
-        categoria:p.categoria,
-        attrs:[],
-        preco:null,
-        imagem:null,
-        ficha:null,
-        fichaPath:null,
-        fichaNome:null,
-        criadoEm:serverTimestamp()
-      });
-    }
-    return { skipped:false, removed:docs.length, added:SYNTHERA_CATALOGO.length };
-  },
   async add(data){
     return await addDoc(collection(db, COL), { ...data, criadoEm: serverTimestamp() });
   },
@@ -200,14 +136,6 @@ document.addEventListener("DOMContentLoaded", () => {
     tryRender(docs);
     if(first){
       first = false;
-      window._fb.resetAndSeedSynthera().then(result => {
-        if(result && !result.skipped && typeof window.showToast === "function"){
-          window.showToast(`Catálogo Synthera configurado: ${result.added} produtos adicionados.`, "success");
-        }
-      }).catch(err => {
-        console.error("Erro ao configurar catálogo Synthera:", err);
-        if(typeof window.showToast === "function") window.showToast("Não foi possível configurar o catálogo Synthera. Verifique as permissões do Firebase.", "error");
-      });
       const el = document.getElementById("dbStatus");
       if(el){ el.className = "db-status ok"; el.innerHTML = "&#9679; Firebase conectado"; }
     }
@@ -585,11 +513,14 @@ document.addEventListener("DOMContentLoaded", () => {
           <label>Categoria *</label>
           <select id="fCategoria" onchange="validarForm()">
             <option value="" disabled selected>Selecione uma categoria…</option>
-            <option value="SGP - Governança">SGP - Governança</option>
-            <option value="SCP - Limpeza Pesada">SCP - Limpeza Pesada</option>
-            <option value="SKP - Cozinha">SKP - Cozinha</option>
-            <option value="SAP - Preparação de Alimentos">SAP - Preparação de Alimentos</option>
-            <option value="SLP - Lavanderia">SLP - Lavanderia</option>
+            <option value="Detergentes">Detergentes</option>
+            <option value="Desengordurantes">Desengordurantes</option>
+            <option value="Desinfetantes">Desinfetantes</option>
+            <option value="Limpeza Geral">Limpeza Geral</option>
+            <option value="Tratamento de Piso">Tratamento de Piso</option>
+            <option value="Lavanderia">Lavanderia</option>
+            <option value="Lava Car">Lava Car</option>
+            <option value="Descartáveis">Descartáveis</option>
           </select>
         </div>
       </div>
@@ -1509,9 +1440,9 @@ async function gerarPDF(){
     }
 
     // Ordem fixa
-    const CAT_ORDER = ["SGP - Governança", "SCP - Limpeza Pesada", "SKP - Cozinha", "SAP - Preparação de Alimentos", "SLP - Lavanderia"];
+    const CAT_ORDER = ["Detergentes", "Desengordurantes", "Desinfetantes", "Limpeza Geral", "Tratamento de Piso", "Lavanderia", "Lava Car", "Descartáveis"];
     // Aceita nomes antigos (singular) salvos em produtos cadastrados antes da renomeação
-    const CAT_ALIASES = {};
+    const CAT_ALIASES = { "Detergente": "Detergentes", "Desengordurante": "Desengordurantes", "Desinfetante": "Desinfetantes" };
     const sortedEntries = Object.entries(groups).sort(([a], [b]) => {
       const na = CAT_ALIASES[a] || a, nb = CAT_ALIASES[b] || b;
       const ia = CAT_ORDER.indexOf(na), ib = CAT_ORDER.indexOf(nb);
