@@ -176,21 +176,95 @@
       };
 
       status(true,"Firebase conectado — aguardando produtos");
+      // Renderização direta dos dados recebidos do Firestore.
+      // Não depende de outras funções da plataforma para exibir os produtos.
       window._fb.listen(docs=>{
-        window.produtos=Array.isArray(docs)?docs:[];
-        const tentar=()=>{
-          if(typeof window.renderLista!=="function" || typeof window.updateSidebar!=="function") return false;
-          try{
-            window.renderLista();
-            if(typeof window.updateSidebar==="function") window.updateSidebar();
-            const n=window.produtos.length;
-            status(true,`Firebase conectado — ${n} produtos`);
-            return !!document.getElementById("productList")?.innerHTML;
-          }catch(e){ console.error("Erro ao renderizar produtos:",e); return false; }
-        };
-        if(!tentar()){
-          let i=0;
-          const timer=setInterval(()=>{ i++; if(tentar()||i>=100) clearInterval(timer); },100);
+        const produtos=Array.isArray(docs)?docs:[];
+        window.produtos=produtos;
+
+        const list=document.getElementById("productList");
+        const title=document.getElementById("listTitle");
+
+        try{
+          if(title) title.textContent=`${produtos.length} produto${produtos.length!==1?"s":""} no catálogo`;
+
+          if(list){
+            if(!produtos.length){
+              list.innerHTML='<div class="empty-state"><div class="empty-icon">📦</div><p>Nenhum produto cadastrado.</p></div>';
+            }else{
+              const cats={};
+              produtos.forEach(p=>{
+                const cat=String(p?.categoria||"Sem categoria");
+                (cats[cat] ||= []).push(p);
+              });
+
+              let ordem=0;
+              list.innerHTML=Object.entries(cats).map(([cat,ps])=>{
+                const cards=ps.map(p=>{
+                  const reverse=(ordem++%2)===1;
+                  const id=String(p?.id||"");
+                  const nome=String(p?.nome||p?.codigo||"Produto");
+                  const codigo=String(p?.codigo||((nome.match(/^([A-Z]{3}\d{3})/)||[])[1]||""));
+                  const clean=nome.replace(/^[A-Z]{3}\d{3}\s*[—-]\s*/i,"").trim()||nome;
+                  const attrs=Array.isArray(p?.attrs)?p.attrs:[];
+                  const sub=attrs[0]?.v ? String(attrs[0].v) : "SOLUÇÃO PROFISSIONAL SYNTHERA";
+                  const imagem=p?.imagem
+                    ? `<img src="${String(p.imagem)}" alt="${clean.replace(/"/g,"&quot;")}" style="max-width:100%;max-height:100%;object-fit:contain">`
+                    : `<div style="font-size:4rem;opacity:.25">🧴</div>`;
+                  const preco=p?.preco
+                    ? `PREÇO: ${String(p.preco)}`
+                    : `PREÇO: CONSULTAR`;
+                  const ficha=p?.ficha
+                    ? `<a class="btn-ficha" href="${String(p.ficha)}" download="${String(p.fichaNome||"ficha-tecnica.pdf")}">BAIXAR FICHA TÉCNICA</a>`
+                    : "";
+                  const safeId=id.replace(/'/g,"&#39;");
+                  return `<div class="product-card synthera-product ${reverse?"reverse":""}">
+                    <div class="product-card-header">
+                      <label class="prod-select-label">
+                        <input type="checkbox" class="prod-select-chk" onchange="toggleSelecao('${safeId}',this.checked)">
+                      </label>
+                      <div class="card-actions">
+                        <button onclick="editarProduto('${safeId}')">✏️ Editar</button>
+                        <button onclick="removerProduto('${safeId}')">🗑 Remover</button>
+                      </div>
+                    </div>
+                    <div class="synthera-product-inner">
+                      <div class="synthera-product-media">${imagem}</div>
+                      <div class="synthera-product-content">
+                        <div class="synthera-product-code">${codigo}</div>
+                        <div class="synthera-product-name">${clean}</div>
+                        <div class="synthera-product-sub">${sub}</div>
+                        <div class="synthera-product-actions">
+                          <div class="product-card-preco ${p?.preco?"":"consultar"}">${preco}</div>
+                          ${ficha}
+                        </div>
+                      </div>
+                    </div>
+                  </div>`;
+                }).join("");
+                return `<div style="margin-bottom:18px"><p style="font-size:.66rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:var(--text-muted);margin-bottom:7px;padding-left:2px">${cat}</p>${cards}</div>`;
+              }).join("");
+            }
+          }
+
+          // Atualiza os números do resumo sem depender de updateSidebar().
+          const categorias=[...new Set(produtos.map(p=>String(p?.categoria||"Sem categoria")))];
+          const statProd=document.getElementById("statProd");
+          const statCat=document.getElementById("statCat");
+          const statData=document.getElementById("statData");
+          if(statProd) statProd.textContent=produtos.length;
+          if(statCat) statCat.textContent=categorias.length;
+          if(statData) statData.textContent=new Date().toLocaleDateString("pt-BR",{day:"2-digit",month:"short",year:"numeric"});
+
+          const btn=document.getElementById("btnGerar");
+          if(btn) btn.disabled=produtos.length===0;
+
+          status(true,`Firebase conectado — ${produtos.length} produtos`);
+          console.log("SYNTHERA: produtos renderizados diretamente do Firebase:",produtos.length);
+        }catch(e){
+          console.error("SYNTHERA: erro na renderização direta:",e);
+          status(false,"Produtos recebidos, mas erro ao exibir");
+          if(list) list.innerHTML='<div class="empty-state"><div class="empty-icon">⚠️</div><p>Firebase encontrou os produtos, mas houve erro ao montar a lista.</p></div>';
         }
       });
 
