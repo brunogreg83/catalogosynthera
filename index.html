@@ -1425,7 +1425,12 @@ async function gerarPDF(){
       const coverImgs=prods.filter(p=>p.imagem).slice(0,4);
       const frameX=122, frameY=39, frameW=74, frameH=142;
       F([3,26,42]); doc.roundedRect(frameX,frameY,frameW,frameH,6,6,"F");
-      D([28,117,148]); doc.setLineWidth(.5); doc.roundedRect(frameX,frameY,frameW,frameH,6,6,"S");
+      D([28,117,148]); doc.setLineWidth(.5);
+      // Borda segura para versões diferentes do jsPDF: desenhada como faixa.
+      doc.rect(frameX,frameY,frameW,.55,"F");
+      doc.rect(frameX,frameY+frameH-.55,frameW,.55,"F");
+      doc.rect(frameX,frameY,.55,frameH,"F");
+      doc.rect(frameX+frameW-.55,frameY,.55,frameH,"F");
 
       if(coverImgs.length){
         const slots=[
@@ -1544,7 +1549,10 @@ async function gerarPDF(){
         }catch(e){}
       }else{
         F(C.ice);doc.roundedRect(x+5,by,w-10,30,3,3,"F");
-        D(C.cyan);doc.setLineWidth(.5);doc.ellipse(x+w/2,by+15,10,4,"S");
+        D(C.cyan);doc.setLineWidth(.7);
+        // Substitui a elipse "S" por um marcador circular compatível.
+        F(C.ice); doc.circle(x+w/2,by+15,7,"F");
+        F(C.cyan2); doc.circle(x+w/2,by+15,1.5,"F");
         F(C.cyan2);doc.circle(x+w/2,by+15,1.5,"F");
         by+=34;
       }
