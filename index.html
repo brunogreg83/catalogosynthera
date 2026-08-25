@@ -241,10 +241,9 @@ window._fb = {
   }
 };
 
-// Inicia listener assim que o DOM estiver pronto
-// (as funções renderLista/updateSidebar são definidas em script normal no body,
-//  por isso usamos retry caso cheguem antes delas estarem disponíveis)
-document.addEventListener("DOMContentLoaded", () => {
+// O módulo Firebase é deferido e executa após o HTML.
+ // Inicializamos diretamente, sem depender de DOMContentLoaded.
+(() => {
   const elStatus = document.getElementById("dbStatus");
   if(elStatus) elStatus.innerHTML = "&#9679; Conectando…";
 
@@ -352,6 +351,24 @@ document.addEventListener("DOMContentLoaded", () => {
   }catch(err){
     firebaseErro(err);
   }
+
+  // Watchdog: se o Firestore não responder, informa isso claramente.
+  setTimeout(() => {
+    if(!Array.isArray(window.produtos) || window.produtos.length === 0){
+      const loading = document.querySelector("#productList .loading-state");
+      if(loading){
+        loading.innerHTML =
+          '<div class="empty-icon">⚠️</div><p>O Firebase não retornou os produtos.</p>' +
+          '<small>Verifique as regras do Firestore e o projeto conectado.</small>';
+      }
+      const status=document.getElementById("firebaseStatus");
+      if(status){
+        status.classList.add("offline");
+        const t=status.querySelector("span:last-child");
+        if(t) t.textContent="Firebase sem resposta";
+      }
+    }
+  },10000);
 
   // Cadastro da estrutura padrão somente em segundo plano.
   // Ele nunca mais bloqueia a leitura dos produtos já existentes.
@@ -965,7 +982,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 <div id="firebaseStatus" class="firebase-status-float" aria-live="polite">
   <span class="dot"></span>
-  <span>Firebase conectado</span>
+  <span>Conectando ao Firebase...</span>
 </div>
 
 
@@ -1956,7 +1973,7 @@ window.addEventListener("load", function(){
       if(sincronizar() || n>=100) clearInterval(t);
     },100);
   }
-});
+})();
 </script>
 <script>
 (function(){
