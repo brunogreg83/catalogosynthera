@@ -1454,10 +1454,27 @@ async function gerarPDF(){
 }
 
 /* === Rótulo do galão: somente LOGO / CÓDIGO / SUBTÍTULO === */
-#__synthera_pdf_page .pdf-galao{
-  width:96% !important;
-  height:94% !important;
-  object-fit:contain !important;
+#__synthera_pdf_page .pdf-galao{width:112% !important;height:112% !important;object-fit:contain !important;max-width:none !important;}
+
+
+/* Fundo químico real — elemento SVG no DOM para aparecer também na captura PDF */
+.pdf-card-media, .pdf-media{
+  position:relative !important;
+  overflow:hidden !important;
+  isolation:isolate !important;
+}
+#synthera-chem-bg{
+  display:block !important;
+  position:absolute !important;
+  inset:0 !important;
+  z-index:0 !important;
+  width:100% !important;
+  height:100% !important;
+  opacity:.32 !important;
+}
+.pdf-card-media .pdf-galao, .pdf-media .pdf-galao{
+  position:relative !important;
+  z-index:2 !important;
 }
 
 </style>
@@ -1485,7 +1502,30 @@ async function gerarPDF(){
             <div class="pdf-code">${esc(code||title)}</div><div class="pdf-name">${esc(title.toUpperCase())}</div><div class="pdf-sub">${esc(sub)}</div>
             <div class="pdf-rule"></div><div class="pdf-price">PREÇO: ${esc(price.toUpperCase())}</div>
             ${p.ficha?`<div class="pdf-ficha">⇩ BAIXAR FICHA TÉCNICA</div>`:""}
-          </div><div class="pdf-card-media">${media}</div><div class="pdf-card-titlebar"></div></div>`;
+          </div><div class="pdf-card-media">
+<svg id="synthera-chem-bg" aria-hidden="true" viewBox="0 0 700 700"
+     style="position:absolute;inset:0;width:100%;height:100%;z-index:0;opacity:.32;pointer-events:none;">
+  <g fill="none" stroke="#00c8ff" stroke-width="2" opacity=".78">
+    <path d="M90 180L205 115L320 180L320 315L205 380L90 315Z"/>
+    <path d="M390 120L505 55L620 120L620 255L505 320L390 255Z"/>
+    <path d="M385 410L500 345L615 410L615 545L500 610L385 545Z"/>
+    <path d="M150 485L205 380L320 315L385 410"/>
+    <path d="M320 180L390 255L385 410"/>
+  </g>
+  <g fill="#00c8ff" opacity=".85">
+    <circle cx="90" cy="180" r="6"/><circle cx="205" cy="115" r="6"/>
+    <circle cx="320" cy="180" r="6"/><circle cx="390" cy="120" r="6"/>
+    <circle cx="505" cy="55" r="6"/><circle cx="620" cy="120" r="6"/>
+    <circle cx="500" cy="610" r="6"/><circle cx="385" cy="545" r="6"/>
+  </g>
+  <g fill="#b7efff" font-family="Arial,sans-serif" font-size="22" opacity=".62">
+    <text x="67" y="165">O</text><text x="198" y="98">N</text>
+    <text x="307" y="169">OH</text><text x="490" y="39">NH</text>
+    <text x="604" y="108">O</text><text x="489" y="595">N</text>
+    <text x="365" y="531">OH</text>
+  </g>
+</svg>
+${media}</div><div class="pdf-card-titlebar"></div></div>`;
           grid.appendChild(card);
         });
 
