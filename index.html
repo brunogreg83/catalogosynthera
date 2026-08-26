@@ -1269,6 +1269,10 @@ async function gerarPDF(){
           : p)
     : window.produtos;
 
+  // Categorias usadas pelo PDF: precisam existir dentro do escopo
+  // da função gerarPDF para evitar "cats is not defined".
+  const cats = [...new Set(prods.map(p => String(p.categoria || "").trim()).filter(Boolean))];
+
   if(!window.produtos.length){
     showToast("Nenhum produto cadastrado.","error");
     return;
