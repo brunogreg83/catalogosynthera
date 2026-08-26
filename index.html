@@ -1463,6 +1463,23 @@ async function gerarPDF(){
   transform:scale(.924) translateY(-1%) !important;
   transform-origin:center center !important;
 }
+
+/* Estrutura química: ocupa todo o campo do galão */
+.pdf-card-media > #synthera-chem-bg{
+ position:absolute!important;
+ inset:0!important;
+ width:100%!important;
+ height:100%!important;
+ z-index:0!important;
+ opacity:.64!important;
+ display:block!important;
+ pointer-events:none!important;
+}
+.pdf-card-media > .pdf-galao{
+ position:relative!important;
+ z-index:2!important;
+}
+
 </style>
       <div class="pdf-top"><div class="pdf-site">www.<b>synthera</b>.com.br</div></div>
       <div class="pdf-cat"></div><div class="pdf-tag">PERFORMANCE QUE TRANSFORMA A ROTINA PROFISSIONAL</div>
@@ -1490,32 +1507,54 @@ async function gerarPDF(){
             ${p.ficha?`<div class="pdf-ficha">⇩ BAIXAR FICHA TÉCNICA</div>`:""}
           </div><div class="pdf-card-media">
 <svg id="synthera-chem-bg" aria-hidden="true" viewBox="0 0 800 800"
- style="position:absolute;inset:0;width:100%;height:100%;z-index:0;opacity:.58;pointer-events:none;">
- <g fill="none" stroke="#16d7ff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round">
-   <path d="M70 220 L190 145 L310 220 L310 360 L190 435 L70 360 Z"/>
-   <path d="M310 220 L430 145 L550 220 L550 360 L430 435 L310 360"/>
-   <path d="M550 220 L670 145 L760 220 L710 350 L550 360"/>
-   <path d="M190 435 L275 565 L430 565 L550 360"/>
-   <path d="M275 565 L205 675"/>
-   <path d="M430 565 L500 675"/>
+ style="position:absolute;inset:0;width:100%;height:100%;z-index:0;opacity:.64;pointer-events:none;">
+ <defs>
+  <filter id="chemGlow"><feGaussianBlur stdDeviation="3"/></filter>
+  <linearGradient id="chemLine" x1="0" y1="0" x2="1" y2="1">
+   <stop offset="0" stop-color="#18dfff"/><stop offset=".5" stop-color="#00aeea"/><stop offset="1" stop-color="#72efff"/>
+  </linearGradient>
+ </defs>
+ <!-- subtle glow -->
+ <g fill="none" stroke="#12cfff" stroke-width="7" opacity=".16" filter="url(#chemGlow)">
+  <path d="M25 105L155 30L285 105L285 255L155 330L25 255Z"/>
+  <path d="M515 80L650 5L790 85L790 240L650 320L515 240Z"/>
+  <path d="M25 510L150 435L280 510L280 665L150 740L25 665Z"/>
+  <path d="M510 500L635 425L775 505L775 660L635 740L510 660Z"/>
  </g>
- <g fill="#16d7ff">
-   <circle cx="70" cy="220" r="7"/><circle cx="190" cy="145" r="7"/>
-   <circle cx="310" cy="220" r="7"/><circle cx="310" cy="360" r="7"/>
-   <circle cx="190" cy="435" r="7"/><circle cx="70" cy="360" r="7"/>
-   <circle cx="430" cy="145" r="7"/><circle cx="550" cy="220" r="7"/>
-   <circle cx="550" cy="360" r="7"/><circle cx="430" cy="435" r="7"/>
-   <circle cx="670" cy="145" r="7"/><circle cx="760" cy="220" r="7"/>
-   <circle cx="710" cy="350" r="7"/><circle cx="275" cy="565" r="7"/>
-   <circle cx="430" cy="565" r="7"/><circle cx="205" cy="675" r="7"/>
-   <circle cx="500" cy="675" r="7"/>
+ <!-- main network fills the whole field -->
+ <g fill="none" stroke="url(#chemLine)" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" opacity=".94">
+  <path d="M25 105L155 30L285 105L285 255L155 330L25 255Z"/>
+  <path d="M285 105L400 40L515 80L515 240L400 310L285 255"/>
+  <path d="M515 80L650 5L790 85L790 240L650 320L515 240"/>
+  <path d="M155 330L280 395L400 310L515 240"/>
+  <path d="M25 510L150 435L280 510L280 665L150 740L25 665Z"/>
+  <path d="M280 510L400 445L510 500L510 660L635 740"/>
+  <path d="M510 500L635 425L775 505L775 660L635 740L510 660"/>
+  <path d="M400 310L400 445"/>
+  <path d="M150 435L155 330"/>
+  <path d="M400 445L280 510"/>
  </g>
- <g fill="#d8f9ff" font-family="Montserrat,Arial,sans-serif" font-size="24" font-weight="800">
-   <text x="48" y="213">O</text><text x="177" y="138">N</text>
-   <text x="296" y="213">OH</text><text x="417" y="138">N</text>
-   <text x="536" y="213">O</text><text x="657" y="138">OH</text>
-   <text x="536" y="353">N</text><text x="417" y="428">O</text>
-   <text x="262" y="558">N</text><text x="190" y="668">O</text>
+ <!-- nodes -->
+ <g fill="#16dfff" opacity=".98">
+  <circle cx="25" cy="105" r="7"/><circle cx="155" cy="30" r="7"/><circle cx="285" cy="105" r="7"/>
+  <circle cx="285" cy="255" r="7"/><circle cx="155" cy="330" r="7"/><circle cx="25" cy="255" r="7"/>
+  <circle cx="400" cy="40" r="7"/><circle cx="515" cy="80" r="7"/><circle cx="515" cy="240" r="7"/>
+  <circle cx="400" cy="310" r="7"/><circle cx="650" cy="5" r="7"/><circle cx="790" cy="85" r="7"/>
+  <circle cx="790" cy="240" r="7"/><circle cx="650" cy="320" r="7"/>
+  <circle cx="25" cy="510" r="7"/><circle cx="150" cy="435" r="7"/><circle cx="280" cy="510" r="7"/>
+  <circle cx="280" cy="665" r="7"/><circle cx="150" cy="740" r="7"/><circle cx="25" cy="665" r="7"/>
+  <circle cx="400" cy="445" r="7"/><circle cx="510" cy="500" r="7"/><circle cx="510" cy="660" r="7"/>
+  <circle cx="635" cy="425" r="7"/><circle cx="775" cy="505" r="7"/><circle cx="775" cy="660" r="7"/>
+  <circle cx="635" cy="740" r="7"/>
+ </g>
+ <!-- restrained chemical labels -->
+ <g fill="#d9f9ff" font-family="Montserrat,Arial,sans-serif" font-size="22" font-weight="800" opacity=".82">
+  <text x="5" y="99">O</text><text x="143" y="25">N</text><text x="268" y="99">OH</text>
+  <text x="388" y="34">N</text><text x="500" y="74">O</text><text x="638" y="28">OH</text>
+  <text x="638" y="313">N</text><text x="132" y="425">O</text>
+  <text x="263" y="504">N</text><text x="388" y="439">O</text>
+  <text x="498" y="494">OH</text><text x="625" y="418">N</text>
+  <text x="762" y="498">O</text><text x="625" y="733">N</text>
  </g>
 </svg>
 ${media}</div><div class="pdf-card-titlebar"></div></div>`;
