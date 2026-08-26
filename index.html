@@ -1387,17 +1387,19 @@ async function gerarPDF(){
     : "CONSULTAR";
 
   textColor([190,225,232]); font(4.7,"bold");
-  doc.text("PREÇO",tx,y+h-17);
-  textColor(CYAN); font(9.2,"bold");
-  doc.text(price,tx,y+h-9);
+  doc.text("PREÇO",tx,y+h-23);
+  textColor(CYAN); font(8.6,"bold");
+  doc.text(price,tx,y+h-15);
 
+  // Botão de ficha técnica: sempre visível no card.
+  // Quando o produto possui ficha cadastrada, o botão recebe o link real.
   const fichaUrl = p.ficha || p.fichaUrl || p.fichaBase64 || null;
+  const bx = tx, by = y+h-10, bw = Math.min(50, tw), bh = 7;
+  fill([4,67,91]); doc.roundedRect(bx,by,bw,bh,2,2,"F");
+  stroke(CYAN); doc.setLineWidth(.4); doc.roundedRect(bx,by,bw,bh,2,2,"S");
+  textColor(WHITE); font(3.8,"bold");
+  doc.text("BAIXAR FICHA TÉCNICA",bx+bw/2,by+4.7,{align:"center"});
   if(fichaUrl){
-    const bx=tx, by=y+h-16, bw=Math.min(48,tw), bh=9;
-    fill([4,67,91]); doc.roundedRect(bx,by,bw,bh,2.2,2.2,"F");
-    stroke(CYAN); doc.setLineWidth(.45); doc.roundedRect(bx,by,bw,bh,2.2,2.2,"S");
-    textColor(WHITE); font(4.2,"bold");
-    doc.text("BAIXAR FICHA TÉCNICA",bx+bw/2,by+5.8,{align:"center"});
     doc.link(bx,by,bw,bh,{url:fichaUrl});
   }
 }
