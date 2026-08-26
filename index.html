@@ -1391,10 +1391,14 @@ async function gerarPDF(){
   textColor(CYAN); font(9.2,"bold");
   doc.text(price,tx,y+h-9);
 
-  if(p.ficha){
-    textColor(CYAN); font(4.8,"bold");
-    doc.text("FICHA TÉCNICA",tx,y+h-3);
-    doc.link(tx,y+h-8,36,7,{url:p.ficha});
+  const fichaUrl = p.ficha || p.fichaUrl || p.fichaBase64 || null;
+  if(fichaUrl){
+    const bx=tx, by=y+h-16, bw=Math.min(48,tw), bh=9;
+    fill([4,67,91]); doc.roundedRect(bx,by,bw,bh,2.2,2.2,"F");
+    stroke(CYAN); doc.setLineWidth(.45); doc.roundedRect(bx,by,bw,bh,2.2,2.2,"S");
+    textColor(WHITE); font(4.2,"bold");
+    doc.text("BAIXAR FICHA TÉCNICA",bx+bw/2,by+5.8,{align:"center"});
+    doc.link(bx,by,bw,bh,{url:fichaUrl});
   }
 }
 
