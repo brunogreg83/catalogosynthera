@@ -1502,6 +1502,28 @@ async function gerarPDF(){
   z-index:2 !important;
 }
 
+
+/* Estrutura química alternativa — mesma opacidade */
+.pdf-card-media{
+  position:relative !important;
+  overflow:hidden !important;
+  isolation:isolate !important;
+}
+.pdf-card-media > #synthera-chem-bg{
+  position:absolute !important;
+  inset:0 !important;
+  width:100% !important;
+  height:100% !important;
+  z-index:0 !important;
+  opacity:.68 !important;
+  display:block !important;
+  pointer-events:none !important;
+}
+.pdf-card-media > .pdf-galao{
+  position:relative !important;
+  z-index:2 !important;
+}
+
 </style>
       <div class="pdf-top"><div class="pdf-site">www.<b>synthera</b>.com.br</div></div>
       <div class="pdf-cat"></div><div class="pdf-tag">PERFORMANCE QUE TRANSFORMA A ROTINA PROFISSIONAL</div>
@@ -1527,7 +1549,89 @@ async function gerarPDF(){
             <div class="pdf-code">${esc(code||title)}</div><div class="pdf-name">${esc(title.toUpperCase())}</div><div class="pdf-sub">${esc(sub)}</div>
             <div class="pdf-rule"></div><div class="pdf-price">PREÇO: ${esc(price.toUpperCase())}</div>
             ${p.ficha?`<div class="pdf-ficha">⇩ BAIXAR FICHA TÉCNICA</div>`:""}
-          </div><div class="pdf-card-media">
+          </div><div class="pdf-card-media"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"
+ aria-hidden="true" style="position:absolute;inset:0;width:100%;height:100%;z-index:0;opacity:.68;pointer-events:none">
+<defs>
+ <linearGradient id="chemNewLine" x1="0" y1="0" x2="1" y2="1">
+  <stop offset="0" stop-color="#31e6ff"/>
+  <stop offset=".5" stop-color="#00b8e8"/>
+  <stop offset="1" stop-color="#76efff"/>
+ </linearGradient>
+ <radialGradient id="chemNewGlow">
+  <stop offset="0" stop-color="#00d9ff" stop-opacity=".18"/>
+  <stop offset="1" stop-color="#00d9ff" stop-opacity="0"/>
+ </radialGradient>
+</defs>
+
+<circle cx="180" cy="210" r="250" fill="url(#chemNewGlow)"/>
+<circle cx="820" cy="780" r="280" fill="url(#chemNewGlow)"/>
+
+<!-- moléculas principais -->
+<g fill="none" stroke="url(#chemNewLine)" stroke-width="3.2"
+   stroke-linecap="round" stroke-linejoin="round" opacity=".92">
+
+ <!-- anel superior esquerdo -->
+ <path d="M45 170 L145 112 L245 170 L245 286 L145 344 L45 286 Z"/>
+ <path d="M78 189 L145 151 L212 189 L212 267 L145 305 L78 267 Z"/>
+
+ <!-- anel superior direito -->
+ <path d="M575 155 L675 97 L775 155 L775 271 L675 329 L575 271 Z"/>
+ <path d="M608 174 L675 136 L742 174 L742 252 L675 290 L608 252 Z"/>
+
+ <!-- molécula central -->
+ <path d="M310 390 L405 335 L500 390 L500 500 L405 555 L310 500 Z"/>
+ <path d="M343 409 L405 373 L467 409 L467 481 L405 517 L343 481 Z"/>
+
+ <!-- anel inferior esquerdo -->
+ <path d="M30 665 L130 607 L230 665 L230 781 L130 839 L30 781 Z"/>
+
+ <!-- anel inferior direito -->
+ <path d="M590 690 L690 632 L790 690 L790 806 L690 864 L590 806 Z"/>
+ <path d="M623 709 L690 671 L757 709 L757 787 L690 825 L623 787 Z"/>
+
+ <!-- conexões -->
+ <path d="M245 228 L310 445"/>
+ <path d="M500 445 L575 213"/>
+ <path d="M145 344 L130 607"/>
+ <path d="M405 555 L405 680"/>
+ <path d="M500 445 L690 632"/>
+ <path d="M230 723 L405 680"/>
+</g>
+
+<!-- átomos/nós -->
+<g fill="#13dfff" stroke="#bdf8ff" stroke-width="1.3">
+ <circle cx="45" cy="170" r="7"/><circle cx="145" cy="112" r="7"/>
+ <circle cx="245" cy="170" r="7"/><circle cx="245" cy="286" r="7"/>
+ <circle cx="145" cy="344" r="7"/><circle cx="45" cy="286" r="7"/>
+
+ <circle cx="575" cy="155" r="7"/><circle cx="675" cy="97" r="7"/>
+ <circle cx="775" cy="155" r="7"/><circle cx="775" cy="271" r="7"/>
+ <circle cx="675" cy="329" r="7"/><circle cx="575" cy="271" r="7"/>
+
+ <circle cx="310" cy="390" r="7"/><circle cx="405" cy="335" r="7"/>
+ <circle cx="500" cy="390" r="7"/><circle cx="500" cy="500" r="7"/>
+ <circle cx="405" cy="555" r="7"/><circle cx="310" cy="500" r="7"/>
+
+ <circle cx="30" cy="665" r="7"/><circle cx="130" cy="607" r="7"/>
+ <circle cx="230" cy="665" r="7"/><circle cx="230" cy="781" r="7"/>
+ <circle cx="130" cy="839" r="7"/><circle cx="30" cy="781" r="7"/>
+
+ <circle cx="590" cy="690" r="7"/><circle cx="690" cy="632" r="7"/>
+ <circle cx="790" cy="690" r="7"/><circle cx="790" cy="806" r="7"/>
+ <circle cx="690" cy="864" r="7"/><circle cx="590" cy="806" r="7"/>
+</g>
+
+<!-- identificação química discreta -->
+<g fill="#d9faff" font-family="Arial,sans-serif" font-size="23"
+   font-weight="700" opacity=".76">
+ <text x="26" y="164">O</text><text x="133" y="106">N</text>
+ <text x="226" y="164">OH</text><text x="557" y="149">N</text>
+ <text x="663" y="91">O</text><text x="756" y="149">OH</text>
+ <text x="292" y="384">N</text><text x="393" y="329">O</text>
+ <text x="483" y="384">OH</text><text x="112" y="601">O</text>
+ <text x="678" y="626">N</text><text x="778" y="684">O</text>
+</g>
+</svg>
 ${media}</div><div class="pdf-card-titlebar"></div></div>`;
           grid.appendChild(card);
         });
