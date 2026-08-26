@@ -1332,31 +1332,29 @@ async function gerarPDF(){
     function footer(page){stroke([35,76,92]);doc.setLineWidth(.35);doc.line(MG,PH-10,PW-MG,PH-10);textColor(NAVY);font(5.7,"bold");doc.text("SYNTHERA",MG,PH-4.8);textColor(MUTED);font(5.2);doc.text("Química profissional • Performance • Resultado",MG+25,PH-4.8);textColor(CYAN);font(5.2,"bold");doc.text("www.synthera.com.br",PW/2,PH-4.8,{align:"center"});doc.text(String(page).padStart(2,"0"),PW-MG,PH-4.8,{align:"right"})}
     function header(cat,count,continuation){base();if(!continuation){fill(NAVY);doc.roundedRect(MG,10,PW-MG*2,25,2,2,"F");fill(CYAN);doc.rect(MG,10,4,25,"F");pill(catCode(cat),MG+8,16,19,7,CYAN,NAVY,5.3);textColor(WHITE);font(11,"bold");doc.text(cat.replace(/^[A-Z]{3}\s*-\s*/,'').toUpperCase(),MG+31,21);textColor([165,205,213]);font(5.5);doc.text("Linha Synthera • soluções profissionais",MG+31,27);pill(`${count} PRODUTOS`,PW-MG-36,17,28,7,BLUE,WHITE,4.7);textColor(CYAN);font(5.3,"bold");doc.text("PERFORMANCE QUE TRANSFORMA A ROTINA PROFISSIONAL",MG,40);return TOP}pill(catCode(cat),MG,10,20,7,NAVY,CYAN,5);textColor(NAVY);font(8,"bold");doc.text(cat.replace(/^[A-Z]{3}\s*-\s*/,'').toUpperCase(),MG+26,15);stroke(CYAN);doc.setLineWidth(.7);doc.line(MG+26,19,PW-MG,19);return 25}
     async function card(p,x,y,w,h,reverse=false){
-  // PDF usa o MESMO MODELO dos cards .synthera-product do GERADOR.
-  // Controles Editar/Remover/checkbox não entram no PDF.
+  // PDF visual aligned to the platform's .synthera-product card.
+  // No radial/circular decoration: the product image area stays clean.
   const NAVY=[2,11,23], MEDIA=[3,16,31], CYAN=[8,170,244],
-        WHITE=[255,255,255], SOFT=[225,238,244];
+        WHITE=[255,255,255], SOFT=[225,238,244], BORDER=[24,155,255];
 
-  fill(NAVY); doc.roundedRect(x,y,w,h,4.2,4.2,"F");
-  stroke([24,155,255]); doc.setLineWidth(.45);
+  fill(NAVY);
+  doc.roundedRect(x,y,w,h,4.2,4.2,"F");
+  stroke(BORDER); doc.setLineWidth(.45);
   doc.roundedRect(x,y,w,h,4.2,4.2,"S");
 
-  // Mesmo grid 1fr / 1fr do gerador.
+  // Same 1fr / 1fr structure as the generator.
   const half=w/2;
   const contentX=reverse ? x+half : x;
   const mediaX=reverse ? x : x+half;
-  const pad=6;
+  const pad=7;
   const textX=contentX+pad;
   const textW=half-pad*2;
 
-  fill(MEDIA); doc.rect(mediaX,y,half,h,"F");
+  // Clean product-media background — no circles or extra graphics.
+  fill(MEDIA);
+  doc.rect(mediaX,y,half,h,"F");
 
-  // Fundo tecnológico equivalente ao .synthera-product-media.
-  stroke([0,105,255]); doc.setLineWidth(.10);
-  for(let r=7;r<Math.min(half,h)*.75;r+=7)
-    doc.circle(mediaX+half/2,y+h/2,r,"S");
-
-  // MESMA imagem cadastrada no gerador.
+  // Same product image stored in the generator.
   if(p.imagem){
     try{
       const sz=await new Promise(resolve=>{
@@ -1366,14 +1364,14 @@ async function gerarPDF(){
         im.src=p.imagem;
       });
       const ratio=sz.w/sz.h;
-      const maxW=half*.72,maxH=h*.78;
-      let dw=maxW,dh=dw/ratio;
+      const maxW=half*.72, maxH=h*.78;
+      let dw=maxW, dh=dw/ratio;
       if(dh>maxH){dh=maxH;dw=dh*ratio;}
       doc.addImage(p.imagem,mediaX+(half-dw)/2,y+(h-dh)/2,dw,dh,undefined,"FAST",0);
     }catch(e){}
   }
 
-  // MESMO código e mesma limpeza do nome usados no renderLista().
+  // Same content/data logic used by renderLista().
   const code=(String(p.nome||"").match(/^([A-Z]{3}\d{3})/)||[])[1]||"";
   const cleanName=String(p.nome||"").replace(/^[A-Z]{3}\d{3}\s*[—-]\s*/i,"").trim()||p.nome||"Produto";
   const attrs=p.attrs||[];
@@ -1390,19 +1388,21 @@ async function gerarPDF(){
   const subLines=doc.splitTextToSize(subtitle.toUpperCase(),textW).slice(0,2);
   subLines.forEach((ln,i)=>doc.text(ln,textX,y+37+i*3.2));
 
+  // Same short cyan divider used by the approved card style.
   stroke(CYAN); doc.setLineWidth(.45);
   doc.line(textX,y+47,textX+25,y+47);
 
-  // Mesmo preço exibido no gerador.
+  // Same price information.
   const price=p.preco?String(p.preco):"CONSULTAR";
   const priceW=Math.min(textW,58), priceY=y+h-20;
-  fill([1,11,23]); doc.roundedRect(textX,priceY-6,priceW,10,2.5,2.5,"F");
+  fill([1,11,23]);
+  doc.roundedRect(textX,priceY-6,priceW,10,2.5,2.5,"F");
   stroke(CYAN); doc.setLineWidth(.4);
   doc.roundedRect(textX,priceY-6,priceW,10,2.5,2.5,"S");
   textColor(CYAN); font(5.2,"bold");
   doc.text("PREÇO: "+price.toUpperCase(),textX+3,priceY+.5);
 
-  // Mesma ficha cadastrada no produto.
+  // Same technical-sheet action, when the product has one.
   if(p.ficha){
     const fw=Math.min(textW,48), fh=6, fx=textX, fy=y+h-8;
     fill([2,48,72]); doc.roundedRect(fx,fy,fw,fh,2,2,"F");
