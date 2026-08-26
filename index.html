@@ -1332,29 +1332,25 @@ async function gerarPDF(){
     function footer(page){stroke([35,76,92]);doc.setLineWidth(.35);doc.line(MG,PH-10,PW-MG,PH-10);textColor(NAVY);font(5.7,"bold");doc.text("SYNTHERA",MG,PH-4.8);textColor(MUTED);font(5.2);doc.text("Química profissional • Performance • Resultado",MG+25,PH-4.8);textColor(CYAN);font(5.2,"bold");doc.text("www.synthera.com.br",PW/2,PH-4.8,{align:"center"});doc.text(String(page).padStart(2,"0"),PW-MG,PH-4.8,{align:"right"})}
     function header(cat,count,continuation){base();if(!continuation){fill(NAVY);doc.roundedRect(MG,10,PW-MG*2,25,2,2,"F");fill(CYAN);doc.rect(MG,10,4,25,"F");pill(catCode(cat),MG+8,16,19,7,CYAN,NAVY,5.3);textColor(WHITE);font(11,"bold");doc.text(cat.replace(/^[A-Z]{3}\s*-\s*/,'').toUpperCase(),MG+31,21);textColor([165,205,213]);font(5.5);doc.text("Linha Synthera • soluções profissionais",MG+31,27);pill(`${count} PRODUTOS`,PW-MG-36,17,28,7,BLUE,WHITE,4.7);textColor(CYAN);font(5.3,"bold");doc.text("PERFORMANCE QUE TRANSFORMA A ROTINA PROFISSIONAL",MG,40);return TOP}pill(catCode(cat),MG,10,20,7,NAVY,CYAN,5);textColor(NAVY);font(8,"bold");doc.text(cat.replace(/^[A-Z]{3}\s*-\s*/,'').toUpperCase(),MG+26,15);stroke(CYAN);doc.setLineWidth(.7);doc.line(MG+26,19,PW-MG,19);return 25}
     async function card(p,x,y,w,h,reverse=false){
-  // PDF visual aligned to the platform's .synthera-product card.
-  // No radial/circular decoration: the product image area stays clean.
+  // Layout seguro para PDF: mesma hierarquia do gerador, mas dimensionada
+  // para caber integralmente no card de 6 por página.
   const NAVY=[2,11,23], MEDIA=[3,16,31], CYAN=[8,170,244],
         WHITE=[255,255,255], SOFT=[225,238,244], BORDER=[24,155,255];
 
-  fill(NAVY);
-  doc.roundedRect(x,y,w,h,4.2,4.2,"F");
+  fill(NAVY); doc.roundedRect(x,y,w,h,4,4,"F");
   stroke(BORDER); doc.setLineWidth(.45);
-  doc.roundedRect(x,y,w,h,4.2,4.2,"S");
+  doc.roundedRect(x,y,w,h,4,4,"S");
 
-  // Same 1fr / 1fr structure as the generator.
   const half=w/2;
   const contentX=reverse ? x+half : x;
   const mediaX=reverse ? x : x+half;
-  const pad=7.2;
+  const pad=5.5;
   const textX=contentX+pad;
   const textW=half-pad*2-1;
 
-  // Clean product-media background — no circles or extra graphics.
-  fill(MEDIA);
-  doc.rect(mediaX,y,half,h,"F");
+  // Área de mídia limpa, sem círculos artificiais.
+  fill(MEDIA); doc.rect(mediaX,y,half,h,"F");
 
-  // Same product image stored in the generator.
   if(p.imagem){
     try{
       const sz=await new Promise(resolve=>{
@@ -1364,50 +1360,49 @@ async function gerarPDF(){
         im.src=p.imagem;
       });
       const ratio=sz.w/sz.h;
-      const maxW=half*.72, maxH=h*.78;
+      const maxW=half*.72, maxH=h*.72;
       let dw=maxW, dh=dw/ratio;
       if(dh>maxH){dh=maxH;dw=dh*ratio;}
       doc.addImage(p.imagem,mediaX+(half-dw)/2,y+(h-dh)/2,dw,dh,undefined,"FAST",0);
     }catch(e){}
   }
 
-  // Same content/data logic used by renderLista().
   const code=(String(p.nome||"").match(/^([A-Z]{3}\d{3})/)||[])[1]||"";
-  const cleanName=String(p.nome||"").replace(/^[A-Z]{3}\d{3}\s*[—-]\s*/i,"").trim()||p.nome||"Produto";
+  const cleanName=String(p.nome||"").replace(/^[A-Z]{3}\d{3}\s*[—-]\s*/i,"").trim()||"Produto";
   const attrs=p.attrs||[];
   const subtitle=attrs.length?String(attrs[0].v):"SOLUÇÃO PROFISSIONAL SYNTHERA";
 
-  textColor(WHITE); font(30,"bold");
-  doc.text(code||cleanName,textX,y+18);
+  // Fontes dimensionadas para a área real do card.
+  textColor(WHITE); font(12.5,"bold");
+  doc.text(code||cleanName,textX,y+13);
 
-  textColor(CYAN); font(16.5,"bold");
-  const nameLines=doc.splitTextToSize(cleanName.toUpperCase(),textW).slice(0,3);
-  nameLines.forEach((ln,i)=>doc.text(ln,textX,y+36+i*5.2));
+  textColor(CYAN); font(6.2,"bold");
+  const nameLines=doc.splitTextToSize(cleanName.toUpperCase(),textW).slice(0,2);
+  nameLines.forEach((ln,i)=>doc.text(ln,textX,y+22+i*3.8));
 
-  textColor(SOFT); font(10.3,"normal");
+  textColor(SOFT); font(4.2,"normal");
   const subLines=doc.splitTextToSize(subtitle.toUpperCase(),textW).slice(0,2);
-  subLines.forEach((ln,i)=>doc.text(ln,textX,y+57+i*3.6));
+  subLines.forEach((ln,i)=>doc.text(ln,textX,y+34+i*3));
 
-  // Same short cyan divider used by the approved card style.
   stroke(CYAN); doc.setLineWidth(.45);
-  doc.line(textX,y+72,textX+25,y+72);
+  doc.line(textX,y+44,textX+21,y+44);
 
-  // Same price information.
+  // Preço dentro da largura disponível, sem ultrapassar a caixa.
   const price=p.preco?String(p.preco):"CONSULTAR";
-  const priceW=Math.min(textW,58), priceY=y+h-20;
-  fill([1,11,23]);
-  doc.roundedRect(textX,priceY-6,priceW,10,2.5,2.5,"F");
-  stroke(CYAN); doc.setLineWidth(.4);
-  doc.roundedRect(textX,priceY-6,priceW,10,2.5,2.5,"S");
-  textColor(CYAN); font(10.8,"bold");
-  doc.text("PREÇO: "+price.toUpperCase(),textX+3,priceY+.5);
+  const priceW=Math.min(textW,52), priceY=y+h-16;
+  fill([1,11,23]); doc.roundedRect(textX,priceY-5,priceW,8,2,2,"F");
+  stroke(CYAN); doc.setLineWidth(.35);
+  doc.roundedRect(textX,priceY-5,priceW,8,2,2,"S");
+  textColor(CYAN); font(4.3,"bold");
+  const priceLines=doc.splitTextToSize("PREÇO: "+price.toUpperCase(),priceW-5).slice(0,1);
+  doc.text(priceLines[0],textX+2.5,priceY+.2);
 
-  // Same technical-sheet action, when the product has one.
+  // Ficha técnica no rodapé, sempre dentro do card.
   if(p.ficha){
-    const fw=Math.min(textW,48), fh=6, fx=textX, fy=y+h-8;
-    fill([2,48,72]); doc.roundedRect(fx,fy,fw,fh,2,2,"F");
-    textColor(WHITE); font(3.2,"bold");
-    doc.text("BAIXAR FICHA TÉCNICA",fx+fw/2,fy+4,{align:"center"});
+    const fw=Math.min(textW,44), fh=5.2, fx=textX, fy=y+h-7;
+    fill([2,48,72]); doc.roundedRect(fx,fy,fw,fh,1.8,1.8,"F");
+    textColor(WHITE); font(2.8,"bold");
+    doc.text("BAIXAR FICHA TÉCNICA",fx+fw/2,fy+3.4,{align:"center"});
     doc.link(fx,fy,fw,fh,{url:p.ficha});
   }
 }
