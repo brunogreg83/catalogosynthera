@@ -1474,9 +1474,15 @@ async function gerarPDF(){
   pointer-events:none !important;
   background:transparent !important;
 }
-.pdf-card-media .pdf-galao, .pdf-media .pdf-galao{
-  position:relative !important;
-  z-index:2 !important;
+.pdf-card-media .pdf-galao,
+.pdf-media .pdf-galao{
+  width:158% !important;
+  height:158% !important;
+  max-width:none !important;
+  max-height:none !important;
+  object-fit:contain !important;
+  transform:translate(0,-5%) !important;
+  transform-origin:center center !important;
 }
 
 
@@ -1510,6 +1516,20 @@ async function gerarPDF(){
   transform-origin:center center !important;
 }
 
+
+#synthera-chem-bg{
+  display:block !important;
+  position:absolute !important;
+  inset:0 !important;
+  width:100% !important;
+  height:100% !important;
+  z-index:0 !important;
+  opacity:.58 !important;
+}
+.pdf-card-media > #synthera-chem-bg{
+  position:absolute !important;
+  z-index:0 !important;
+}
 </style>
       <div class="pdf-top"><div class="pdf-site">www.<b>synthera</b>.com.br</div></div>
       <div class="pdf-cat"></div><div class="pdf-tag">PERFORMANCE QUE TRANSFORMA A ROTINA PROFISSIONAL</div>
@@ -1537,26 +1557,38 @@ async function gerarPDF(){
             ${p.ficha?`<div class="pdf-ficha">⇩ BAIXAR FICHA TÉCNICA</div>`:""}
           </div><div class="pdf-card-media">
 <svg id="synthera-chem-bg" aria-hidden="true" viewBox="0 0 700 700"
-     style="position:absolute;inset:0;width:100%;height:100%;z-index:0;opacity:.32;pointer-events:none;">
-  <g fill="none" stroke="#12d7ff" stroke-width="4" opacity=".98">
-    <path d="M90 180L205 115L320 180L320 315L205 380L90 315Z"/>
-    <path d="M390 120L505 55L620 120L620 255L505 320L390 255Z"/>
-    <path d="M385 410L500 345L615 410L615 545L500 610L385 545Z"/>
-    <path d="M150 485L205 380L320 315L385 410"/>
-    <path d="M320 180L390 255L385 410"/>
-  </g>
-  <g fill="#12d7ff" opacity="1">
-    <circle cx="90" cy="180" r="6"/><circle cx="205" cy="115" r="6"/>
-    <circle cx="320" cy="180" r="6"/><circle cx="390" cy="120" r="6"/>
-    <circle cx="505" cy="55" r="6"/><circle cx="620" cy="120" r="6"/>
-    <circle cx="500" cy="610" r="6"/><circle cx="385" cy="545" r="6"/>
-  </g>
-  <g fill="#d9f8ff" font-family="Arial,sans-serif" font-size="25" opacity=".92">
-    <text x="67" y="165">O</text><text x="198" y="98">N</text>
-    <text x="307" y="169">OH</text><text x="490" y="39">NH</text>
-    <text x="604" y="108">O</text><text x="489" y="595">N</text>
-    <text x="365" y="531">OH</text>
-  </g>
+ style="position:absolute;inset:0;width:100%;height:100%;z-index:0;opacity:.58;pointer-events:none;">
+ <g fill="none" stroke="#13cfff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity=".9">
+   <path d="M70 150 L180 82 L300 150 L300 286 L180 354 L70 286 Z"/>
+   <path d="M300 150 L420 82 L540 150 L540 286 L420 354 L300 286 Z"/>
+   <path d="M180 354 L300 422 L420 354"/>
+   <path d="M300 422 L300 558"/>
+   <path d="M300 558 L188 624"/>
+   <path d="M300 558 L412 624"/>
+   <path d="M540 286 L610 398 L540 510 L420 510 L350 398"/>
+   <path d="M70 286 L35 398 L105 510 L225 510 L300 422"/>
+ </g>
+ <g fill="#0ed5ff" opacity=".95">
+   <circle cx="70" cy="150" r="8"/><circle cx="180" cy="82" r="8"/>
+   <circle cx="300" cy="150" r="8"/><circle cx="420" cy="82" r="8"/>
+   <circle cx="540" cy="150" r="8"/><circle cx="540" cy="286" r="8"/>
+   <circle cx="420" cy="354" r="8"/><circle cx="300" cy="422" r="8"/>
+   <circle cx="180" cy="354" r="8"/><circle cx="70" cy="286" r="8"/>
+   <circle cx="300" cy="558" r="8"/><circle cx="188" cy="624" r="8"/>
+   <circle cx="412" cy="624" r="8"/><circle cx="610" cy="398" r="8"/>
+   <circle cx="540" cy="510" r="8"/><circle cx="420" cy="510" r="8"/>
+   <circle cx="35" cy="398" r="8"/><circle cx="105" cy="510" r="8"/>
+   <circle cx="225" cy="510" r="8"/>
+ </g>
+ <g fill="#c9f5ff" font-family="Montserrat,Arial,sans-serif" font-size="24" font-weight="800">
+   <text x="48" y="143">O</text><text x="168" y="75">N</text>
+   <text x="286" y="143">O</text><text x="408" y="75">N</text>
+   <text x="526" y="143">OH</text><text x="526" y="279">O</text>
+   <text x="407" y="347">N</text><text x="287" y="415">O</text>
+   <text x="167" y="347">OH</text><text x="57" y="279">N</text>
+   <text x="288" y="551">OH</text><text x="169" y="617">O</text>
+   <text x="395" y="617">N</text>
+ </g>
 </svg>
 ${media}</div><div class="pdf-card-titlebar"></div></div>`;
           grid.appendChild(card);
