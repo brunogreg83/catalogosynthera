@@ -1464,66 +1464,20 @@ async function gerarPDF(){
   transform-origin:center center !important;
 }
 
-/* Estrutura química: ocupa todo o campo do galão */
-.pdf-card-media > #synthera-chem-bg{
- position:absolute!important;
- inset:0!important;
- width:100%!important;
- height:100%!important;
- z-index:0!important;
- opacity:.64!important;
- display:block!important;
- pointer-events:none!important;
+
+
+/* === ESTRUTURA QUÍMICA — LIMPA, SEM SOBREPOSIÇÃO === */
+.pdf-card-media{
+ position:relative!important;
+ overflow:hidden!important;
+ isolation:isolate!important;
+ background:#020b17 url("data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20800%20800%22%3E%0A%3Cdefs%3E%0A%20%3ClinearGradient%20id%3D%22m%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%221%22%20y2%3D%221%22%3E%3Cstop%20stop-color%3D%22%2329dfff%22%2F%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%23087fb5%22%2F%3E%3C%2FlinearGradient%3E%0A%3C%2Fdefs%3E%0A%3Cg%20fill%3D%22none%22%20stroke%3D%22url(%23m)%22%20stroke-width%3D%223%22%20opacity%3D%22.55%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%0A%20%3Cpath%20d%3D%22M45%20120L155%2055L265%20120L265%20245L155%20310L45%20245Z%22%2F%3E%0A%20%3Cpath%20d%3D%22M535%20125L645%2060L755%20125L755%20250L645%20315L535%20250Z%22%2F%3E%0A%20%3Cpath%20d%3D%22M70%20610L180%20545L290%20610L290%20735L180%20800L70%20735Z%22%2F%3E%0A%20%3Cpath%20d%3D%22M510%20600L620%20535L730%20600L730%20725L620%20790L510%20725Z%22%2F%3E%0A%20%3Cpath%20d%3D%22M265%20120L345%2075L425%20120%22%2F%3E%0A%20%3Cpath%20d%3D%22M425%20680L510%20600%22%2F%3E%0A%3C%2Fg%3E%0A%3Cg%20fill%3D%22%2320dfff%22%20opacity%3D%22.7%22%3E%0A%20%3Ccircle%20cx%3D%2245%22%20cy%3D%22120%22%20r%3D%226%22%2F%3E%3Ccircle%20cx%3D%22155%22%20cy%3D%2255%22%20r%3D%226%22%2F%3E%3Ccircle%20cx%3D%22265%22%20cy%3D%22120%22%20r%3D%226%22%2F%3E%0A%20%3Ccircle%20cx%3D%22535%22%20cy%3D%22125%22%20r%3D%226%22%2F%3E%3Ccircle%20cx%3D%22645%22%20cy%3D%2260%22%20r%3D%226%22%2F%3E%3Ccircle%20cx%3D%22755%22%20cy%3D%22125%22%20r%3D%226%22%2F%3E%0A%20%3Ccircle%20cx%3D%2270%22%20cy%3D%22610%22%20r%3D%226%22%2F%3E%3Ccircle%20cx%3D%22180%22%20cy%3D%22545%22%20r%3D%226%22%2F%3E%3Ccircle%20cx%3D%22290%22%20cy%3D%22610%22%20r%3D%226%22%2F%3E%0A%20%3Ccircle%20cx%3D%22510%22%20cy%3D%22600%22%20r%3D%226%22%2F%3E%3Ccircle%20cx%3D%22620%22%20cy%3D%22535%22%20r%3D%226%22%2F%3E%3Ccircle%20cx%3D%22730%22%20cy%3D%22600%22%20r%3D%226%22%2F%3E%0A%3C%2Fg%3E%0A%3Cg%20fill%3D%22%23d7f8ff%22%20font-family%3D%22Arial%2Csans-serif%22%20font-size%3D%2220%22%20font-weight%3D%22700%22%20opacity%3D%22.55%22%3E%0A%20%3Ctext%20x%3D%2232%22%20y%3D%22113%22%3EO%3C%2Ftext%3E%3Ctext%20x%3D%22145%22%20y%3D%2249%22%3EN%3C%2Ftext%3E%3Ctext%20x%3D%22252%22%20y%3D%22113%22%3EOH%3C%2Ftext%3E%0A%20%3Ctext%20x%3D%22522%22%20y%3D%22118%22%3EN%3C%2Ftext%3E%3Ctext%20x%3D%22635%22%20y%3D%2253%22%3EO%3C%2Ftext%3E%3Ctext%20x%3D%22742%22%20y%3D%22118%22%3EOH%3C%2Ftext%3E%0A%20%3Ctext%20x%3D%2257%22%20y%3D%22603%22%3EN%3C%2Ftext%3E%3Ctext%20x%3D%22170%22%20y%3D%22539%22%3EO%3C%2Ftext%3E%3Ctext%20x%3D%22497%22%20y%3D%22593%22%3EOH%3C%2Ftext%3E%3Ctext%20x%3D%22610%22%20y%3D%22529%22%3EN%3C%2Ftext%3E%0A%3C%2Fg%3E%0A%3C%2Fsvg%3E") center/100% 100% no-repeat!important;
 }
+.pdf-card-media::after{content:none!important;}
 .pdf-card-media > .pdf-galao{
  position:relative!important;
- z-index:2!important;
+ z-index:3!important;
 }
-
-/* Estrutura química premium — ocupa todo o campo do galão */
-#__synthera_pdf_page .pdf-card-media{position:relative!important;overflow:hidden!important;isolation:isolate!important;}
-#__synthera_pdf_page .pdf-card-media > #synthera-chem-bg{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;z-index:0!important;display:block!important;opacity:.68!important;pointer-events:none!important;}
-#__synthera_pdf_page .pdf-card-media > .pdf-galao{position:relative!important;z-index:2!important;}
-
-/* === ESTRUTURA QUÍMICA DEFINITIVA — FUNDO REAL DO CAMPO DO GALÃO === */
-.pdf-card-media{
-  position:relative !important;
-  overflow:hidden !important;
-  isolation:isolate !important;
-  background-color:#020b17 !important;
-  background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%201000%201000%22%3E%0A%3Cdefs%3E%0A%3ClinearGradient%20id%3D%22a%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%221%22%20y2%3D%221%22%3E%3Cstop%20stop-color%3D%22%2331e5ff%22%2F%3E%3Cstop%20offset%3D%22.5%22%20stop-color%3D%22%2300b8e8%22%2F%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%239af4ff%22%2F%3E%3C%2FlinearGradient%3E%0A%3CradialGradient%20id%3D%22b%22%3E%3Cstop%20stop-color%3D%22%2300d9ff%22%20stop-opacity%3D%22.24%22%2F%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%2300d9ff%22%20stop-opacity%3D%220%22%2F%3E%3C%2FradialGradient%3E%0A%3C%2Fdefs%3E%0A%3Ccircle%20cx%3D%22180%22%20cy%3D%22180%22%20r%3D%22260%22%20fill%3D%22url(%23b)%22%2F%3E%3Ccircle%20cx%3D%22820%22%20cy%3D%22820%22%20r%3D%22280%22%20fill%3D%22url(%23b)%22%2F%3E%0A%3Cg%20fill%3D%22none%22%20stroke%3D%22url(%23a)%22%20stroke-width%3D%224%22%20opacity%3D%22.9%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%0A%3Cpath%20d%3D%22M20%20140L155%2060L290%20140V295L155%20375L20%20295Z%22%2F%3E%0A%3Cpath%20d%3D%22M290%20140L430%2055L565%20135V290L430%20370L290%20295%22%2F%3E%0A%3Cpath%20d%3D%22M565%20135L710%2050L980%20145V300L820%20385L565%20290%22%2F%3E%0A%3Cpath%20d%3D%22M155%20375L265%20510L430%20370L545%20510L700%20510L820%20385%22%2F%3E%0A%3Cpath%20d%3D%22M20%20690L155%20610L290%20690V850L155%20935L20%20850Z%22%2F%3E%0A%3Cpath%20d%3D%22M290%20690L430%20605L565%20685V840L430%20925L290%20850%22%2F%3E%0A%3Cpath%20d%3D%22M565%20685L710%20600L980%20690V850L820%20935L565%20840%22%2F%3E%0A%3Cpath%20d%3D%22M430%20370V605M265%20510L290%20690M700%20510L710%20600%22%2F%3E%0A%3C%2Fg%3E%0A%3Cg%20fill%3D%22%2316dcff%22%20stroke%3D%22%23c8f9ff%22%20stroke-width%3D%221%22%3E%0A%3Ccircle%20cx%3D%2220%22%20cy%3D%22140%22%20r%3D%228%22%2F%3E%3Ccircle%20cx%3D%22155%22%20cy%3D%2260%22%20r%3D%228%22%2F%3E%3Ccircle%20cx%3D%22290%22%20cy%3D%22140%22%20r%3D%228%22%2F%3E%3Ccircle%20cx%3D%22290%22%20cy%3D%22295%22%20r%3D%228%22%2F%3E%3Ccircle%20cx%3D%22155%22%20cy%3D%22375%22%20r%3D%228%22%2F%3E%3Ccircle%20cx%3D%2220%22%20cy%3D%22295%22%20r%3D%228%22%2F%3E%0A%3Ccircle%20cx%3D%22430%22%20cy%3D%2255%22%20r%3D%228%22%2F%3E%3Ccircle%20cx%3D%22565%22%20cy%3D%22135%22%20r%3D%228%22%2F%3E%3Ccircle%20cx%3D%22565%22%20cy%3D%22290%22%20r%3D%228%22%2F%3E%3Ccircle%20cx%3D%22430%22%20cy%3D%22370%22%20r%3D%228%22%2F%3E%0A%3Ccircle%20cx%3D%22710%22%20cy%3D%2250%22%20r%3D%228%22%2F%3E%3Ccircle%20cx%3D%22980%22%20cy%3D%22145%22%20r%3D%228%22%2F%3E%3Ccircle%20cx%3D%22980%22%20cy%3D%22300%22%20r%3D%228%22%2F%3E%3Ccircle%20cx%3D%22820%22%20cy%3D%22385%22%20r%3D%228%22%2F%3E%0A%3Ccircle%20cx%3D%22265%22%20cy%3D%22510%22%20r%3D%228%22%2F%3E%3Ccircle%20cx%3D%22545%22%20cy%3D%22510%22%20r%3D%228%22%2F%3E%3Ccircle%20cx%3D%22700%22%20cy%3D%22510%22%20r%3D%228%22%2F%3E%0A%3Ccircle%20cx%3D%2220%22%20cy%3D%22690%22%20r%3D%228%22%2F%3E%3Ccircle%20cx%3D%22155%22%20cy%3D%22610%22%20r%3D%228%22%2F%3E%3Ccircle%20cx%3D%22290%22%20cy%3D%22690%22%20r%3D%228%22%2F%3E%3Ccircle%20cx%3D%22290%22%20cy%3D%22850%22%20r%3D%228%22%2F%3E%3Ccircle%20cx%3D%22155%22%20cy%3D%22935%22%20r%3D%228%22%2F%3E%3Ccircle%20cx%3D%2220%22%20cy%3D%22850%22%20r%3D%228%22%2F%3E%0A%3Ccircle%20cx%3D%22430%22%20cy%3D%22605%22%20r%3D%228%22%2F%3E%3Ccircle%20cx%3D%22565%22%20cy%3D%22685%22%20r%3D%228%22%2F%3E%3Ccircle%20cx%3D%22565%22%20cy%3D%22840%22%20r%3D%228%22%2F%3E%3Ccircle%20cx%3D%22430%22%20cy%3D%22925%22%20r%3D%228%22%2F%3E%0A%3Ccircle%20cx%3D%22710%22%20cy%3D%22600%22%20r%3D%228%22%2F%3E%3Ccircle%20cx%3D%22980%22%20cy%3D%22690%22%20r%3D%228%22%2F%3E%3Ccircle%20cx%3D%22980%22%20cy%3D%22850%22%20r%3D%228%22%2F%3E%3Ccircle%20cx%3D%22820%22%20cy%3D%22935%22%20r%3D%228%22%2F%3E%0A%3C%2Fg%3E%0A%3Cg%20fill%3D%22%23dffbff%22%20font-family%3D%22Arial%2Csans-serif%22%20font-size%3D%2227%22%20font-weight%3D%22700%22%20opacity%3D%22.78%22%3E%0A%3Ctext%20x%3D%225%22%20y%3D%22132%22%3EO%3C%2Ftext%3E%3Ctext%20x%3D%22140%22%20y%3D%2253%22%3EN%3C%2Ftext%3E%3Ctext%20x%3D%22270%22%20y%3D%22132%22%3EOH%3C%2Ftext%3E%3Ctext%20x%3D%22415%22%20y%3D%2248%22%3EO%3C%2Ftext%3E%3Ctext%20x%3D%22545%22%20y%3D%22128%22%3EN%3C%2Ftext%3E%3Ctext%20x%3D%22690%22%20y%3D%2243%22%3EOH%3C%2Ftext%3E%3Ctext%20x%3D%22953%22%20y%3D%22138%22%3EO%3C%2Ftext%3E%3Ctext%20x%3D%22805%22%20y%3D%22378%22%3EN%3C%2Ftext%3E%0A%3Ctext%20x%3D%22250%22%20y%3D%22503%22%3EO%3C%2Ftext%3E%3Ctext%20x%3D%22530%22%20y%3D%22503%22%3EN%3C%2Ftext%3E%3Ctext%20x%3D%22685%22%20y%3D%22503%22%3EOH%3C%2Ftext%3E%3Ctext%20x%3D%225%22%20y%3D%22682%22%3EN%3C%2Ftext%3E%3Ctext%20x%3D%22140%22%20y%3D%22603%22%3EO%3C%2Ftext%3E%3Ctext%20x%3D%22275%22%20y%3D%22682%22%3EOH%3C%2Ftext%3E%3Ctext%20x%3D%22415%22%20y%3D%22598%22%3EN%3C%2Ftext%3E%3Ctext%20x%3D%22550%22%20y%3D%22678%22%3EO%3C%2Ftext%3E%3Ctext%20x%3D%22695%22%20y%3D%22593%22%3EOH%3C%2Ftext%3E%3Ctext%20x%3D%22953%22%20y%3D%22682%22%3EN%3C%2Ftext%3E%0A%3C%2Fg%3E%3C%2Fsvg%3E") !important;
-  background-size:cover !important;
-  background-position:center !important;
-  background-repeat:no-repeat !important;
-}
-.pdf-card-media::after{content:none !important;}
-.pdf-card-media > .pdf-galao{
-  position:relative !important;
-  z-index:2 !important;
-}
-
-
-/* Estrutura química alternativa — mesma opacidade */
-.pdf-card-media{
-  position:relative !important;
-  overflow:hidden !important;
-  isolation:isolate !important;
-}
-.pdf-card-media > #synthera-chem-bg{
-  position:absolute !important;
-  inset:0 !important;
-  width:100% !important;
-  height:100% !important;
-  z-index:0 !important;
-  opacity:.68 !important;
-  display:block !important;
-  pointer-events:none !important;
-}
-.pdf-card-media > .pdf-galao{
-  position:relative !important;
-  z-index:2 !important;
-}
-
 </style>
       <div class="pdf-top"><div class="pdf-site">www.<b>synthera</b>.com.br</div></div>
       <div class="pdf-cat"></div><div class="pdf-tag">PERFORMANCE QUE TRANSFORMA A ROTINA PROFISSIONAL</div>
@@ -1549,89 +1503,7 @@ async function gerarPDF(){
             <div class="pdf-code">${esc(code||title)}</div><div class="pdf-name">${esc(title.toUpperCase())}</div><div class="pdf-sub">${esc(sub)}</div>
             <div class="pdf-rule"></div><div class="pdf-price">PREÇO: ${esc(price.toUpperCase())}</div>
             ${p.ficha?`<div class="pdf-ficha">⇩ BAIXAR FICHA TÉCNICA</div>`:""}
-          </div><div class="pdf-card-media"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 1000"
- aria-hidden="true" style="position:absolute;inset:0;width:100%;height:100%;z-index:0;opacity:.68;pointer-events:none">
-<defs>
- <linearGradient id="chemNewLine" x1="0" y1="0" x2="1" y2="1">
-  <stop offset="0" stop-color="#31e6ff"/>
-  <stop offset=".5" stop-color="#00b8e8"/>
-  <stop offset="1" stop-color="#76efff"/>
- </linearGradient>
- <radialGradient id="chemNewGlow">
-  <stop offset="0" stop-color="#00d9ff" stop-opacity=".18"/>
-  <stop offset="1" stop-color="#00d9ff" stop-opacity="0"/>
- </radialGradient>
-</defs>
-
-<circle cx="180" cy="210" r="250" fill="url(#chemNewGlow)"/>
-<circle cx="820" cy="780" r="280" fill="url(#chemNewGlow)"/>
-
-<!-- moléculas principais -->
-<g fill="none" stroke="url(#chemNewLine)" stroke-width="3.2"
-   stroke-linecap="round" stroke-linejoin="round" opacity=".92">
-
- <!-- anel superior esquerdo -->
- <path d="M45 170 L145 112 L245 170 L245 286 L145 344 L45 286 Z"/>
- <path d="M78 189 L145 151 L212 189 L212 267 L145 305 L78 267 Z"/>
-
- <!-- anel superior direito -->
- <path d="M575 155 L675 97 L775 155 L775 271 L675 329 L575 271 Z"/>
- <path d="M608 174 L675 136 L742 174 L742 252 L675 290 L608 252 Z"/>
-
- <!-- molécula central -->
- <path d="M310 390 L405 335 L500 390 L500 500 L405 555 L310 500 Z"/>
- <path d="M343 409 L405 373 L467 409 L467 481 L405 517 L343 481 Z"/>
-
- <!-- anel inferior esquerdo -->
- <path d="M30 665 L130 607 L230 665 L230 781 L130 839 L30 781 Z"/>
-
- <!-- anel inferior direito -->
- <path d="M590 690 L690 632 L790 690 L790 806 L690 864 L590 806 Z"/>
- <path d="M623 709 L690 671 L757 709 L757 787 L690 825 L623 787 Z"/>
-
- <!-- conexões -->
- <path d="M245 228 L310 445"/>
- <path d="M500 445 L575 213"/>
- <path d="M145 344 L130 607"/>
- <path d="M405 555 L405 680"/>
- <path d="M500 445 L690 632"/>
- <path d="M230 723 L405 680"/>
-</g>
-
-<!-- átomos/nós -->
-<g fill="#13dfff" stroke="#bdf8ff" stroke-width="1.3">
- <circle cx="45" cy="170" r="7"/><circle cx="145" cy="112" r="7"/>
- <circle cx="245" cy="170" r="7"/><circle cx="245" cy="286" r="7"/>
- <circle cx="145" cy="344" r="7"/><circle cx="45" cy="286" r="7"/>
-
- <circle cx="575" cy="155" r="7"/><circle cx="675" cy="97" r="7"/>
- <circle cx="775" cy="155" r="7"/><circle cx="775" cy="271" r="7"/>
- <circle cx="675" cy="329" r="7"/><circle cx="575" cy="271" r="7"/>
-
- <circle cx="310" cy="390" r="7"/><circle cx="405" cy="335" r="7"/>
- <circle cx="500" cy="390" r="7"/><circle cx="500" cy="500" r="7"/>
- <circle cx="405" cy="555" r="7"/><circle cx="310" cy="500" r="7"/>
-
- <circle cx="30" cy="665" r="7"/><circle cx="130" cy="607" r="7"/>
- <circle cx="230" cy="665" r="7"/><circle cx="230" cy="781" r="7"/>
- <circle cx="130" cy="839" r="7"/><circle cx="30" cy="781" r="7"/>
-
- <circle cx="590" cy="690" r="7"/><circle cx="690" cy="632" r="7"/>
- <circle cx="790" cy="690" r="7"/><circle cx="790" cy="806" r="7"/>
- <circle cx="690" cy="864" r="7"/><circle cx="590" cy="806" r="7"/>
-</g>
-
-<!-- identificação química discreta -->
-<g fill="#d9faff" font-family="Arial,sans-serif" font-size="23"
-   font-weight="700" opacity=".76">
- <text x="26" y="164">O</text><text x="133" y="106">N</text>
- <text x="226" y="164">OH</text><text x="557" y="149">N</text>
- <text x="663" y="91">O</text><text x="756" y="149">OH</text>
- <text x="292" y="384">N</text><text x="393" y="329">O</text>
- <text x="483" y="384">OH</text><text x="112" y="601">O</text>
- <text x="678" y="626">N</text><text x="778" y="684">O</text>
-</g>
-</svg>
+          </div><div class="pdf-card-media">
 ${media}</div><div class="pdf-card-titlebar"></div></div>`;
           grid.appendChild(card);
         });
