@@ -1332,53 +1332,36 @@ async function gerarPDF(){
     function footer(page){stroke([35,76,92]);doc.setLineWidth(.35);doc.line(MG,PH-10,PW-MG,PH-10);textColor(NAVY);font(5.7,"bold");doc.text("SYNTHERA",MG,PH-4.8);textColor(MUTED);font(5.2);doc.text("Química profissional • Performance • Resultado",MG+25,PH-4.8);textColor(CYAN);font(5.2,"bold");doc.text("www.synthera.com.br",PW/2,PH-4.8,{align:"center"});doc.text(String(page).padStart(2,"0"),PW-MG,PH-4.8,{align:"right"})}
     function header(cat,count,continuation){base();if(!continuation){fill(NAVY);doc.roundedRect(MG,10,PW-MG*2,25,2,2,"F");fill(CYAN);doc.rect(MG,10,4,25,"F");pill(catCode(cat),MG+8,16,19,7,CYAN,NAVY,5.3);textColor(WHITE);font(11,"bold");doc.text(cat.replace(/^[A-Z]{3}\s*-\s*/,'').toUpperCase(),MG+31,21);textColor([165,205,213]);font(5.5);doc.text("Linha Synthera • soluções profissionais",MG+31,27);pill(`${count} PRODUTOS`,PW-MG-36,17,28,7,BLUE,WHITE,4.7);textColor(CYAN);font(5.3,"bold");doc.text("PERFORMANCE QUE TRANSFORMA A ROTINA PROFISSIONAL",MG,40);return TOP}pill(catCode(cat),MG,10,20,7,NAVY,CYAN,5);textColor(NAVY);font(8,"bold");doc.text(cat.replace(/^[A-Z]{3}\s*-\s*/,'').toUpperCase(),MG+26,15);stroke(CYAN);doc.setLineWidth(.7);doc.line(MG+26,19,PW-MG,19);return 25}
     
+
 function fitPdfText(text, x, y, maxW, maxH, opts={}){
   const family=opts.family||"bold";
   const min=opts.min||3;
-  const max=opts.max||18;
+  const max=opts.max||20;
   const maxLines=opts.maxLines||2;
-  const lineFactor=opts.lineFactor||1.12;
-
+  const lineFactor=opts.lineFactor||1.05;
   let lo=min, hi=max, best=min, bestLines=[String(text||"")];
 
-  for(let i=0;i<16;i++){
+  for(let i=0;i<18;i++){
     const mid=(lo+hi)/2;
     font(mid,family);
     const lines=doc.splitTextToSize(String(text||""),maxW);
     const lineH=mid*lineFactor;
     const ok=lines.length<=maxLines && lines.length*lineH<=maxH;
-
-    if(ok){
-      best=mid;
-      bestLines=lines;
-      lo=mid;
-    }else{
-      hi=mid;
-    }
+    if(ok){best=mid;bestLines=lines;lo=mid;}
+    else hi=mid;
   }
 
   font(best,family);
   const lineH=best*lineFactor;
-  bestLines.slice(0,maxLines).forEach((line,i)=>{
-    doc.text(line,x,y+i*lineH);
-  });
-
-  return {
-    size:best,
-    lines:bestLines.slice(0,maxLines),
-    height:bestLines.slice(0,maxLines).length*lineH
-  };
+  bestLines.slice(0,maxLines).forEach((ln,i)=>doc.text(ln,x,y+i*lineH));
+  return {size:best,lines:bestLines.slice(0,maxLines),height:bestLines.length*lineH};
 }
 
 async function card(p,x,y,w,h,reverse=false){
-  // Card inspirado diretamente no modelo enviado:
-  // fundo azul/preto, código grande, título ciano, subtítulo claro,
-  // preço em moldura e imagem do produto em painel lateral.
   const NAVY=[2,11,23], PANEL=[1,17,31], CYAN=[8,170,244],
         WHITE=[255,255,255], SOFT=[220,232,238], BORDER=[20,145,220];
 
-  fill(NAVY);
-  doc.roundedRect(x,y,w,h,4.5,4.5,"F");
+  fill(NAVY); doc.roundedRect(x,y,w,h,4.5,4.5,"F");
   stroke(BORDER); doc.setLineWidth(.5);
   doc.roundedRect(x,y,w,h,4.5,4.5,"S");
 
@@ -1386,21 +1369,18 @@ async function card(p,x,y,w,h,reverse=false){
   const contentW=w-mediaW;
   const mediaX=reverse?x:x+contentW;
   const contentX=reverse?x+mediaW:x;
-  const pad=6;
+  const pad=5.5;
   const textX=contentX+pad;
   const textW=contentW-pad*2;
 
-  // Painel da imagem, como no card de referência.
   fill(PANEL);
   doc.roundedRect(mediaX+2,y+2,mediaW-4,h-4,3.2,3.2,"F");
 
-  // Filete/ângulo ciano separando texto e imagem.
   stroke(CYAN); doc.setLineWidth(.65);
   const sepX=reverse?mediaX+mediaW-2:mediaX+2;
   doc.line(sepX,y+7,sepX+(reverse?-4:4),y+h*.50);
   doc.line(sepX+(reverse?-4:4),y+h*.50,sepX+(reverse?1:-1),y+h-7);
 
-  // Imagem real cadastrada no gerador.
   if(p.imagem){
     try{
       const sz=await new Promise(resolve=>{
@@ -1410,7 +1390,7 @@ async function card(p,x,y,w,h,reverse=false){
         im.src=p.imagem;
       });
       const ratio=sz.w/sz.h;
-      const maxW=mediaW*.80, maxH=h*.76;
+      const maxW=mediaW*.80,maxH=h*.76;
       let dw=maxW,dh=dw/ratio;
       if(dh>maxH){dh=maxH;dw=dh*ratio;}
       doc.addImage(p.imagem,mediaX+(mediaW-dw)/2,y+(h-dh)/2,dw,dh,undefined,"FAST",0);
@@ -1423,39 +1403,44 @@ async function card(p,x,y,w,h,reverse=false){
   const attrs=p.attrs||[];
   const subtitle=attrs.length?String(attrs[0].v):"SOLUÇÃO PROFISSIONAL SYNTHERA";
 
-  // Hierarquia visual do modelo enviado.
+  // Máximo tamanho possível dentro de cada área.
   textColor(WHITE);
-  fitPdfText(code,textX,y+15,textW,18,{min:11,max:22,maxLines:1,lineFactor:1});
+  fitPdfText(code,textX,y+16,textW,21,{min:12,max:25,maxLines:1,lineFactor:.95});
 
   textColor(CYAN);
-  const titleFit=fitPdfText(cleanName.toUpperCase(),textX,y+27,textW,18,{min:6,max:11.5,maxLines:2,lineFactor:1.05});
+  const titleFit=fitPdfText(cleanName.toUpperCase(),textX,y+31,textW,24,{
+    min:7,max:15,maxLines:2,lineFactor:1.02
+  });
 
   textColor(SOFT);
-  const subY=Math.min(y+51,y+27+titleFit.height+5);
-  fitPdfText(subtitle.toUpperCase(),textX,subY,textW,11,{min:4.5,max:7,maxLines:2,lineFactor:1.08});
+  const subY=Math.min(y+60,y+31+titleFit.height+4);
+  fitPdfText(subtitle.toUpperCase(),textX,subY,textW,14,{
+    min:4.8,max:9,maxLines:2,lineFactor:1.04
+  });
 
-  // Pequeno traço horizontal característico do modelo.
-  const lineY=Math.min(y+62,subY+14);
+  const lineY=Math.min(y+70,subY+16);
   stroke(CYAN); doc.setLineWidth(.55);
-  doc.line(textX,lineY,textX+24,lineY);
+  doc.line(textX,lineY,textX+25,lineY);
 
-  // Preço: caixa grande e limpa, como no card de referência.
+  // Caixa do preço permanece proporcional ao card e recebe fonte dinâmica.
   const price=p.preco?String(p.preco):"CONSULTAR";
   const priceY=y+h-14;
   const priceW=Math.min(textW,58);
-  fill([1,14,27]);
-  doc.roundedRect(textX,priceY-7,priceW,11,2.8,2.8,"F");
+  fill([1,14,27]); doc.roundedRect(textX,priceY-7,priceW,11,2.8,2.8,"F");
   stroke([30,145,220]); doc.setLineWidth(.5);
   doc.roundedRect(textX,priceY-7,priceW,11,2.8,2.8,"S");
   textColor(CYAN);
-  fitPdfText("PREÇO: "+price.toUpperCase(),textX+3,priceY,priceW-6,7.5,{min:4,max:7.5,maxLines:1,lineFactor:1});
+  fitPdfText("PREÇO: "+price.toUpperCase(),textX+3,priceY+.2,priceW-6,7.5,{
+    min:4,max:8,maxLines:1,lineFactor:1
+  });
 
-  // Ficha técnica fica como botão discreto no rodapé, se existir.
   if(p.ficha){
     const fw=Math.min(textW,48),fh=5.5,fx=textX,fy=y+h-7;
     fill([3,45,67]); doc.roundedRect(fx,fy,fw,fh,1.8,1.8,"F");
     textColor(WHITE);
-    fitPdfText("BAIXAR FICHA TÉCNICA",fx+2,fy+3.7,fw-4,4,{min:2.5,max:4,maxLines:1,lineFactor:1});
+    fitPdfText("BAIXAR FICHA TÉCNICA",fx+2,fy+3.7,fw-4,4,{
+      min:2.5,max:4.5,maxLines:1,lineFactor:1
+    });
     doc.link(fx,fy,fw,fh,{url:p.ficha});
   }
 }
