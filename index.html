@@ -1413,7 +1413,7 @@ async function gerarPDF(){
         .pdf-card.reverse .pdf-card-content{grid-column:2;grid-row:1}.pdf-card.reverse .pdf-card-media{grid-column:1;grid-row:1}
         .pdf-card-content{padding:24px 18px 16px;min-width:0;max-width:100%;overflow:hidden;display:flex;flex-direction:column;justify-content:center;position:relative;z-index:3}
         .pdf-card-media{min-width:0;position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden;background:linear-gradient(135deg,#031523,#020b17)}
-        .pdf-card-media:after{content:"";position:absolute;bottom:18px;width:72%;height:18px;border-radius:50%;background:rgba(0,180,245,.28);filter:blur(10px)}
+        .pdf-card-media:after{content:none !important;}
         .pdf-card-media img{width:96%;height:94%;object-fit:contain;position:relative;z-index:2;filter:drop-shadow(0 12px 14px rgba(0,0,0,.58))}
         .pdf-card-titlebar{position:absolute;top:0;bottom:0;width:3px;background:#08baf1;z-index:4;transform:skew(-11deg)}
         .pdf-card:not(.reverse) .pdf-card-titlebar{left:55%}.pdf-card.reverse .pdf-card-titlebar{right:45%}
@@ -1470,13 +1470,20 @@ async function gerarPDF(){
   z-index:0 !important;
   width:100% !important;
   height:100% !important;
-  opacity:.32 !important;
+  opacity:.55 !important;
+  pointer-events:none !important;
+  background:transparent !important;
 }
 .pdf-card-media .pdf-galao, .pdf-media .pdf-galao{
   position:relative !important;
   z-index:2 !important;
 }
 
+
+.pdf-card-media > #synthera-chem-bg{
+  position:absolute !important;
+  z-index:0 !important;
+}
 </style>
       <div class="pdf-top"><div class="pdf-site">www.<b>synthera</b>.com.br</div></div>
       <div class="pdf-cat"></div><div class="pdf-tag">PERFORMANCE QUE TRANSFORMA A ROTINA PROFISSIONAL</div>
@@ -1505,20 +1512,20 @@ async function gerarPDF(){
           </div><div class="pdf-card-media">
 <svg id="synthera-chem-bg" aria-hidden="true" viewBox="0 0 700 700"
      style="position:absolute;inset:0;width:100%;height:100%;z-index:0;opacity:.32;pointer-events:none;">
-  <g fill="none" stroke="#00c8ff" stroke-width="2" opacity=".78">
+  <g fill="none" stroke="#12c9f4" stroke-width="3" opacity=".92">
     <path d="M90 180L205 115L320 180L320 315L205 380L90 315Z"/>
     <path d="M390 120L505 55L620 120L620 255L505 320L390 255Z"/>
     <path d="M385 410L500 345L615 410L615 545L500 610L385 545Z"/>
     <path d="M150 485L205 380L320 315L385 410"/>
     <path d="M320 180L390 255L385 410"/>
   </g>
-  <g fill="#00c8ff" opacity=".85">
+  <g fill="#12c9f4" opacity=".95">
     <circle cx="90" cy="180" r="6"/><circle cx="205" cy="115" r="6"/>
     <circle cx="320" cy="180" r="6"/><circle cx="390" cy="120" r="6"/>
     <circle cx="505" cy="55" r="6"/><circle cx="620" cy="120" r="6"/>
     <circle cx="500" cy="610" r="6"/><circle cx="385" cy="545" r="6"/>
   </g>
-  <g fill="#b7efff" font-family="Arial,sans-serif" font-size="22" opacity=".62">
+  <g fill="#c7f4ff" font-family="Arial,sans-serif" font-size="24" opacity=".82">
     <text x="67" y="165">O</text><text x="198" y="98">N</text>
     <text x="307" y="169">OH</text><text x="490" y="39">NH</text>
     <text x="604" y="108">O</text><text x="489" y="595">N</text>
@@ -1554,7 +1561,9 @@ ${media}</div><div class="pdf-card-titlebar"></div></div>`;
 
         for(const img of grid.querySelectorAll("img"))await waitImage(img);
         page.querySelector(".pdf-page-number").textContent=String(pageNumber+1).padStart(2,"0");
-        const canvas=await window.html2canvas(page,{scale:2,backgroundColor:"#020b17",useCORS:true,allowTaint:false,logging:false,width:794,height:1123,windowWidth:794,windowHeight:1123});
+        if(document.fonts?.ready) await document.fonts.ready;
+          await new Promise(r=>requestAnimationFrame(()=>requestAnimationFrame(r)));
+          const canvas=await window.html2canvas(page,{scale:2,backgroundColor:"#020b17",useCORS:true,allowTaint:false,logging:false,width:794,height:1123,windowWidth:794,windowHeight:1123});
         doc.addPage();doc.addImage(canvas.toDataURL("image/jpeg",.97),"JPEG",0,0,PW,PH,undefined,"FAST");pageNumber++;
       }
     }
