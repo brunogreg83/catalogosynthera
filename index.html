@@ -1422,7 +1422,9 @@ for(const [cat,gprods] of entries){
     doc.addPage();
     page++;
 
-    // Fundo preto da página inteira.
+    // Fundo preto da PÁGINA inteira (não somente dos cards).
+    doc.setFillColor(2,15,29);
+    doc.rect(0,0,PW,PH,"F");
     fill([2,15,29]);
     doc.rect(0,0,PW,PH,"F");
 
