@@ -1476,6 +1476,45 @@ async function gerarPDF(){
  z-index:3!important;
 }
 
+
+/* PDF CARD — FUNDO 20% MAIS VISÍVEL + FADE REAL */
+.pdf-card-media{
+ position:relative!important;
+ overflow:hidden!important;
+ isolation:isolate!important;
+ background:#020b17!important;
+}
+.pdf-card-media>.pdf-clean-fade-layer{
+ position:absolute!important;
+ inset:0!important;
+ z-index:0!important;
+ pointer-events:none!important;
+ overflow:hidden!important;
+}
+.pdf-card-media>.pdf-clean-fade-layer>.pdf-clean-fade-image{
+ position:absolute!important;
+ inset:0!important;
+ background-image:none!important;
+ background-position:center!important;
+ background-size:100% 100%!important;
+ background-repeat:no-repeat!important;
+ opacity:1!important;
+}
+.pdf-card-media>.pdf-clean-fade-layer>.pdf-clean-fade-edge{
+ position:absolute!important;
+ inset:0!important;
+ background:
+  linear-gradient(to right,rgba(2,11,23,.45) 0%,rgba(2,11,23,0) 20%,rgba(2,11,23,0) 80%,rgba(2,11,23,.45) 100%),
+  linear-gradient(to bottom,rgba(2,11,23,.38) 0%,rgba(2,11,23,0) 22%,rgba(2,11,23,0) 78%,rgba(2,11,23,.52) 100%)!important;
+}
+.pdf-card-media>.pdf-galao,
+.pdf-card-media>.pdf-card-content,
+.pdf-card-media>img,
+.pdf-card-media>div:not(.pdf-clean-fade-layer){
+ position:relative!important;
+ z-index:3!important;
+}
+
 </style>
       <div class="pdf-top"><div class="pdf-site">www.<b>synthera</b>.com.br</div></div>
       <div class="pdf-cat"></div><div class="pdf-tag">PERFORMANCE QUE TRANSFORMA A ROTINA PROFISSIONAL</div>
@@ -1501,7 +1540,7 @@ async function gerarPDF(){
             <div class="pdf-code">${esc(code||title)}</div><div class="pdf-name">${esc(title.toUpperCase())}</div><div class="pdf-sub">${esc(sub)}</div>
             <div class="pdf-rule"></div><div class="pdf-price">PREÇO: ${esc(price.toUpperCase())}</div>
             ${p.ficha?`<div class="pdf-ficha">⇩ BAIXAR FICHA TÉCNICA</div>`:""}
-          </div><div class="pdf-card-media">
+          </div><div class="pdf-card-media"><div class="pdf-clean-fade-layer" aria-hidden="true"><div class="pdf-clean-fade-image"></div><div class="pdf-clean-fade-edge"></div></div>
 <svg class="pdf-clean-bg" viewBox="0 0 1000 1000" preserveAspectRatio="none"
 xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
 <defs>
