@@ -1446,7 +1446,7 @@ async function gerarPDF(){
   width:100% !important;
   height:100% !important;
   z-index:0 !important;
-  opacity:.48 !important;
+  opacity:.576 !important;
   display:block !important;
   pointer-events:none !important;
 }
@@ -1490,24 +1490,32 @@ async function gerarPDF(){
             ${p.ficha?`<div class="pdf-ficha">⇩ BAIXAR FICHA TÉCNICA</div>`:""}
           </div><div class="pdf-card-media">
 <svg id="synthera-chem-bg" aria-hidden="true" viewBox="0 0 800 800"
- style="position:absolute;inset:0;width:100%;height:100%;z-index:0;opacity:.48;pointer-events:none;">
- <g fill="none" stroke="#12cfff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity=".82">
-  <path d="M90 230 L205 165 L320 230 L320 360 L205 425 L90 360 Z"/>
-  <path d="M480 180 L595 115 L710 180 L710 310 L595 375 L480 310 Z"/>
-  <path d="M320 360 L400 470 L595 375"/>
-  <path d="M205 425 L300 555 L500 555"/>
+ style="position:absolute;inset:0;width:100%;height:100%;z-index:0;opacity:.58;pointer-events:none;">
+ <g fill="none" stroke="#16d7ff" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round">
+   <path d="M70 220 L190 145 L310 220 L310 360 L190 435 L70 360 Z"/>
+   <path d="M310 220 L430 145 L550 220 L550 360 L430 435 L310 360"/>
+   <path d="M550 220 L670 145 L760 220 L710 350 L550 360"/>
+   <path d="M190 435 L275 565 L430 565 L550 360"/>
+   <path d="M275 565 L205 675"/>
+   <path d="M430 565 L500 675"/>
  </g>
- <g fill="#12d8ff" opacity=".9">
-  <circle cx="90" cy="230" r="6"/><circle cx="205" cy="165" r="6"/><circle cx="320" cy="230" r="6"/>
-  <circle cx="320" cy="360" r="6"/><circle cx="205" cy="425" r="6"/><circle cx="90" cy="360" r="6"/>
-  <circle cx="480" cy="180" r="6"/><circle cx="595" cy="115" r="6"/><circle cx="710" cy="180" r="6"/>
-  <circle cx="710" cy="310" r="6"/><circle cx="595" cy="375" r="6"/><circle cx="400" cy="470" r="6"/>
-  <circle cx="300" cy="555" r="6"/><circle cx="500" cy="555" r="6"/>
+ <g fill="#16d7ff">
+   <circle cx="70" cy="220" r="7"/><circle cx="190" cy="145" r="7"/>
+   <circle cx="310" cy="220" r="7"/><circle cx="310" cy="360" r="7"/>
+   <circle cx="190" cy="435" r="7"/><circle cx="70" cy="360" r="7"/>
+   <circle cx="430" cy="145" r="7"/><circle cx="550" cy="220" r="7"/>
+   <circle cx="550" cy="360" r="7"/><circle cx="430" cy="435" r="7"/>
+   <circle cx="670" cy="145" r="7"/><circle cx="760" cy="220" r="7"/>
+   <circle cx="710" cy="350" r="7"/><circle cx="275" cy="565" r="7"/>
+   <circle cx="430" cy="565" r="7"/><circle cx="205" cy="675" r="7"/>
+   <circle cx="500" cy="675" r="7"/>
  </g>
- <g fill="#c9f5ff" font-family="Montserrat,Arial,sans-serif" font-size="23" font-weight="800" opacity=".72">
-  <text x="68" y="223">O</text><text x="194" y="158">N</text><text x="304" y="223">OH</text>
-  <text x="458" y="173">N</text><text x="583" y="108">O</text><text x="690" y="173">OH</text>
-  <text x="390" y="463">O</text><text x="290" y="548">N</text>
+ <g fill="#d8f9ff" font-family="Montserrat,Arial,sans-serif" font-size="24" font-weight="800">
+   <text x="48" y="213">O</text><text x="177" y="138">N</text>
+   <text x="296" y="213">OH</text><text x="417" y="138">N</text>
+   <text x="536" y="213">O</text><text x="657" y="138">OH</text>
+   <text x="536" y="353">N</text><text x="417" y="428">O</text>
+   <text x="262" y="558">N</text><text x="190" y="668">O</text>
  </g>
 </svg>
 ${media}</div><div class="pdf-card-titlebar"></div></div>`;
