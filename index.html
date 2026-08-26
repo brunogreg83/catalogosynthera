@@ -1331,7 +1331,46 @@ async function gerarPDF(){
 }
     function footer(page){stroke([35,76,92]);doc.setLineWidth(.35);doc.line(MG,PH-10,PW-MG,PH-10);textColor(NAVY);font(5.7,"bold");doc.text("SYNTHERA",MG,PH-4.8);textColor(MUTED);font(5.2);doc.text("Química profissional • Performance • Resultado",MG+25,PH-4.8);textColor(CYAN);font(5.2,"bold");doc.text("www.synthera.com.br",PW/2,PH-4.8,{align:"center"});doc.text(String(page).padStart(2,"0"),PW-MG,PH-4.8,{align:"right"})}
     function header(cat,count,continuation){base();if(!continuation){fill(NAVY);doc.roundedRect(MG,10,PW-MG*2,25,2,2,"F");fill(CYAN);doc.rect(MG,10,4,25,"F");pill(catCode(cat),MG+8,16,19,7,CYAN,NAVY,5.3);textColor(WHITE);font(11,"bold");doc.text(cat.replace(/^[A-Z]{3}\s*-\s*/,'').toUpperCase(),MG+31,21);textColor([165,205,213]);font(5.5);doc.text("Linha Synthera • soluções profissionais",MG+31,27);pill(`${count} PRODUTOS`,PW-MG-36,17,28,7,BLUE,WHITE,4.7);textColor(CYAN);font(5.3,"bold");doc.text("PERFORMANCE QUE TRANSFORMA A ROTINA PROFISSIONAL",MG,40);return TOP}pill(catCode(cat),MG,10,20,7,NAVY,CYAN,5);textColor(NAVY);font(8,"bold");doc.text(cat.replace(/^[A-Z]{3}\s*-\s*/,'').toUpperCase(),MG+26,15);stroke(CYAN);doc.setLineWidth(.7);doc.line(MG+26,19,PW-MG,19);return 25}
-    async function card(p,x,y,w,h,reverse=false){
+    
+function fitPdfText(text, x, y, maxW, maxH, opts={}){
+  const family=opts.family||"bold";
+  const min=opts.min||3;
+  const max=opts.max||18;
+  const maxLines=opts.maxLines||2;
+  const lineFactor=opts.lineFactor||1.12;
+
+  let lo=min, hi=max, best=min, bestLines=[String(text||"")];
+
+  for(let i=0;i<16;i++){
+    const mid=(lo+hi)/2;
+    font(mid,family);
+    const lines=doc.splitTextToSize(String(text||""),maxW);
+    const lineH=mid*lineFactor;
+    const ok=lines.length<=maxLines && lines.length*lineH<=maxH;
+
+    if(ok){
+      best=mid;
+      bestLines=lines;
+      lo=mid;
+    }else{
+      hi=mid;
+    }
+  }
+
+  font(best,family);
+  const lineH=best*lineFactor;
+  bestLines.slice(0,maxLines).forEach((line,i)=>{
+    doc.text(line,x,y+i*lineH);
+  });
+
+  return {
+    size:best,
+    lines:bestLines.slice(0,maxLines),
+    height:bestLines.slice(0,maxLines).length*lineH
+  };
+}
+
+async function card(p,x,y,w,h,reverse=false){
   // Layout seguro para PDF: mesma hierarquia do gerador, mas dimensionada
   // para caber integralmente no card de 6 por página.
   const NAVY=[2,11,23], MEDIA=[3,16,31], CYAN=[8,170,244],
