@@ -1530,6 +1530,62 @@ async function gerarPDF(){
   position:absolute !important;
   z-index:0 !important;
 }
+
+/* =========================================================
+   AJUSTE REAL DO CAMPO DO PRODUTO NO PDF
+   Aplica-se tanto ao galão SVG quanto à imagem cadastrada.
+   ========================================================= */
+#__synthera_pdf_page .pdf-card-media{
+  position:relative !important;
+  overflow:hidden !important;
+  isolation:isolate !important;
+  display:flex !important;
+  align-items:center !important;
+  justify-content:center !important;
+}
+
+/* Estrutura química ocupa TODO o campo */
+#__synthera_pdf_page .pdf-card-media > #synthera-chem-bg{
+  position:absolute !important;
+  inset:0 !important;
+  width:100% !important;
+  height:100% !important;
+  z-index:0 !important;
+  opacity:.68 !important;
+  display:block !important;
+  transform:none !important;
+}
+
+/* Galão/imagem REAL do produto — maior */
+#__synthera_pdf_page .pdf-card-media > img{
+  position:relative !important;
+  z-index:2 !important;
+  width:118% !important;
+  height:118% !important;
+  max-width:none !important;
+  max-height:none !important;
+  object-fit:contain !important;
+  transform:translateY(-3%) !important;
+  filter:drop-shadow(0 14px 18px rgba(0,0,0,.62)) !important;
+}
+
+/* Galão SVG de fallback — mesma proporção visual */
+#__synthera_pdf_page .pdf-card-media > .pdf-galao{
+  position:relative !important;
+  z-index:2 !important;
+  width:150% !important;
+  height:150% !important;
+  max-width:none !important;
+  max-height:none !important;
+  object-fit:contain !important;
+  transform:translateY(-4%) !important;
+}
+
+/* Nenhum elemento decorativo oval abaixo do galão */
+#__synthera_pdf_page .pdf-card-media::after{
+  content:none !important;
+}
+
 </style>
       <div class="pdf-top"><div class="pdf-site">www.<b>synthera</b>.com.br</div></div>
       <div class="pdf-cat"></div><div class="pdf-tag">PERFORMANCE QUE TRANSFORMA A ROTINA PROFISSIONAL</div>
@@ -1568,7 +1624,7 @@ async function gerarPDF(){
    <path d="M540 286 L610 398 L540 510 L420 510 L350 398"/>
    <path d="M70 286 L35 398 L105 510 L225 510 L300 422"/>
  </g>
- <g fill="#0ed5ff" opacity=".95">
+ <g fill="#0ed5ff" opacity=".98">
    <circle cx="70" cy="150" r="8"/><circle cx="180" cy="82" r="8"/>
    <circle cx="300" cy="150" r="8"/><circle cx="420" cy="82" r="8"/>
    <circle cx="540" cy="150" r="8"/><circle cx="540" cy="286" r="8"/>
