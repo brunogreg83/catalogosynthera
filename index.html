@@ -794,7 +794,7 @@ document.addEventListener("DOMContentLoaded", () => {
       <p>PDF com o visual da plataforma Synthera, pronto para enviar a clientes ou imprimir. Cada produto pode incluir o download da ficha técnica.</p>
       <div class="preco-pdf-row">
         <label>
-          <input type="checkbox" id="chkPreco"/>
+          <input type="checkbox" id="chkPreco"/ checked>
           Exibir preços no PDF
         </label>
         <span class="preco-hint">Quando marcado, inclui o preço de todos os produtos</span>
@@ -1360,7 +1360,7 @@ async function gerarPDF(){
 
       const raw = p.preco ?? p.preço ?? p.valor ?? p.price ?? "";
       const rawText = String(raw).trim();
-      const preco = mostrarPreco && rawText
+      const preco = rawText
         ? (rawText.toUpperCase().startsWith("R$") ? rawText : "R$ " + rawText)
         : "PREÇO: CONSULTAR";
       textColor(WHITE);
@@ -1378,7 +1378,7 @@ async function gerarPDF(){
     // CAPA: preserva a proporção original da arte aprovada, sem esticar.
     await addContain(approvedCover,0,0,PW,PH);
     let page=1;
-    for(const [cat,gprods] of entries){for(let ci=0;ci<gprods.length;ci+=6){doc.addPage();page++;const sy=header(cat,gprods.length,ci>0);const chunk=gprods.slice(ci,ci+6);for(let i=0;i<chunk.length;i++){const col=i%2,row=Math.floor(i/2);await card(chunk[i],MG+col*(CARD_W+GAP),sy+row*(CARD_H+GAP),CARD_W,CARD_H,((ci+i)%2)===1)}footer(page)}}
+    for(const [cat,gprods] of entries){for(let ci=0;ci<gprods.length;ci+=6){doc.addPage();page++;doc.setFillColor(2,15,29);doc.rect(0,0,PW,PH,"F");const sy=header(cat,gprods.length,ci>0);const chunk=gprods.slice(ci,ci+6);for(let i=0;i<chunk.length;i++){const col=i%2,row=Math.floor(i/2);await card(chunk[i],MG+col*(CARD_W+GAP),sy+row*(CARD_H+GAP),CARD_W,CARD_H,((ci+i)%2)===1)}footer(page)}}
     doc.save("catalogo-synthera.pdf");showToast("Catálogo Synthera gerado com sucesso!");
   }catch(e){console.error(e);showToast("Erro ao gerar PDF: "+(e?.message||"erro desconhecido"),"error")}
   finally{if(b1){b1.disabled=false;b1.innerHTML=`<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/></svg> Gerar e Baixar PDF`}if(b2)b2.disabled=false}
