@@ -1449,7 +1449,9 @@ async function gerarPDF(){
 
 
 
-/* FADE DO FUNDO — IMAGEM PARA FUNDO LISO */
+
+
+/* FADE SUAVE — IMAGEM PRESERVADA */
 .pdf-card-media{
   position:relative!important;
   overflow:hidden!important;
@@ -1464,19 +1466,26 @@ async function gerarPDF(){
   pointer-events:none!important;
   display:block!important;
   background:
-    linear-gradient(to bottom, rgba(2,11,23,.82) 0%, rgba(2,11,23,0) 24%, rgba(2,11,23,0) 76%, rgba(2,11,23,.88) 100%),
-    linear-gradient(to right, rgba(2,11,23,.78) 0%, rgba(2,11,23,0) 20%, rgba(2,11,23,0) 80%, rgba(2,11,23,.78) 100%)!important;
+    linear-gradient(to bottom,
+      rgba(2,11,23,.55) 0%,
+      rgba(2,11,23,.05) 18%,
+      rgba(2,11,23,0) 35%,
+      rgba(2,11,23,0) 68%,
+      rgba(2,11,23,.08) 82%,
+      rgba(2,11,23,.62) 100%
+    ),
+    linear-gradient(to right,
+      rgba(2,11,23,.48) 0%,
+      rgba(2,11,23,.03) 16%,
+      rgba(2,11,23,0) 30%,
+      rgba(2,11,23,0) 70%,
+      rgba(2,11,23,.03) 84%,
+      rgba(2,11,23,.48) 100%
+    )!important;
 }
 .pdf-card-media::after{
-  content:""!important;
-  position:absolute!important;
-  left:0!important;
-  right:0!important;
-  bottom:0!important;
-  height:34%!important;
-  z-index:2!important;
-  pointer-events:none!important;
-  background:linear-gradient(to bottom, rgba(2,11,23,0), rgba(2,11,23,.94))!important;
+  content:none!important;
+  display:none!important;
 }
 .pdf-card-media>.pdf-galao{
   position:relative!important;
