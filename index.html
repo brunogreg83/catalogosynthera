@@ -1484,6 +1484,24 @@ async function gerarPDF(){
 #__synthera_pdf_page .pdf-card-media{position:relative!important;overflow:hidden!important;isolation:isolate!important;}
 #__synthera_pdf_page .pdf-card-media > #synthera-chem-bg{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;z-index:0!important;display:block!important;opacity:.68!important;pointer-events:none!important;}
 #__synthera_pdf_page .pdf-card-media > .pdf-galao{position:relative!important;z-index:2!important;}
+
+/* === ESTRUTURA QUÍMICA DEFINITIVA — FUNDO REAL DO CAMPO DO GALÃO === */
+.pdf-card-media{
+  position:relative !important;
+  overflow:hidden !important;
+  isolation:isolate !important;
+  background-color:#020b17 !important;
+  background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%201000%201000%22%3E%0A%3Cdefs%3E%0A%3ClinearGradient%20id%3D%22a%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%221%22%20y2%3D%221%22%3E%3Cstop%20stop-color%3D%22%2331e5ff%22%2F%3E%3Cstop%20offset%3D%22.5%22%20stop-color%3D%22%2300b8e8%22%2F%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%239af4ff%22%2F%3E%3C%2FlinearGradient%3E%0A%3CradialGradient%20id%3D%22b%22%3E%3Cstop%20stop-color%3D%22%2300d9ff%22%20stop-opacity%3D%22.24%22%2F%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%2300d9ff%22%20stop-opacity%3D%220%22%2F%3E%3C%2FradialGradient%3E%0A%3C%2Fdefs%3E%0A%3Ccircle%20cx%3D%22180%22%20cy%3D%22180%22%20r%3D%22260%22%20fill%3D%22url(%23b)%22%2F%3E%3Ccircle%20cx%3D%22820%22%20cy%3D%22820%22%20r%3D%22280%22%20fill%3D%22url(%23b)%22%2F%3E%0A%3Cg%20fill%3D%22none%22%20stroke%3D%22url(%23a)%22%20stroke-width%3D%224%22%20opacity%3D%22.9%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%0A%3Cpath%20d%3D%22M20%20140L155%2060L290%20140V295L155%20375L20%20295Z%22%2F%3E%0A%3Cpath%20d%3D%22M290%20140L430%2055L565%20135V290L430%20370L290%20295%22%2F%3E%0A%3Cpath%20d%3D%22M565%20135L710%2050L980%20145V300L820%20385L565%20290%22%2F%3E%0A%3Cpath%20d%3D%22M155%20375L265%20510L430%20370L545%20510L700%20510L820%20385%22%2F%3E%0A%3Cpath%20d%3D%22M20%20690L155%20610L290%20690V850L155%20935L20%20850Z%22%2F%3E%0A%3Cpath%20d%3D%22M290%20690L430%20605L565%20685V840L430%20925L290%20850%22%2F%3E%0A%3Cpath%20d%3D%22M565%20685L710%20600L980%20690V850L820%20935L565%20840%22%2F%3E%0A%3Cpath%20d%3D%22M430%20370V605M265%20510L290%20690M700%20510L710%20600%22%2F%3E%0A%3C%2Fg%3E%0A%3Cg%20fill%3D%22%2316dcff%22%20stroke%3D%22%23c8f9ff%22%20stroke-width%3D%221%22%3E%0A%3Ccircle%20cx%3D%2220%22%20cy%3D%22140%22%20r%3D%228%22%2F%3E%3Ccircle%20cx%3D%22155%22%20cy%3D%2260%22%20r%3D%228%22%2F%3E%3Ccircle%20cx%3D%22290%22%20cy%3D%22140%22%20r%3D%228%22%2F%3E%3Ccircle%20cx%3D%22290%22%20cy%3D%22295%22%20r%3D%228%22%2F%3E%3Ccircle%20cx%3D%22155%22%20cy%3D%22375%22%20r%3D%228%22%2F%3E%3Ccircle%20cx%3D%2220%22%20cy%3D%22295%22%20r%3D%228%22%2F%3E%0A%3Ccircle%20cx%3D%22430%22%20cy%3D%2255%22%20r%3D%228%22%2F%3E%3Ccircle%20cx%3D%22565%22%20cy%3D%22135%22%20r%3D%228%22%2F%3E%3Ccircle%20cx%3D%22565%22%20cy%3D%22290%22%20r%3D%228%22%2F%3E%3Ccircle%20cx%3D%22430%22%20cy%3D%22370%22%20r%3D%228%22%2F%3E%0A%3Ccircle%20cx%3D%22710%22%20cy%3D%2250%22%20r%3D%228%22%2F%3E%3Ccircle%20cx%3D%22980%22%20cy%3D%22145%22%20r%3D%228%22%2F%3E%3Ccircle%20cx%3D%22980%22%20cy%3D%22300%22%20r%3D%228%22%2F%3E%3Ccircle%20cx%3D%22820%22%20cy%3D%22385%22%20r%3D%228%22%2F%3E%0A%3Ccircle%20cx%3D%22265%22%20cy%3D%22510%22%20r%3D%228%22%2F%3E%3Ccircle%20cx%3D%22545%22%20cy%3D%22510%22%20r%3D%228%22%2F%3E%3Ccircle%20cx%3D%22700%22%20cy%3D%22510%22%20r%3D%228%22%2F%3E%0A%3Ccircle%20cx%3D%2220%22%20cy%3D%22690%22%20r%3D%228%22%2F%3E%3Ccircle%20cx%3D%22155%22%20cy%3D%22610%22%20r%3D%228%22%2F%3E%3Ccircle%20cx%3D%22290%22%20cy%3D%22690%22%20r%3D%228%22%2F%3E%3Ccircle%20cx%3D%22290%22%20cy%3D%22850%22%20r%3D%228%22%2F%3E%3Ccircle%20cx%3D%22155%22%20cy%3D%22935%22%20r%3D%228%22%2F%3E%3Ccircle%20cx%3D%2220%22%20cy%3D%22850%22%20r%3D%228%22%2F%3E%0A%3Ccircle%20cx%3D%22430%22%20cy%3D%22605%22%20r%3D%228%22%2F%3E%3Ccircle%20cx%3D%22565%22%20cy%3D%22685%22%20r%3D%228%22%2F%3E%3Ccircle%20cx%3D%22565%22%20cy%3D%22840%22%20r%3D%228%22%2F%3E%3Ccircle%20cx%3D%22430%22%20cy%3D%22925%22%20r%3D%228%22%2F%3E%0A%3Ccircle%20cx%3D%22710%22%20cy%3D%22600%22%20r%3D%228%22%2F%3E%3Ccircle%20cx%3D%22980%22%20cy%3D%22690%22%20r%3D%228%22%2F%3E%3Ccircle%20cx%3D%22980%22%20cy%3D%22850%22%20r%3D%228%22%2F%3E%3Ccircle%20cx%3D%22820%22%20cy%3D%22935%22%20r%3D%228%22%2F%3E%0A%3C%2Fg%3E%0A%3Cg%20fill%3D%22%23dffbff%22%20font-family%3D%22Arial%2Csans-serif%22%20font-size%3D%2227%22%20font-weight%3D%22700%22%20opacity%3D%22.78%22%3E%0A%3Ctext%20x%3D%225%22%20y%3D%22132%22%3EO%3C%2Ftext%3E%3Ctext%20x%3D%22140%22%20y%3D%2253%22%3EN%3C%2Ftext%3E%3Ctext%20x%3D%22270%22%20y%3D%22132%22%3EOH%3C%2Ftext%3E%3Ctext%20x%3D%22415%22%20y%3D%2248%22%3EO%3C%2Ftext%3E%3Ctext%20x%3D%22545%22%20y%3D%22128%22%3EN%3C%2Ftext%3E%3Ctext%20x%3D%22690%22%20y%3D%2243%22%3EOH%3C%2Ftext%3E%3Ctext%20x%3D%22953%22%20y%3D%22138%22%3EO%3C%2Ftext%3E%3Ctext%20x%3D%22805%22%20y%3D%22378%22%3EN%3C%2Ftext%3E%0A%3Ctext%20x%3D%22250%22%20y%3D%22503%22%3EO%3C%2Ftext%3E%3Ctext%20x%3D%22530%22%20y%3D%22503%22%3EN%3C%2Ftext%3E%3Ctext%20x%3D%22685%22%20y%3D%22503%22%3EOH%3C%2Ftext%3E%3Ctext%20x%3D%225%22%20y%3D%22682%22%3EN%3C%2Ftext%3E%3Ctext%20x%3D%22140%22%20y%3D%22603%22%3EO%3C%2Ftext%3E%3Ctext%20x%3D%22275%22%20y%3D%22682%22%3EOH%3C%2Ftext%3E%3Ctext%20x%3D%22415%22%20y%3D%22598%22%3EN%3C%2Ftext%3E%3Ctext%20x%3D%22550%22%20y%3D%22678%22%3EO%3C%2Ftext%3E%3Ctext%20x%3D%22695%22%20y%3D%22593%22%3EOH%3C%2Ftext%3E%3Ctext%20x%3D%22953%22%20y%3D%22682%22%3EN%3C%2Ftext%3E%0A%3C%2Fg%3E%3C%2Fsvg%3E") !important;
+  background-size:cover !important;
+  background-position:center !important;
+  background-repeat:no-repeat !important;
+}
+.pdf-card-media::after{content:none !important;}
+.pdf-card-media > .pdf-galao{
+  position:relative !important;
+  z-index:2 !important;
+}
+
 </style>
       <div class="pdf-top"><div class="pdf-site">www.<b>synthera</b>.com.br</div></div>
       <div class="pdf-cat"></div><div class="pdf-tag">PERFORMANCE QUE TRANSFORMA A ROTINA PROFISSIONAL</div>
@@ -1510,30 +1528,6 @@ async function gerarPDF(){
             <div class="pdf-rule"></div><div class="pdf-price">PREÇO: ${esc(price.toUpperCase())}</div>
             ${p.ficha?`<div class="pdf-ficha">⇩ BAIXAR FICHA TÉCNICA</div>`:""}
           </div><div class="pdf-card-media">
-<svg id="synthera-chem-bg" aria-hidden="true" viewBox="0 0 1000 1000" style="position:absolute;inset:0;width:100%;height:100%;z-index:0;opacity:.68;pointer-events:none;">
-<defs>
-<linearGradient id="molStroke" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#42e7ff"/><stop offset=".5" stop-color="#00bce9"/><stop offset="1" stop-color="#8cefff"/></linearGradient>
-<radialGradient id="molGlow"><stop offset="0" stop-color="#00d9ff" stop-opacity=".28"/><stop offset="1" stop-color="#00d9ff" stop-opacity="0"/></radialGradient>
-</defs>
-<circle cx="180" cy="180" r="240" fill="url(#molGlow)"/><circle cx="820" cy="820" r="260" fill="url(#molGlow)"/>
-<g fill="none" stroke="url(#molStroke)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" opacity=".92">
-<path d="M35 145L170 65L305 145L305 300L170 378L35 300Z"/>
-<path d="M305 145L455 60L590 140L590 295L455 375L305 300"/>
-<path d="M590 140L735 55L925 145L925 305L790 380L590 295"/>
-<path d="M170 378L265 505L420 505L455 375"/><path d="M455 375L535 505L680 505L790 380"/>
-<path d="M35 690L170 610L305 690L305 845L170 925L35 845Z"/>
-<path d="M305 690L455 605L590 685L590 840L455 925L305 845"/>
-<path d="M590 685L735 600L925 690L925 845L790 925L590 840"/>
-<path d="M420 505L455 605"/><path d="M680 505L735 600"/>
-</g>
-<g fill="#16dcff" stroke="#baf7ff" stroke-width="1.5">
-<circle cx="35" cy="145" r="8"/><circle cx="170" cy="65" r="8"/><circle cx="305" cy="145" r="8"/><circle cx="305" cy="300" r="8"/><circle cx="170" cy="378" r="8"/><circle cx="35" cy="300" r="8"/>
-<circle cx="455" cy="60" r="8"/><circle cx="590" cy="140" r="8"/><circle cx="590" cy="295" r="8"/><circle cx="455" cy="375" r="8"/><circle cx="735" cy="55" r="8"/><circle cx="925" cy="145" r="8"/><circle cx="925" cy="305" r="8"/><circle cx="790" cy="380" r="8"/>
-<circle cx="265" cy="505" r="8"/><circle cx="420" cy="505" r="8"/><circle cx="535" cy="505" r="8"/><circle cx="680" cy="505" r="8"/><circle cx="35" cy="690" r="8"/><circle cx="170" cy="610" r="8"/><circle cx="305" cy="690" r="8"/><circle cx="305" cy="845" r="8"/><circle cx="170" cy="925" r="8"/><circle cx="35" cy="845" r="8"/><circle cx="455" cy="605" r="8"/><circle cx="590" cy="685" r="8"/><circle cx="590" cy="840" r="8"/><circle cx="455" cy="925" r="8"/><circle cx="735" cy="600" r="8"/><circle cx="925" cy="690" r="8"/><circle cx="925" cy="845" r="8"/><circle cx="790" cy="925" r="8"/>
-</g>
-<g fill="#e0fbff" font-family="Montserrat,Arial,sans-serif" font-size="27" font-weight="700" opacity=".84">
-<text x="14" y="137">O</text><text x="155" y="58">N</text><text x="280" y="137">OH</text><text x="440" y="53">O</text><text x="565" y="132">N</text><text x="715" y="48">OH</text><text x="898" y="138">O</text><text x="775" y="373">N</text><text x="252" y="498">O</text><text x="407" y="498">N</text><text x="522" y="498">OH</text><text x="667" y="498">O</text><text x="14" y="682">N</text><text x="155" y="603">O</text><text x="288" y="682">OH</text><text x="440" y="598">N</text><text x="575" y="678">O</text><text x="720" y="593">OH</text><text x="898" y="683">N</text><text x="775" y="918">O</text>
-</g></svg>
 ${media}</div><div class="pdf-card-titlebar"></div></div>`;
           grid.appendChild(card);
         });
