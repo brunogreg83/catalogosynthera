@@ -1346,9 +1346,9 @@ async function gerarPDF(){
   const half=w/2;
   const contentX=reverse ? x+half : x;
   const mediaX=reverse ? x : x+half;
-  const pad=7;
+  const pad=7.2;
   const textX=contentX+pad;
-  const textW=half-pad*2;
+  const textW=half-pad*2-1;
 
   // Clean product-media background — no circles or extra graphics.
   fill(MEDIA);
@@ -1377,20 +1377,20 @@ async function gerarPDF(){
   const attrs=p.attrs||[];
   const subtitle=attrs.length?String(attrs[0].v):"SOLUÇÃO PROFISSIONAL SYNTHERA";
 
-  textColor(WHITE); font(11.8,"bold");
-  doc.text(code||cleanName,textX,y+14);
+  textColor(WHITE); font(30,"bold");
+  doc.text(code||cleanName,textX,y+18);
 
-  textColor(CYAN); font(6.5,"bold");
+  textColor(CYAN); font(16.5,"bold");
   const nameLines=doc.splitTextToSize(cleanName.toUpperCase(),textW).slice(0,3);
-  nameLines.forEach((ln,i)=>doc.text(ln,textX,y+23+i*4));
+  nameLines.forEach((ln,i)=>doc.text(ln,textX,y+36+i*5.2));
 
-  textColor(SOFT); font(4.8,"normal");
+  textColor(SOFT); font(10.3,"normal");
   const subLines=doc.splitTextToSize(subtitle.toUpperCase(),textW).slice(0,2);
-  subLines.forEach((ln,i)=>doc.text(ln,textX,y+37+i*3.2));
+  subLines.forEach((ln,i)=>doc.text(ln,textX,y+57+i*3.6));
 
   // Same short cyan divider used by the approved card style.
   stroke(CYAN); doc.setLineWidth(.45);
-  doc.line(textX,y+47,textX+25,y+47);
+  doc.line(textX,y+72,textX+25,y+72);
 
   // Same price information.
   const price=p.preco?String(p.preco):"CONSULTAR";
@@ -1399,7 +1399,7 @@ async function gerarPDF(){
   doc.roundedRect(textX,priceY-6,priceW,10,2.5,2.5,"F");
   stroke(CYAN); doc.setLineWidth(.4);
   doc.roundedRect(textX,priceY-6,priceW,10,2.5,2.5,"S");
-  textColor(CYAN); font(5.2,"bold");
+  textColor(CYAN); font(10.8,"bold");
   doc.text("PREÇO: "+price.toUpperCase(),textX+3,priceY+.5);
 
   // Same technical-sheet action, when the product has one.
