@@ -1358,10 +1358,14 @@ async function gerarPDF(){
       lab.forEach((ln,i)=>doc.text(ln,ix+iw/2,labelY+10+i*3.5,{align:"center"}));
       textColor(WHITE);font(3.2,"bold");doc.text("5L",ix+iw/2,labelY+20,{align:"center"});
 
-      const raw=p.preco?String(p.preco).trim():"";
-      const preco=mostrarPreco&&raw?(raw.startsWith("R$")?raw:"R$ "+raw):"PREÇO: CONSULTAR";
-      font(4.1,"bold");
-      const pw=Math.min(tw,Math.max(28,doc.getTextWidth(preco)+7));
+      const raw = p.preco ?? p.preço ?? p.valor ?? p.price ?? "";
+      const rawText = String(raw).trim();
+      const preco = mostrarPreco && rawText
+        ? (rawText.toUpperCase().startsWith("R$") ? rawText : "R$ " + rawText)
+        : "PREÇO: CONSULTAR";
+      textColor(WHITE);
+      font(4.0,"bold");
+      const pw=Math.min(tw,Math.max(34,doc.getTextWidth(preco)+9));
       pill(preco,tx,y+h-11,pw,7,[5,39,61],CYAN,4.0);
 
       if(p.ficha){
