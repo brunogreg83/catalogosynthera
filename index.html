@@ -1334,23 +1334,21 @@ async function gerarPDF(){
     async function card(p,x,y,w,h,reverse=false){
   const NAVY=[2,15,29], PANEL=[3,23,38], CYAN=[12,194,222], WHITE=[255,255,255], MUTED=[170,205,214];
 
-  // Layout premium compacto: 6 cards fixos por página, com melhor uso interno.
-  fill(NAVY); doc.roundedRect(x,y,w,h,3,3,"F");
+  // CARD 6/PÁGINA — aproveitamento visual real.
+  fill(NAVY); doc.roundedRect(x,y,w,h,3.2,3.2,"F");
   stroke([24,88,116]); doc.setLineWidth(.5);
-  doc.roundedRect(x,y,w,h,3,3,"S");
+  doc.roundedRect(x,y,w,h,3.2,3.2,"S");
 
-  const pad=3;
-  const imgW=w*.43;
+  const pad=3.5;
+  const imgW=w*.48;
+  const textW=w-imgW-pad*2-3;
   const ix=reverse ? x+pad : x+w-imgW-pad;
-  const tx=reverse ? x+imgW+6.5 : x+pad+1;
-  const iw=imgW-3;
+  const tx=reverse ? x+imgW+7 : x+pad+1;
+  const iw=imgW-2.5;
   const bodyY=y+pad, bodyH=h-pad*2;
-  const tw=w-imgW-pad*2-2;
 
-  fill(PANEL);
-  doc.roundedRect(ix,bodyY,iw,bodyH,2.2,2.2,"F");
-
-  // Imagem do produto: ocupa o máximo possível sem distorção.
+  // Imagem ocupa quase metade do card.
+  fill(PANEL); doc.roundedRect(ix,bodyY,iw,bodyH,2.5,2.5,"F");
   if(p.imagem){
     try{
       const sz=await new Promise(resolve=>{
@@ -1360,55 +1358,51 @@ async function gerarPDF(){
         im.src=p.imagem;
       });
       const ratio=sz.w/sz.h;
-      const maxW=iw-3, maxH=bodyH-3;
-      let dw=maxW, dh=dw/ratio;
+      const maxW=iw-4,maxH=bodyH-4;
+      let dw=maxW,dh=dw/ratio;
       if(dh>maxH){dh=maxH;dw=dh*ratio;}
       doc.addImage(p.imagem,ix+(iw-dw)/2,bodyY+(bodyH-dh)/2,dw,dh,undefined,"FAST",0);
     }catch(e){}
   }
 
-  // Divisor central mais fino.
-  stroke(CYAN); doc.setLineWidth(.65);
-  const vx=reverse ? ix+iw+1.5 : ix-1.5;
-  const dx=reverse ? -5.5 : 5.5;
+  // Divisor.
+  stroke(CYAN); doc.setLineWidth(.7);
+  const vx=reverse?ix+iw+1.5:ix-1.5, dx=reverse?-6:6;
   doc.line(vx,y+3,vx+dx,y+h/2);
   doc.line(vx+dx,y+h/2,vx,y+h-3);
 
-  // Tipografia redimensionada para a área real do card.
-  textColor(WHITE); font(11.8,"bold");
+  // Título — maior e com melhor leitura.
   const code=codeOf(p)||"";
-  if(code) doc.text(code,tx,y+12);
+  textColor(WHITE); font(12.5,"bold");
+  if(code) doc.text(code,tx,y+13);
 
   const title=String(p.nome||"PRODUTO").toUpperCase();
-  textColor(CYAN); font(6.6,"bold");
-  const lines=doc.splitTextToSize(title,tw).slice(0,3);
-  const titleY=y+20;
-  lines.forEach((ln,i)=>doc.text(ln,tx,titleY+i*3.8));
+  textColor(CYAN); font(7.1,"bold");
+  const lines=doc.splitTextToSize(title,textW).slice(0,3);
+  lines.forEach((ln,i)=>doc.text(ln,tx,y+23+i*4.2));
 
-  const lineY=Math.min(y+35,titleY+lines.length*3.8+3);
-  stroke(CYAN); doc.setLineWidth(.45);
-  doc.line(tx,lineY,tx+Math.min(22,tw-2),lineY);
+  stroke(CYAN); doc.setLineWidth(.5);
+  doc.line(tx,y+38,tx+Math.min(28,textW),y+38);
 
-  // Preço com hierarquia visual.
-  const raw=p.preco ?? p.preço ?? p.valor ?? p.price ?? "";
-  const rawText=String(raw).trim();
-  const price=rawText
-    ? (rawText.toUpperCase().startsWith("R$") ? rawText : "R$ "+rawText)
+  // Apenas informação essencial.
+  const priceRaw=p.preco ?? p.preço ?? p.valor ?? p.price ?? "";
+  const priceText=String(priceRaw).trim();
+  const price=priceText
+    ? (priceText.toUpperCase().startsWith("R$")?priceText:"R$ "+priceText)
     : "CONSULTAR";
 
-  const priceY=y+h-20;
-  textColor(MUTED); font(4.2,"bold");
-  doc.text("PREÇO",tx,priceY-5);
-  textColor(CYAN); font(7.4,"bold");
-  doc.text(price,tx,priceY+1);
+  textColor(MUTED); font(4.4,"bold");
+  doc.text("PREÇO",tx,y+h-20);
+  textColor(CYAN); font(8.2,"bold");
+  doc.text(price,tx,y+h-12);
 
-  // Ficha técnica integrada ao card.
-  const fichaUrl=p.ficha || p.fichaUrl || p.fichaBase64 || null;
-  const bx=tx, by=y+h-10, bw=Math.min(50,tw), bh=7;
+  // Ficha técnica.
+  const fichaUrl=p.ficha||p.fichaUrl||p.fichaBase64||null;
+  const bx=tx,by=y+h-9,bw=Math.min(50,textW),bh=6.5;
   fill([4,67,91]); doc.roundedRect(bx,by,bw,bh,2,2,"F");
   stroke(CYAN); doc.setLineWidth(.35); doc.roundedRect(bx,by,bw,bh,2,2,"S");
-  textColor(WHITE); font(3.5,"bold");
-  doc.text("BAIXAR FICHA TÉCNICA",bx+bw/2,by+4.6,{align:"center"});
+  textColor(WHITE); font(3.4,"bold");
+  doc.text("BAIXAR FICHA TÉCNICA",bx+bw/2,by+4.3,{align:"center"});
   if(fichaUrl) doc.link(bx,by,bw,bh,{url:fichaUrl});
 }
 
@@ -1443,7 +1437,7 @@ for(const [cat,gprods] of entries){
     const sy=header(cat,gprods.length,ci>0);
     const chunk=gprods.slice(ci,ci+6);
     const availH=PH-FOOT- sy;
-    const cardGap=3;
+    const cardGap=2.5;
     const cardH=(availH-cardGap*2)/3;
     const cardW=(PW-MG*2-GAP)/2;
 
