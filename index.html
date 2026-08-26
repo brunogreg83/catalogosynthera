@@ -1470,7 +1470,7 @@ async function gerarPDF(){
   z-index:0 !important;
   width:100% !important;
   height:100% !important;
-  opacity:.55 !important;
+  opacity:.72 !important;
   pointer-events:none !important;
   background:transparent !important;
 }
@@ -1484,6 +1484,32 @@ async function gerarPDF(){
   position:absolute !important;
   z-index:0 !important;
 }
+
+/* === AJUSTE FINAL DOS GALÕES — somente tamanho e posição === */
+.pdf-card-media .pdf-galao,
+.pdf-media .pdf-galao{
+  width:124% !important;
+  height:124% !important;
+  max-width:none !important;
+  max-height:none !important;
+  object-fit:contain !important;
+  transform:translate(0,-2%) !important;
+  transform-origin:center center !important;
+}
+
+
+/* === GALÕES MAIORES — somente produto === */
+.pdf-card-media .pdf-galao,
+.pdf-media .pdf-galao{
+  width:140% !important;
+  height:140% !important;
+  max-width:none !important;
+  max-height:none !important;
+  object-fit:contain !important;
+  transform:translate(0,-4%) !important;
+  transform-origin:center center !important;
+}
+
 </style>
       <div class="pdf-top"><div class="pdf-site">www.<b>synthera</b>.com.br</div></div>
       <div class="pdf-cat"></div><div class="pdf-tag">PERFORMANCE QUE TRANSFORMA A ROTINA PROFISSIONAL</div>
@@ -1512,20 +1538,20 @@ async function gerarPDF(){
           </div><div class="pdf-card-media">
 <svg id="synthera-chem-bg" aria-hidden="true" viewBox="0 0 700 700"
      style="position:absolute;inset:0;width:100%;height:100%;z-index:0;opacity:.32;pointer-events:none;">
-  <g fill="none" stroke="#12c9f4" stroke-width="3" opacity=".92">
+  <g fill="none" stroke="#12d7ff" stroke-width="4" opacity=".98">
     <path d="M90 180L205 115L320 180L320 315L205 380L90 315Z"/>
     <path d="M390 120L505 55L620 120L620 255L505 320L390 255Z"/>
     <path d="M385 410L500 345L615 410L615 545L500 610L385 545Z"/>
     <path d="M150 485L205 380L320 315L385 410"/>
     <path d="M320 180L390 255L385 410"/>
   </g>
-  <g fill="#12c9f4" opacity=".95">
+  <g fill="#12d7ff" opacity="1">
     <circle cx="90" cy="180" r="6"/><circle cx="205" cy="115" r="6"/>
     <circle cx="320" cy="180" r="6"/><circle cx="390" cy="120" r="6"/>
     <circle cx="505" cy="55" r="6"/><circle cx="620" cy="120" r="6"/>
     <circle cx="500" cy="610" r="6"/><circle cx="385" cy="545" r="6"/>
   </g>
-  <g fill="#c7f4ff" font-family="Arial,sans-serif" font-size="24" opacity=".82">
+  <g fill="#d9f8ff" font-family="Arial,sans-serif" font-size="25" opacity=".92">
     <text x="67" y="165">O</text><text x="198" y="98">N</text>
     <text x="307" y="169">OH</text><text x="490" y="39">NH</text>
     <text x="604" y="108">O</text><text x="489" y="595">N</text>
