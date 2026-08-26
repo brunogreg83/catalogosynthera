@@ -1425,7 +1425,42 @@ async function gerarPDF(){
         .pdf-ficha{margin-top:7px;font:800 8px Montserrat,sans-serif;color:#fff;border:1.5px solid #0ab9ff;border-radius:7px;padding:6px 9px;width:100%;text-align:center}
         .pdf-foot{height:48px;margin:0 32px;border-top:1px solid #245066;display:flex;align-items:center;justify-content:space-between;color:#7e9da8;font:500 7px Nunito,sans-serif}.pdf-foot b{color:#08baf1}
         .pdf-galao{width:98%;height:96%;position:relative;z-index:2}
-      </style>
+      
+/* === SYNTHERA: fundo químico REAL do campo do galão === */
+#__synthera_pdf_page .pdf-card-media{
+  position:relative !important;
+  overflow:hidden !important;
+  isolation:isolate !important;
+  background:linear-gradient(135deg,#031523 0%,#020b17 100%) !important;
+}
+#__synthera_pdf_page .pdf-card-media::before{
+  content:"" !important;
+  position:absolute !important;
+  inset:0 !important;
+  z-index:0 !important;
+  pointer-events:none !important;
+  opacity:.32 !important;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 700 700'%3E%3Cg fill='none' stroke='%2300c8ff' stroke-width='2' opacity='.8'%3E%3Cpath d='M90 180L205 115L320 180L320 315L205 380L90 315Z'/%3E%3Cpath d='M390 120L505 55L620 120L620 255L505 320L390 255Z'/%3E%3Cpath d='M385 410L500 345L615 410L615 545L500 610L385 545Z'/%3E%3Cpath d='M150 485L205 380L320 315L385 410'/%3E%3Cpath d='M320 180L390 255L385 410'/%3E%3C/g%3E%3Cg fill='%2300c8ff' opacity='.8'%3E%3Ccircle cx='90' cy='180' r='6'/%3E%3Ccircle cx='205' cy='115' r='6'/%3E%3Ccircle cx='320' cy='180' r='6'/%3E%3Ccircle cx='390' cy='120' r='6'/%3E%3Ccircle cx='505' cy='55' r='6'/%3E%3Ccircle cx='620' cy='120' r='6'/%3E%3Ccircle cx='500' cy='610' r='6'/%3E%3Ccircle cx='385' cy='545' r='6'/%3E%3C/g%3E%3Cg fill='%23b7efff' font-family='Arial' font-size='22' opacity='.55'%3E%3Ctext x='67' y='165'%3EO%3C/text%3E%3Ctext x='198' y='98'%3EN%3C/text%3E%3Ctext x='307' y='169'%3EOH%3C/text%3E%3Ctext x='490' y='39'%3ENH%3C/text%3E%3Ctext x='604' y='108'%3EO%3C/text%3E%3Ctext x='489' y='595'%3EN%3C/text%3E%3Ctext x='365' y='531'%3EOH%3C/text%3E%3C/g%3E%3C/svg%3E") !important;
+  background-size:135% 135% !important;
+  background-position:center !important;
+  background-repeat:no-repeat !important;
+}
+#__synthera_pdf_page .pdf-card-media::after{
+  content:none !important;
+}
+#__synthera_pdf_page .pdf-card-media > *{
+  position:relative !important;
+  z-index:2 !important;
+}
+
+/* === Rótulo do galão: somente LOGO / CÓDIGO / SUBTÍTULO === */
+#__synthera_pdf_page .pdf-galao{
+  width:96% !important;
+  height:94% !important;
+  object-fit:contain !important;
+}
+
+</style>
       <div class="pdf-top"><div class="pdf-site">www.<b>synthera</b>.com.br</div></div>
       <div class="pdf-cat"></div><div class="pdf-tag">PERFORMANCE QUE TRANSFORMA A ROTINA PROFISSIONAL</div>
       <div class="pdf-grid"></div><div class="pdf-foot"><span>Química profissional • Performance • Resultado</span><span>www.<b>synthera</b>.com.br</span><b class="pdf-page-number"></b></div>`;
