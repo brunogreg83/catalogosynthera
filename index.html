@@ -1460,8 +1460,8 @@ async function gerarPDF(){
     // =========================================================
     // CARDS — 2 por página, alternando a composição.
     // =========================================================
-    const cardX=7, cardW=196, cardH=108, gap=8, top=32;
-    const cardY2=top+cardH+gap;
+    const cardX=7, cardW=196, cardH=59, gap=5, top=28;
+    const cardY2=top+cardH+gap; const cardY3=cardY2+cardH+gap; const cardY4=cardY3+cardH+gap;
 
     function footer(){
       fill(NAVY2); doc.rect(0,PH-9,PW,9,"F");
@@ -1578,31 +1578,27 @@ async function gerarPDF(){
       }
     }
 
-    for(let i=0;i<prods.length;i+=2){
+    for(let i=0;i<prods.length;i+=4){
       doc.addPage();
       page++;
-      const a=prods[i], b=prods[i+1];
 
-      // Cabeçalho de página.
-      text(CYAN); font(6.5,"bold");
-      doc.text("CATÁLOGO DE PRODUTOS",8,16);
-      text(WHITE); font(6.5,"bold");
-      doc.text(`${catShort(a).toUpperCase()}`,PW-8,16,{align:"right"});
+      const pageProducts = [
+        prods[i],
+        prods[i+1],
+        prods[i+2],
+        prods[i+3]
+      ];
 
-      await drawCard(a,top,false);
-      if(b) await drawCard(b,cardY2,true);
+      // Cabeçalho compacto.
+      text(CYAN); font(6.2,"bold");
+      doc.text("CATÁLOGO DE PRODUTOS",8,14);
+      text(WHITE); font(6.2,"bold");
+      doc.text(catShort(pageProducts.find(Boolean)||{}).toUpperCase(),PW-8,14,{align:"right"});
 
-      // Se houver apenas um produto na página, uma faixa institucional ocupa o espaço restante.
-      if(!b){
-        fill([7,31,48]); doc.roundedRect(7,cardY2,196,108,5,5,"F");
-        text(CYAN); font(9,"bold"); doc.text("SOLUÇÕES SYNTHERA",18,cardY2+25);
-        text(WHITE); font(17,"bold"); doc.text("Performance para a rotina profissional",18,cardY2+39);
-        text(MUTED); font(8,"normal");
-        doc.text("Escolha produtos com aplicação clara, informação técnica",18,cardY2+51);
-        doc.text("e suporte para transformar resultado em produtividade.",18,cardY2+62);
-        stroke(CYAN); doc.setLineWidth(.7); doc.line(18,cardY2+74,72,cardY2+74);
-        text(CYAN); font(7,"bold"); doc.text("www.synthera.com.br",18,cardY2+88);
-      }
+      if(pageProducts[0]) await drawCard(pageProducts[0],top,false);
+      if(pageProducts[1]) await drawCard(pageProducts[1],cardY2,true);
+      if(pageProducts[2]) await drawCard(pageProducts[2],cardY3,false);
+      if(pageProducts[3]) await drawCard(pageProducts[3],cardY4,true);
 
       footer();
     }
