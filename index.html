@@ -1372,37 +1372,37 @@ async function gerarPDF(){
   const attrs=p.attrs||[];
   const subtitle=attrs.length?String(attrs[0].v):"SOLUÇÃO PROFISSIONAL SYNTHERA";
 
-  // Fontes dimensionadas para a área real do card.
-  textColor(WHITE); font(12.5,"bold");
-  doc.text(code||cleanName,textX,y+13);
+  // Tipografia dinâmica: cada texto cresce até o maior tamanho que
+  // cabe na largura/altura disponível, sem overflow.
+  textColor(WHITE);
+  fitPdfText(code||cleanName,textX,y+15,textW,17,{min:10,max:18,maxLines:1,lineFactor:1.05});
 
-  textColor(CYAN); font(6.2,"bold");
-  const nameLines=doc.splitTextToSize(cleanName.toUpperCase(),textW).slice(0,2);
-  nameLines.forEach((ln,i)=>doc.text(ln,textX,y+22+i*3.8));
+  textColor(CYAN);
+  const titleFit=fitPdfText(cleanName.toUpperCase(),textX,y+25,textW,14,{min:5.5,max:10.5,maxLines:2,lineFactor:1.05});
 
-  textColor(SOFT); font(4.2,"normal");
-  const subLines=doc.splitTextToSize(subtitle.toUpperCase(),textW).slice(0,2);
-  subLines.forEach((ln,i)=>doc.text(ln,textX,y+34+i*3));
+  textColor(SOFT);
+  const subY=y+25+Math.max(12,titleFit.height)+3;
+  fitPdfText(subtitle.toUpperCase(),textX,subY,textW,10,{min:4.2,max:7,maxLines:2,lineFactor:1.08});
 
+  const dividerY=Math.min(y+55, subY+12);
   stroke(CYAN); doc.setLineWidth(.45);
-  doc.line(textX,y+44,textX+21,y+44);
+  doc.line(textX,dividerY,textX+22,dividerY);
 
-  // Preço dentro da largura disponível, sem ultrapassar a caixa.
+  // Preço também cresce automaticamente até caber na caixa.
   const price=p.preco?String(p.preco):"CONSULTAR";
   const priceW=Math.min(textW,52), priceY=y+h-16;
   fill([1,11,23]); doc.roundedRect(textX,priceY-5,priceW,8,2,2,"F");
   stroke(CYAN); doc.setLineWidth(.35);
   doc.roundedRect(textX,priceY-5,priceW,8,2,2,"S");
-  textColor(CYAN); font(4.3,"bold");
-  const priceLines=doc.splitTextToSize("PREÇO: "+price.toUpperCase(),priceW-5).slice(0,1);
-  doc.text(priceLines[0],textX+2.5,priceY+.2);
+  textColor(CYAN);
+  fitPdfText("PREÇO: "+price.toUpperCase(),textX+2.5,priceY+.1,priceW-5,5.5,{min:3.5,max:6.5,maxLines:1,lineFactor:1});
 
-  // Ficha técnica no rodapé, sempre dentro do card.
+  // Ficha técnica permanece fixa e legível no rodapé.
   if(p.ficha){
     const fw=Math.min(textW,44), fh=5.2, fx=textX, fy=y+h-7;
     fill([2,48,72]); doc.roundedRect(fx,fy,fw,fh,1.8,1.8,"F");
-    textColor(WHITE); font(2.8,"bold");
-    doc.text("BAIXAR FICHA TÉCNICA",fx+fw/2,fy+3.4,{align:"center"});
+    textColor(WHITE);
+    fitPdfText("BAIXAR FICHA TÉCNICA",fx+2,fy+3.5,fw-4,3.8,{min:2.4,max:4,maxLines:1,lineFactor:1});
     doc.link(fx,fy,fw,fh,{url:p.ficha});
   }
 }
