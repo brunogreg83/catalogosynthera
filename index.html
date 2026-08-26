@@ -1518,20 +1518,16 @@ async function gerarPDF(){
 
 
 
-/* BOX DE PREÇO DO PDF — 10% MENOR */
-.pdf-card .pdf-price{
-  width:90% !important;
-  max-width:90% !important;
-  height:30.6px !important;
-  padding:5.4px 9px !important;
-  box-sizing:border-box !important;
-}
 
 
-/* PDF — BOX DE PREÇO DO LADO DIREITO IGUAL AO ESQUERDO */
+/* PDF — BOX DE PREÇO DIREITO REPOSICIONADO PARA A ESQUERDA */
 .pdf-card.reverse .pdf-price{
-  width:122.22% !important;
-  max-width:none !important;
+  position:relative !important;
+  left:-12px !important;
+  right:auto !important;
+  transform:none !important;
+  box-sizing:border-box !important;
+  max-width:calc(100% - 12px) !important;
 }
 
 </style>
