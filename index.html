@@ -1322,7 +1322,13 @@ async function gerarPDF(){
     function codeOf(p){return (String(p.nome||"").match(/^([A-Z]{3}\d{3})/)||[])[1]||""}
     function catCode(cat){return (String(cat||"").match(/^([A-Z]{3})/)||[])[1]||"SYN"}
     function shortName(n){return String(n||"").replace(/^[A-Z]{3}\d{3}\s*[—-]\s*/,"").trim()}
-    function base(){fill(ICE);doc.rect(0,0,PW,PH,"F");fill(NAVY);doc.rect(0,0,PW,6,"F");fill(CYAN);doc.rect(0,0,PW,2,"F")}
+    function base(){
+  // Fundo padrão das páginas internas: preto Synthera.
+  // A capa aprovada é adicionada separadamente e não é alterada.
+  fill(NAVY); doc.rect(0,0,PW,PH,"F");
+  fill(NAVY); doc.rect(0,0,PW,6,"F");
+  fill(CYAN); doc.rect(0,0,PW,2,"F");
+}
     function footer(page){stroke([35,76,92]);doc.setLineWidth(.35);doc.line(MG,PH-10,PW-MG,PH-10);textColor(NAVY);font(5.7,"bold");doc.text("SYNTHERA",MG,PH-4.8);textColor(MUTED);font(5.2);doc.text("Química profissional • Performance • Resultado",MG+25,PH-4.8);textColor(CYAN);font(5.2,"bold");doc.text("www.synthera.com.br",PW/2,PH-4.8,{align:"center"});doc.text(String(page).padStart(2,"0"),PW-MG,PH-4.8,{align:"right"})}
     function header(cat,count,continuation){base();if(!continuation){fill(NAVY);doc.roundedRect(MG,10,PW-MG*2,25,2,2,"F");fill(CYAN);doc.rect(MG,10,4,25,"F");pill(catCode(cat),MG+8,16,19,7,CYAN,NAVY,5.3);textColor(WHITE);font(11,"bold");doc.text(cat.replace(/^[A-Z]{3}\s*-\s*/,'').toUpperCase(),MG+31,21);textColor([165,205,213]);font(5.5);doc.text("Linha Synthera • soluções profissionais",MG+31,27);pill(`${count} PRODUTOS`,PW-MG-36,17,28,7,BLUE,WHITE,4.7);textColor(CYAN);font(5.3,"bold");doc.text("PERFORMANCE QUE TRANSFORMA A ROTINA PROFISSIONAL",MG,40);return TOP}pill(catCode(cat),MG,10,20,7,NAVY,CYAN,5);textColor(NAVY);font(8,"bold");doc.text(cat.replace(/^[A-Z]{3}\s*-\s*/,'').toUpperCase(),MG+26,15);stroke(CYAN);doc.setLineWidth(.7);doc.line(MG+26,19,PW-MG,19);return 25}
     async function card(p,x,y,w,h,reverse=false){
@@ -1430,8 +1436,6 @@ for(const [cat,gprods] of entries){
 
     // Fundo preto da PÁGINA inteira (não somente dos cards).
     doc.setFillColor(2,15,29);
-    doc.rect(0,0,PW,PH,"F");
-    fill([2,15,29]);
     doc.rect(0,0,PW,PH,"F");
 
     const sy=header(cat,gprods.length,ci>0);
