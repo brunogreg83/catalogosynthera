@@ -1332,24 +1332,26 @@ async function gerarPDF(){
     function footer(page){stroke([35,76,92]);doc.setLineWidth(.35);doc.line(MG,PH-10,PW-MG,PH-10);textColor(NAVY);font(5.7,"bold");doc.text("SYNTHERA",MG,PH-4.8);textColor(MUTED);font(5.2);doc.text("Química profissional • Performance • Resultado",MG+25,PH-4.8);textColor(CYAN);font(5.2,"bold");doc.text("www.synthera.com.br",PW/2,PH-4.8,{align:"center"});doc.text(String(page).padStart(2,"0"),PW-MG,PH-4.8,{align:"right"})}
     function header(cat,count,continuation){base();if(!continuation){fill(NAVY);doc.roundedRect(MG,10,PW-MG*2,25,2,2,"F");fill(CYAN);doc.rect(MG,10,4,25,"F");pill(catCode(cat),MG+8,16,19,7,CYAN,NAVY,5.3);textColor(WHITE);font(11,"bold");doc.text(cat.replace(/^[A-Z]{3}\s*-\s*/,'').toUpperCase(),MG+31,21);textColor([165,205,213]);font(5.5);doc.text("Linha Synthera • soluções profissionais",MG+31,27);pill(`${count} PRODUTOS`,PW-MG-36,17,28,7,BLUE,WHITE,4.7);textColor(CYAN);font(5.3,"bold");doc.text("PERFORMANCE QUE TRANSFORMA A ROTINA PROFISSIONAL",MG,40);return TOP}pill(catCode(cat),MG,10,20,7,NAVY,CYAN,5);textColor(NAVY);font(8,"bold");doc.text(cat.replace(/^[A-Z]{3}\s*-\s*/,'').toUpperCase(),MG+26,15);stroke(CYAN);doc.setLineWidth(.7);doc.line(MG+26,19,PW-MG,19);return 25}
     async function card(p,x,y,w,h,reverse=false){
-  const NAVY=[2,15,29], PANEL=[3,23,38], CYAN=[12,194,222], WHITE=[255,255,255];
+  const NAVY=[2,15,29], PANEL=[3,23,38], CYAN=[12,194,222], WHITE=[255,255,255], MUTED=[170,205,214];
 
-  // Fundo do próprio card.
-  fill(NAVY); doc.roundedRect(x,y,w,h,3.2,3.2,"F");
-  stroke([24,88,116]); doc.setLineWidth(.45);
-  doc.roundedRect(x,y,w,h,3.2,3.2,"S");
+  // Card compacto: melhor aproveitamento da página e hierarquia visual mais clara.
+  fill(NAVY); doc.roundedRect(x,y,w,h,3,3,"F");
+  stroke([24,88,116]); doc.setLineWidth(.5);
+  doc.roundedRect(x,y,w,h,3,3,"S");
 
-  // 2 colunas internas: texto + galão.
-  const imgW=w*.45;
-  const ix=reverse ? x+3 : x+w-imgW-3;
-  const tx=reverse ? x+imgW+7 : x+6;
-  const iw=imgW-4;
-  const bodyY=y+3, bodyH=h-6;
+  // Área da imagem ~43% e área de informação ~57%.
+  const pad=3.5;
+  const imgW=w*.43;
+  const ix=reverse ? x+pad : x+w-imgW-pad;
+  const tx=reverse ? x+imgW+7 : x+pad+1;
+  const iw=imgW-pad;
+  const bodyY=y+pad, bodyH=h-pad*2;
+  const tw=w-imgW-pad*2-3;
 
   fill(PANEL);
-  doc.roundedRect(ix,bodyY,iw,bodyH,2.5,2.5,"F");
+  doc.roundedRect(ix,bodyY,iw,bodyH,2.4,2.4,"F");
 
-  // Imagem cadastrada no produto, sem deformação.
+  // Imagem cadastrada: preserva proporção e ocupa melhor o espaço disponível.
   if(p.imagem){
     try{
       const sz=await new Promise(resolve=>{
@@ -1359,55 +1361,55 @@ async function gerarPDF(){
         im.src=p.imagem;
       });
       const ratio=sz.w/sz.h;
-      const maxW=iw-5, maxH=bodyH-5;
+      const maxW=iw-4, maxH=bodyH-4;
       let dw=maxW, dh=dw/ratio;
       if(dh>maxH){dh=maxH;dw=dh*ratio;}
       doc.addImage(p.imagem,ix+(iw-dw)/2,bodyY+(bodyH-dh)/2,dw,dh,undefined,"FAST",0);
     }catch(e){}
   }
 
-  // Divisor.
-  stroke(CYAN); doc.setLineWidth(.8);
-  const vx=reverse ? ix+iw+2 : ix-2;
-  doc.line(vx,y+4,vx+(reverse?-8:8),y+h/2);
-  doc.line(vx+(reverse?-8:8),y+h/2,vx,y+h-4);
+  // Divisor central com desenho mais discreto.
+  stroke(CYAN); doc.setLineWidth(.7);
+  const vx=reverse ? ix+iw+1.5 : ix-1.5;
+  const dx=reverse ? -6 : 6;
+  doc.line(vx,y+3,vx+dx,y+h/2);
+  doc.line(vx+dx,y+h/2,vx,y+h-3);
 
-  const tw=w-imgW-13;
   const code=codeOf(p)||"";
-  textColor(WHITE); font(13.5,"bold");
-  if(code) doc.text(code,tx,y+14);
+  textColor(WHITE); font(11.5,"bold");
+  if(code) doc.text(code,tx,y+12);
 
   const title=String(p.nome||"PRODUTO").toUpperCase();
-  textColor(CYAN); font(7.4,"bold");
+  textColor(CYAN); font(6.5,"bold");
   const lines=doc.splitTextToSize(title,tw).slice(0,3);
-  lines.forEach((ln,i)=>doc.text(ln,tx,y+23+i*4.2));
+  const titleY=y+20;
+  lines.forEach((ln,i)=>doc.text(ln,tx,titleY+i*3.7));
 
-  stroke(CYAN); doc.setLineWidth(.5);
-  doc.line(tx,y+38,tx+Math.min(25,tw-2),y+38);
+  const lineY=Math.min(y+34,titleY+lines.length*3.7+3);
+  stroke(CYAN); doc.setLineWidth(.45);
+  doc.line(tx,lineY,tx+Math.min(23,tw-2),lineY);
 
-  // Preço real cadastrado.
+  // Preço em bloco compacto, sem ocupar espaço excessivo.
   const raw=p.preco ?? p.preço ?? p.valor ?? p.price ?? "";
   const rawText=String(raw).trim();
   const price=rawText
     ? (rawText.toUpperCase().startsWith("R$") ? rawText : "R$ "+rawText)
     : "CONSULTAR";
 
-  textColor([190,225,232]); font(4.7,"bold");
-  doc.text("PREÇO",tx,y+h-23);
-  textColor(CYAN); font(8.6,"bold");
-  doc.text(price,tx,y+h-15);
+  const priceY=y+h-20;
+  textColor(MUTED); font(4.1,"bold");
+  doc.text("PREÇO",tx,priceY-5);
+  textColor(CYAN); font(7.3,"bold");
+  doc.text(price,tx,priceY+1);
 
-  // Botão de ficha técnica: sempre visível no card.
-  // Quando o produto possui ficha cadastrada, o botão recebe o link real.
-  const fichaUrl = p.ficha || p.fichaUrl || p.fichaBase64 || null;
-  const bx = tx, by = y+h-10, bw = Math.min(50, tw), bh = 7;
+  // Botão de ficha técnica permanece integrado ao card.
+  const fichaUrl=p.ficha || p.fichaUrl || p.fichaBase64 || null;
+  const bx=tx, by=y+h-10, bw=Math.min(50,tw), bh=7;
   fill([4,67,91]); doc.roundedRect(bx,by,bw,bh,2,2,"F");
-  stroke(CYAN); doc.setLineWidth(.4); doc.roundedRect(bx,by,bw,bh,2,2,"S");
-  textColor(WHITE); font(3.8,"bold");
-  doc.text("BAIXAR FICHA TÉCNICA",bx+bw/2,by+4.7,{align:"center"});
-  if(fichaUrl){
-    doc.link(bx,by,bw,bh,{url:fichaUrl});
-  }
+  stroke(CYAN); doc.setLineWidth(.35); doc.roundedRect(bx,by,bw,bh,2,2,"S");
+  textColor(WHITE); font(3.5,"bold");
+  doc.text("BAIXAR FICHA TÉCNICA",bx+bw/2,by+4.6,{align:"center"});
+  if(fichaUrl) doc.link(bx,by,bw,bh,{url:fichaUrl});
 }
 
     const groups={};
