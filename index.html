@@ -2068,12 +2068,13 @@ ${media}</div><div class="pdf-card-titlebar"></div></div>`;
 
 
 
+
 <style id="synthera-pdf-card-futuristic-background">
-/* PDF — FUNDO FUTURISTA REAL DOS CARDS */
+/* PDF — TRANSIÇÃO SUAVE DO FUNDO PARA A ÁREA SEM FUNDO */
 .pdf-card{
  position:relative!important;
  overflow:hidden!important;
- background:#031827!important;
+ background:#fff!important;
 }
 .pdf-card .pdf-futuristic-bg{
  position:absolute!important;
@@ -2083,18 +2084,43 @@ ${media}</div><div class="pdf-card-titlebar"></div></div>`;
  z-index:0!important;
  pointer-events:none!important;
  opacity:1!important;
+
+ /* O fundo nasce mais forte no lado externo e desaparece suavemente
+    em direção à área limpa do conteúdo. */
  background:
-   radial-gradient(circle at 12% 15%,rgba(0,214,255,.32),transparent 28%),
-   radial-gradient(circle at 88% 84%,rgba(55,130,255,.28),transparent 30%),
-   linear-gradient(135deg,#02101e 0%,#06324a 48%,#020b17 100%)!important;
+   radial-gradient(ellipse at 18% 25%,
+     rgba(0,214,255,.30) 0%,
+     rgba(0,170,230,.20) 24%,
+     rgba(3,50,74,.10) 48%,
+     rgba(255,255,255,0) 76%),
+   radial-gradient(ellipse at 82% 75%,
+     rgba(55,130,255,.26) 0%,
+     rgba(30,100,210,.15) 25%,
+     rgba(3,40,65,.07) 48%,
+     rgba(255,255,255,0) 76%),
+   linear-gradient(135deg,
+     rgba(2,16,30,.92) 0%,
+     rgba(4,45,67,.70) 34%,
+     rgba(20,100,130,.28) 58%,
+     rgba(255,255,255,0) 88%)!important;
 }
 .pdf-card .pdf-futuristic-bg:before{
  content:""!important;
  position:absolute!important;
  inset:0!important;
  background:
-   repeating-linear-gradient(118deg,transparent 0 45px,rgba(43,220,255,.20) 46px 47px,transparent 48px 92px),
-   repeating-linear-gradient(28deg,transparent 0 78px,rgba(120,225,255,.12) 79px 80px,transparent 81px 158px)!important;
+   repeating-linear-gradient(118deg,
+     transparent 0 45px,
+     rgba(43,220,255,.18) 46px 47px,
+     transparent 48px 92px),
+   repeating-linear-gradient(28deg,
+     transparent 0 78px,
+     rgba(120,225,255,.10) 79px 80px,
+     transparent 81px 158px);
+ opacity:.85!important;
+ /* fade das linhas junto com o fundo */
+ -webkit-mask-image:linear-gradient(90deg,#000 0%,#000 38%,transparent 86%)!important;
+ mask-image:linear-gradient(90deg,#000 0%,#000 38%,transparent 86%)!important;
 }
 .pdf-card .pdf-futuristic-bg:after{
  content:""!important;
@@ -2103,12 +2129,23 @@ ${media}</div><div class="pdf-card-titlebar"></div></div>`;
  height:440px!important;
  right:-210px!important;
  bottom:-220px!important;
- border:2px solid rgba(70,220,255,.28)!important;
+ border:2px solid rgba(70,220,255,.24)!important;
  border-radius:50%!important;
- box-shadow:0 0 0 40px rgba(70,220,255,.06),0 0 0 82px rgba(70,220,255,.035)!important;
+ box-shadow:
+   0 0 0 40px rgba(70,220,255,.05),
+   0 0 0 82px rgba(70,220,255,.025)!important;
+ -webkit-mask-image:radial-gradient(circle,#000 0%,#000 42%,transparent 72%)!important;
+ mask-image:radial-gradient(circle,#000 0%,#000 42%,transparent 72%)!important;
 }
-.pdf-card-inner{position:relative!important;z-index:2!important}
-.pdf-card-content,.pdf-card-media{position:relative!important;z-index:3!important}
+.pdf-card-inner{
+ position:relative!important;
+ z-index:2!important;
+}
+.pdf-card-content,
+.pdf-card-media{
+ position:relative!important;
+ z-index:3!important;
+}
 </style>
 </body>
 </html>
