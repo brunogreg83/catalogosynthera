@@ -1687,9 +1687,9 @@ async function gerarPDF(){
 }
 
 </style>
-      <div class="pdf-top"><div class="pdf-site">www.<b>synthera</b>.com.br</div></div>
+      <div class="pdf-top"><div class="pdf-site">www.<b>syntherabr</b>.com.br</div></div>
       <div class="pdf-cat"></div><div class="pdf-tag">PERFORMANCE QUE TRANSFORMA A ROTINA PROFISSIONAL</div>
-      <div class="pdf-grid"></div><div class="pdf-foot"><span>Química profissional • Performance • Resultado</span><span>www.<b>synthera</b>.com.br</span><b class="pdf-page-number"></b></div>`;
+      <div class="pdf-grid"></div><div class="pdf-foot"><span>Química profissional • Performance • Resultado</span><span>www.<b>syntherabr</b>.com.br</span><b class="pdf-page-number"></b></div>`;
     document.body.appendChild(page);
 
     const waitImage=img=>new Promise(resolve=>{if(img.complete)return resolve();img.onload=resolve;img.onerror=resolve;});
@@ -2009,6 +2009,59 @@ ${media}</div><div class="pdf-card-titlebar"></div></div>`;
   font-family:Arial,sans-serif !important;
   font-size:12px !important;
   font-weight:400 !important;
+}
+</style>
+
+<style id="synthera-pdf-futuristic-background">
+/* PDF — BACKGROUND FUTURISTA APENAS NAS PÁGINAS DE PRODUTOS.
+   A CAPA (approvedCover) continua sendo a mesma imagem original. */
+.pdf-page{
+  position:relative !important;
+  overflow:hidden !important;
+  background:
+    radial-gradient(circle at 12% 18%, rgba(0,190,255,.18) 0, rgba(0,190,255,0) 24%),
+    radial-gradient(circle at 88% 82%, rgba(0,130,255,.15) 0, rgba(0,130,255,0) 28%),
+    linear-gradient(135deg,#020914 0%,#031827 48%,#010b17 100%) !important;
+}
+.pdf-page::before{
+  content:"" !important;
+  position:absolute !important;
+  inset:0 !important;
+  pointer-events:none !important;
+  z-index:0 !important;
+  opacity:.42 !important;
+  background:
+    repeating-linear-gradient(118deg,
+      transparent 0 58px,
+      rgba(8,186,241,.10) 59px,
+      transparent 60px 120px),
+    repeating-linear-gradient(28deg,
+      transparent 0 94px,
+      rgba(96,205,255,.055) 95px,
+      transparent 96px 190px);
+}
+.pdf-page::after{
+  content:"" !important;
+  position:absolute !important;
+  width:520px !important;
+  height:520px !important;
+  right:-190px !important;
+  bottom:-230px !important;
+  pointer-events:none !important;
+  z-index:0 !important;
+  border:1px solid rgba(8,186,241,.18) !important;
+  border-radius:50% !important;
+  box-shadow:
+    0 0 0 38px rgba(8,186,241,.035),
+    0 0 0 78px rgba(8,186,241,.025),
+    0 0 0 118px rgba(8,186,241,.018) !important;
+}
+.pdf-top,.pdf-cat,.pdf-tag,.pdf-grid,.pdf-foot{
+  position:relative !important;
+  z-index:2 !important;
+}
+.pdf-grid{
+  background:transparent !important;
 }
 </style>
 </body>
