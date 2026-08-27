@@ -1537,6 +1537,24 @@ async function gerarPDF(){
   right:auto !important;
 }
 
+
+/* PDF — BOX DE PREÇO: MESMO TAMANHO, POSIÇÃO ORIGINAL, SEM CORTE */
+.pdf-card .pdf-price{
+  box-sizing:border-box !important;
+  width:126px !important;
+  max-width:126px !important;
+  min-width:126px !important;
+  flex:none !important;
+}
+.pdf-card.reverse .pdf-price{
+  position:relative !important;
+  left:0 !important;
+  right:auto !important;
+  margin-left:0 !important;
+  margin-right:0 !important;
+  transform:none !important;
+}
+
 </style>
       <div class="pdf-top"><div class="pdf-site">www.<b>synthera</b>.com.br</div></div>
       <div class="pdf-cat"></div><div class="pdf-tag">PERFORMANCE QUE TRANSFORMA A ROTINA PROFISSIONAL</div>
