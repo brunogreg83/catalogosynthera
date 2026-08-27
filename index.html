@@ -1333,7 +1333,20 @@ async function gerarPDF(){
     const esc=v=>String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
     const codeOf=p=>(String(p.nome||"").match(/^([A-Z]{3}\d{3})/)||[])[1]||"";
     const nameOf=p=>String(p.nome||"").replace(/^[A-Z]{3}\d{3}\s*[—-]\s*/i,"").trim()||"Produto";
-    const subOf=p=>((p.attrs||[]).length?String(p.attrs[0].v):"SOLUÇÃO PROFISSIONAL SYNTHERA");
+    const subOf=p=>{
+      const attrs=p.attrs||[];
+      const raw=attrs.length?String(attrs[0].v||"").trim():"";
+      if(raw && !/solução\s+profissional\s+synthera/i.test(raw)) return raw;
+      const n=nameOf(p).toUpperCase();
+      if(/ÁGUA\s+SANITÁRIA|AGUA\s+SANITARIA/.test(n)) return "ALVEJANTE";
+      if(/DESENGORD|GRILL/.test(n)) return "DESENGORDURANTE";
+      if(/LIMPA\s+PISO|PISO|PISOS/.test(n)) return "LIMPADOR DE PISOS";
+      if(/LIMPA\s+BANHEIRO|BANHEIRO/.test(n)) return "LIMPADOR DE BANHEIRO";
+      if(/REMOVEDOR\s+DE\s+LODO|LODO/.test(n)) return "REMOVEDOR DE LODO";
+      if(/ODORIZ|ODOR/.test(n)) return "ODORIZADOR";
+      if(/ALVEJ|HIPOCLORITO/.test(n)) return "ALVEJANTE";
+      return nameOf(p).toUpperCase();
+    };
     const catCode=cat=>(String(cat).match(/^([A-Z]{3})/)||[])[1]||"SYN";
 
     function fallbackGalao(title,subtitle,code){
@@ -1360,7 +1373,7 @@ async function gerarPDF(){
           <text x="160" y="181" text-anchor="middle" fill="#fff" font-family="Montserrat,Arial,sans-serif" font-size="17" font-weight="900">SYNTHERA</text>
           <line x1="108" y1="191" x2="212" y2="191" stroke="#08baf1" stroke-width="2"/>
           <text x="160" y="220" text-anchor="middle" fill="#08baf1" font-family="Montserrat,Arial,sans-serif" font-size="18" font-weight="900">${esc(code||"SYN")}</text>
-          <text x="160" y="247" text-anchor="middle" fill="#f2f6f8" font-family="Montserrat,Arial,sans-serif" font-size="9" font-weight="700">${esc(subtitle||"SOLUÇÃO PROFISSIONAL").slice(0,32)}</text>
+          <text class="label-subtitle" x="160" y="247" text-anchor="middle" fill="#f2f6f8" font-family="Montserrat,Arial,sans-serif">${esc(subtitle||"").slice(0,30)}</text>
           <line x1="112" y1="260" x2="208" y2="260" stroke="#08baf1" stroke-width="1.5" opacity=".65"/>
         </g>
       </svg>`;
@@ -1553,6 +1566,14 @@ async function gerarPDF(){
   margin-left:0 !important;
   margin-right:0 !important;
   transform:none !important;
+}
+
+
+/* RÓTULO DO GALÃO — subtítulo específico do produto */
+.pdf-galao .label-subtitle{
+  font-size:9px;
+  font-weight:700;
+  letter-spacing:.1px;
 }
 
 </style>
