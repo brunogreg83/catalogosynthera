@@ -2125,5 +2125,95 @@ ${media}</div><div class="pdf-card-titlebar"></div></div>`;
  z-index:3!important;
 }
 </style>
+
+<style id="synthera-pdf-smooth-divider">
+/* PDF — TRANSIÇÃO MODERNA ENTRE ÁREA DE TEXTO E PRODUTO
+   Inspirada no modelo aprovado: sem corte vertical brusco. */
+.pdf-card{
+  position:relative!important;
+  overflow:hidden!important;
+  background:
+    radial-gradient(ellipse at 25% 45%,rgba(4,93,132,.72) 0%,rgba(3,55,80,.50) 28%,rgba(2,18,31,.10) 58%,transparent 76%),
+    radial-gradient(ellipse at 82% 55%,rgba(5,38,62,.90) 0%,rgba(2,13,25,.96) 58%),
+    linear-gradient(135deg,#031827 0%,#02101e 52%,#010a15 100%)!important;
+}
+.pdf-card::before{
+  content:""!important;
+  position:absolute!important;
+  top:-12%!important;
+  bottom:-12%!important;
+  left:42%!important;
+  width:27%!important;
+  z-index:1!important;
+  pointer-events:none!important;
+  background:
+    radial-gradient(ellipse at center,
+      rgba(8,190,245,.22) 0%,
+      rgba(8,190,245,.12) 24%,
+      rgba(8,190,245,.045) 46%,
+      transparent 72%)!important;
+  filter:blur(10px)!important;
+  transform:skewX(-8deg)!important;
+}
+.pdf-card-inner{
+  position:relative!important;
+  z-index:2!important;
+}
+.pdf-card-content{
+  position:relative!important;
+  z-index:4!important;
+  background:transparent!important;
+}
+.pdf-card-media{
+  position:relative!important;
+  z-index:3!important;
+  background:transparent!important;
+  overflow:visible!important;
+}
+.pdf-card-media::before{
+  content:""!important;
+  position:absolute!important;
+  top:-8%!important;
+  bottom:-8%!important;
+  left:-20%!important;
+  width:48%!important;
+  z-index:1!important;
+  pointer-events:none!important;
+  background:
+    linear-gradient(90deg,
+      transparent 0%,
+      rgba(2,17,30,.10) 22%,
+      rgba(3,42,62,.34) 55%,
+      rgba(8,167,220,.16) 76%,
+      transparent 100%)!important;
+  filter:blur(13px)!important;
+  transform:skewX(-10deg)!important;
+}
+.pdf-card.reverse .pdf-card-media::before{
+  left:auto!important;
+  right:-20%!important;
+  transform:skewX(10deg)!important;
+}
+.pdf-card-media > .pdf-clean-fade-layer,
+.pdf-card-media > .pdf-clean-bg{
+  z-index:1!important;
+}
+.pdf-card-media > .pdf-galao{
+  position:relative!important;
+  z-index:5!important;
+}
+.pdf-card-titlebar{
+  z-index:6!important;
+  width:2px!important;
+  opacity:.72!important;
+  box-shadow:0 0 12px rgba(8,190,245,.38)!important;
+}
+.pdf-card:not(.reverse) .pdf-card-titlebar{
+  left:55%!important;
+}
+.pdf-card.reverse .pdf-card-titlebar{
+  right:45%!important;
+}
+</style>
 </body>
 </html>
