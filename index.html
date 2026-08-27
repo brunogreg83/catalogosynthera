@@ -1707,7 +1707,7 @@ async function gerarPDF(){
           const card=document.createElement("div");card.className="pdf-card"+(i%2?" reverse":"");
           const media=fallbackGalao(title,sub,code);
           const price=p.preco?String(p.preco):"CONSULTAR";
-          card.innerHTML=`<div class="pdf-card-inner"><div class="pdf-card-content">
+          card.innerHTML=`<div class="pdf-futuristic-bg" aria-hidden="true"></div><div class="pdf-card-inner"><div class="pdf-card-content">
             <div class="pdf-code">${esc(code||title)}</div><div class="pdf-name">${esc(title.toUpperCase())}</div><div class="pdf-sub">${esc(sub)}</div>
             <div class="pdf-rule"></div><div class="pdf-price">PREÇO: ${esc(price.toUpperCase())}</div>
             ${p.ficha?`<div class="pdf-ficha">⇩ BAIXAR FICHA TÉCNICA</div>`:""}
@@ -2067,62 +2067,48 @@ ${media}</div><div class="pdf-card-titlebar"></div></div>`;
 
 
 
+
 <style id="synthera-pdf-card-futuristic-background">
-/* PDF — FUNDO DOS CARDS +20% DE VISIBILIDADE REAL */
+/* PDF — FUNDO FUTURISTA REAL DOS CARDS */
 .pdf-card{
  position:relative!important;
  overflow:hidden!important;
- isolation:isolate!important;
- background:#020b17!important;
+ background:#031827!important;
 }
-.pdf-card::before{
- content:""!important;
+.pdf-card .pdf-futuristic-bg{
  position:absolute!important;
  inset:0!important;
+ width:100%!important;
+ height:100%!important;
  z-index:0!important;
  pointer-events:none!important;
  opacity:1!important;
  background:
-   radial-gradient(circle at 14% 18%,rgba(20,220,255,.30) 0,rgba(20,220,255,.04) 28%,transparent 52%),
-   radial-gradient(circle at 88% 82%,rgba(55,145,255,.26) 0,rgba(55,145,255,.03) 30%,transparent 54%),
-   linear-gradient(135deg,rgba(2,18,34,.95),rgba(3,31,49,.88),rgba(1,12,25,.96))!important;
+   radial-gradient(circle at 12% 15%,rgba(0,214,255,.32),transparent 28%),
+   radial-gradient(circle at 88% 84%,rgba(55,130,255,.28),transparent 30%),
+   linear-gradient(135deg,#02101e 0%,#06324a 48%,#020b17 100%)!important;
 }
-.pdf-card::after{
+.pdf-card .pdf-futuristic-bg:before{
  content:""!important;
  position:absolute!important;
  inset:0!important;
- z-index:0!important;
- pointer-events:none!important;
- opacity:.68!important;
  background:
-   repeating-linear-gradient(118deg,
-     transparent 0 46px,
-     rgba(8,210,255,.18) 47px,
-     transparent 49px 96px),
-   repeating-linear-gradient(28deg,
-     transparent 0 76px,
-     rgba(105,220,255,.10) 77px,
-     transparent 79px 154px)!important;
+   repeating-linear-gradient(118deg,transparent 0 45px,rgba(43,220,255,.20) 46px 47px,transparent 48px 92px),
+   repeating-linear-gradient(28deg,transparent 0 78px,rgba(120,225,255,.12) 79px 80px,transparent 81px 158px)!important;
 }
-.pdf-card-inner{
- position:relative!important;
- z-index:2!important;
+.pdf-card .pdf-futuristic-bg:after{
+ content:""!important;
+ position:absolute!important;
+ width:440px!important;
+ height:440px!important;
+ right:-210px!important;
+ bottom:-220px!important;
+ border:2px solid rgba(70,220,255,.28)!important;
+ border-radius:50%!important;
+ box-shadow:0 0 0 40px rgba(70,220,255,.06),0 0 0 82px rgba(70,220,255,.035)!important;
 }
-.pdf-card-content{
- position:relative!important;
- z-index:4!important;
-}
-.pdf-card-media{
- position:relative!important;
- z-index:3!important;
- background:transparent!important;
-}
-.pdf-card-media>.pdf-clean-bg{
- z-index:1!important;
-}
-.pdf-card-media>.pdf-galao{
- z-index:4!important;
-}
+.pdf-card-inner{position:relative!important;z-index:2!important}
+.pdf-card-content,.pdf-card-media{position:relative!important;z-index:3!important}
 </style>
 </body>
 </html>
