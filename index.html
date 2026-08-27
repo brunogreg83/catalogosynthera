@@ -2064,5 +2064,61 @@ ${media}</div><div class="pdf-card-titlebar"></div></div>`;
   background:transparent !important;
 }
 </style>
+
+<style id="synthera-pdf-card-futuristic-background">
+/* PDF — FUNDO FUTURISTA DIRETAMENTE NAS ÁREAS DOS CARDS DE PRODUTOS */
+.pdf-card{
+  position:relative !important;
+  overflow:hidden !important;
+  background:
+    radial-gradient(circle at 15% 20%, rgba(8,186,241,.20) 0, rgba(8,186,241,0) 32%),
+    radial-gradient(circle at 85% 80%, rgba(44,120,255,.16) 0, rgba(44,120,255,0) 34%),
+    linear-gradient(135deg,#020b17 0%,#031827 52%,#010914 100%) !important;
+}
+.pdf-card::before{
+  content:"" !important;
+  position:absolute !important;
+  inset:0 !important;
+  z-index:0 !important;
+  pointer-events:none !important;
+  opacity:.42 !important;
+  background:
+    repeating-linear-gradient(118deg,
+      transparent 0 52px,
+      rgba(8,186,241,.12) 53px,
+      transparent 54px 108px),
+    repeating-linear-gradient(28deg,
+      transparent 0 86px,
+      rgba(96,205,255,.06) 87px,
+      transparent 88px 172px) !important;
+}
+.pdf-card::after{
+  content:"" !important;
+  position:absolute !important;
+  width:420px !important;
+  height:420px !important;
+  right:-180px !important;
+  bottom:-210px !important;
+  z-index:0 !important;
+  pointer-events:none !important;
+  border:1px solid rgba(8,186,241,.22) !important;
+  border-radius:50% !important;
+  box-shadow:
+    0 0 0 34px rgba(8,186,241,.035),
+    0 0 0 70px rgba(8,186,241,.025) !important;
+}
+.pdf-card-inner{
+  position:relative !important;
+  z-index:1 !important;
+}
+.pdf-card-content,
+.pdf-card-media{
+  position:relative !important;
+  z-index:2 !important;
+}
+.pdf-card-media{
+  background:transparent !important;
+}
+</style>
 </body>
 </html>
