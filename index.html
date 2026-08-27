@@ -1576,6 +1576,61 @@ async function gerarPDF(){
   letter-spacing:.1px;
 }
 
+
+/* ===== GERADOR — CARDS PLAIN (somente interface do gerador, NÃO PDF) ===== */
+#productsContainer .product-card,
+#productsContainer .productCard,
+#productsContainer .card,
+.product-list .product-card,
+.product-grid .product-card{
+  background-image:none !important;
+  background:none !important;
+  box-shadow:none !important;
+  border:1px solid #d7dee7 !important;
+  border-radius:8px !important;
+  overflow:hidden !important;
+}
+
+#productsContainer .product-card::before,
+#productsContainer .product-card::after,
+#productsContainer .productCard::before,
+#productsContainer .productCard::after,
+#productsContainer .card::before,
+#productsContainer .card::after{
+  display:none !important;
+  content:none !important;
+}
+
+#productsContainer .product-card .product-image,
+#productsContainer .productCard .product-image,
+#productsContainer .card .product-image{
+  background-image:none !important;
+  background:none !important;
+  box-shadow:none !important;
+}
+
+#productsContainer .product-card .product-image img,
+#productsContainer .productCard .product-image img,
+#productsContainer .card .product-image img{
+  filter:none !important;
+  opacity:1 !important;
+}
+
+#productsContainer .product-card .product-info,
+#productsContainer .productCard .product-info,
+#productsContainer .card .product-info{
+  background:#fff !important;
+  background-image:none !important;
+  box-shadow:none !important;
+}
+
+#productsContainer .product-card button,
+#productsContainer .productCard button,
+#productsContainer .card button{
+  box-shadow:none !important;
+  background-image:none !important;
+}
+
 </style>
       <div class="pdf-top"><div class="pdf-site">www.<b>synthera</b>.com.br</div></div>
       <div class="pdf-cat"></div><div class="pdf-tag">PERFORMANCE QUE TRANSFORMA A ROTINA PROFISSIONAL</div>
