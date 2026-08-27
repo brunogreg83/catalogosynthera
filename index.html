@@ -2066,45 +2066,63 @@ ${media}</div><div class="pdf-card-titlebar"></div></div>`;
 </style>
 
 
+
 <style id="synthera-pdf-card-futuristic-background">
-/* PDF — BACKGROUND FUTURISTA DOS CARDS: +20% VISIBILIDADE */
+/* PDF — FUNDO DOS CARDS +20% DE VISIBILIDADE REAL */
 .pdf-card{
-  position:relative!important;
-  overflow:hidden!important;
-  background:
-    radial-gradient(circle at 15% 20%,rgba(8,186,241,.24) 0,rgba(8,186,241,0) 32%),
-    radial-gradient(circle at 85% 80%,rgba(44,120,255,.19) 0,rgba(44,120,255,0) 34%),
-    linear-gradient(135deg,#020b17 0%,#031827 52%,#010914 100%)!important;
+ position:relative!important;
+ overflow:hidden!important;
+ isolation:isolate!important;
+ background:#020b17!important;
 }
 .pdf-card::before{
-  content:""!important;
-  position:absolute!important;
-  inset:0!important;
-  z-index:0!important;
-  pointer-events:none!important;
-  opacity:.50!important;
-  background:
-    repeating-linear-gradient(118deg,transparent 0 52px,rgba(8,186,241,.14) 53px,transparent 54px 108px),
-    repeating-linear-gradient(28deg,transparent 0 86px,rgba(96,205,255,.072) 87px,transparent 88px 172px)!important;
+ content:""!important;
+ position:absolute!important;
+ inset:0!important;
+ z-index:0!important;
+ pointer-events:none!important;
+ opacity:1!important;
+ background:
+   radial-gradient(circle at 14% 18%,rgba(20,220,255,.30) 0,rgba(20,220,255,.04) 28%,transparent 52%),
+   radial-gradient(circle at 88% 82%,rgba(55,145,255,.26) 0,rgba(55,145,255,.03) 30%,transparent 54%),
+   linear-gradient(135deg,rgba(2,18,34,.95),rgba(3,31,49,.88),rgba(1,12,25,.96))!important;
 }
 .pdf-card::after{
-  content:""!important;
-  position:absolute!important;
-  width:420px!important;
-  height:420px!important;
-  right:-180px!important;
-  bottom:-210px!important;
-  z-index:0!important;
-  pointer-events:none!important;
-  border:1px solid rgba(8,186,241,.26)!important;
-  border-radius:50%!important;
-  box-shadow:
-    0 0 0 34px rgba(8,186,241,.042),
-    0 0 0 70px rgba(8,186,241,.030)!important;
+ content:""!important;
+ position:absolute!important;
+ inset:0!important;
+ z-index:0!important;
+ pointer-events:none!important;
+ opacity:.68!important;
+ background:
+   repeating-linear-gradient(118deg,
+     transparent 0 46px,
+     rgba(8,210,255,.18) 47px,
+     transparent 49px 96px),
+   repeating-linear-gradient(28deg,
+     transparent 0 76px,
+     rgba(105,220,255,.10) 77px,
+     transparent 79px 154px)!important;
 }
-.pdf-card-inner{position:relative!important;z-index:1!important}
-.pdf-card-content,.pdf-card-media{position:relative!important;z-index:2!important}
-.pdf-card-media{background:transparent!important}
+.pdf-card-inner{
+ position:relative!important;
+ z-index:2!important;
+}
+.pdf-card-content{
+ position:relative!important;
+ z-index:4!important;
+}
+.pdf-card-media{
+ position:relative!important;
+ z-index:3!important;
+ background:transparent!important;
+}
+.pdf-card-media>.pdf-clean-bg{
+ z-index:1!important;
+}
+.pdf-card-media>.pdf-galao{
+ z-index:4!important;
+}
 </style>
 </body>
 </html>
