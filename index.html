@@ -597,26 +597,24 @@ document.addEventListener("DOMContentLoaded", () => {
 
 </style>
 
+
 <style id="synthera-jug-final-fix">
-/* AJUSTE EXCLUSIVO DO GALÃO NO PDF: 90% + margem interna superior para nunca cortar a tampa */
-#synthera-chem-bg + .pdf-galao-real,
-.pdf-card-media .pdf-galao-real{
-  width:100% !important;
-  height:100% !important;
+/* SOMENTE O GALÃO DO PDF — 90%, perfeitamente centralizado e sem cortar a tampa */
+.pdf-card-media > img.pdf-galao-real{
+  position:absolute !important;
+  left:5% !important;
+  top:5% !important;
+  width:90% !important;
+  height:90% !important;
   max-width:none !important;
   max-height:none !important;
-  object-fit:contain !important;
-  object-position:center center !important;
-  display:block !important;
-  position:relative !important;
   margin:0 !important;
   padding:0 !important;
-  transform:translateY(5%) scale(.90) !important;
-  transform-origin:center center !important;
+  object-fit:contain !important;
+  object-position:center center !important;
+  transform:none !important;
+  display:block !important;
   z-index:10 !important;
-}
-.pdf-card-media{
-  overflow:hidden !important;
 }
 </style>
 
