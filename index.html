@@ -597,6 +597,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
 </style>
 
+
+<style id="synthera-pdf-galao">
+.pdf-galao-wrap{position:relative;width:100%;height:100%;display:flex;align-items:center;justify-content:center;overflow:visible;}
+.pdf-card-media .pdf-galao-real{width:auto!important;height:92%!important;max-width:100%!important;object-fit:contain!important;clip-path:none!important;-webkit-clip-path:none!important;position:relative;z-index:1;}
+.pdf-galao-label{position:absolute;z-index:2;width:28%;max-width:145px;min-width:95px;aspect-ratio:1/1.08;background:#050505;border-radius:5px;padding:7px;color:#fff;text-align:center;font-family:Montserrat,Arial,sans-serif;left:50%;top:56%;transform:translate(-50%,-50%);display:flex;flex-direction:column;}
+.pdf-label-logo{font-size:8px;font-weight:900;line-height:1;display:flex;align-items:center;justify-content:center;gap:3px;white-space:nowrap}.pdf-label-mark{color:#08baf1;font-size:12px}.pdf-label-tagline{font-size:3.5px;margin-top:2px;white-space:nowrap}.pdf-label-code{font-size:19px;font-weight:900;line-height:1;margin-top:13px}.pdf-label-name{font-size:6px;font-weight:800;line-height:1.15;margin-top:6px;text-transform:uppercase}.pdf-label-accent{height:2px;width:55%;margin:6px auto 0;background:linear-gradient(90deg,#0b8fa3,#14d9ec)}.pdf-label-volume{font-size:8px;font-weight:900;text-align:right;margin-top:auto}
+</style>
 <style id="synthera-original-pdf-fix">
 /* SOMENTE remoção do recorte/inset do espaço do galão no PDF */
 .pdf-card-media{
@@ -611,28 +618,19 @@ document.addEventListener("DOMContentLoaded", () => {
 </style>
 
 
-<style id="synthera-galao-aplicado">
-/* Galão Synthera padrão: transparente, inteiro e proporcional em todos os cards */
-.synthera-product .synthera-product-media{overflow:hidden!important;background:radial-gradient(circle at 50% 50%,rgba(0,105,255,.18),transparent 55%),#03101f!important}
-.synthera-galao-wrap{position:relative!important;width:170px!important;height:225px!important;max-width:100%!important;max-height:100%!important;display:flex!important;align-items:center!important;justify-content:center!important;flex:0 1 auto!important}
-.synthera-galao-img{width:100%!important;height:100%!important;max-width:100%!important;max-height:100%!important;object-fit:contain!important;display:block!important;border:0!important;border-radius:0!important;filter:drop-shadow(0 12px 16px rgba(0,0,0,.42))!important}
-.synthera-galao-label{position:absolute!important;left:15.5%!important;top:28.5%!important;width:69%!important;height:55%!important;box-sizing:border-box!important;border-radius:6px!important;background:linear-gradient(145deg,#02070d 0%,#071521 58%,#02080f 100%)!important;border:1px solid rgba(8,186,241,.72)!important;box-shadow:0 2px 8px rgba(0,0,0,.28)!important;color:#fff!important;display:flex!important;flex-direction:column!important;align-items:center!important;text-align:center!important;padding:8px 6px 6px!important;overflow:hidden!important;z-index:4!important;font-family:Montserrat,Arial,sans-serif!important}
-.synthera-label-logo{display:flex;align-items:center;gap:4px;font-size:9px;font-weight:900;line-height:1;color:#fff;white-space:nowrap}
-.synthera-label-logo sup{font-size:4px;top:-.6em;position:relative}
-.synthera-label-mark{color:#08baf1;font-size:12px;line-height:1;text-shadow:5px -3px 0 #08baf1,5px 3px 0 #08baf1}
-.synthera-label-tagline{font-size:3.6px;font-weight:700;letter-spacing:.28px;margin-top:2px;color:#a8d7e6;white-space:nowrap}
-.synthera-label-code{font-size:16px;font-weight:900;line-height:1.02;color:#08baf1;margin-top:10px;max-width:100%;white-space:nowrap}
-.synthera-label-name{font-size:6px;font-weight:800;line-height:1.16;color:#fff;margin-top:4px;text-transform:uppercase;max-width:94%;overflow:hidden;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical}
-.synthera-label-accent{width:62%;height:2px;background:linear-gradient(90deg,#0878a8,#08baf1);margin-top:6px;border-radius:2px;flex:0 0 auto}
-.synthera-label-volume{font-size:7px;font-weight:900;margin-top:auto;align-self:flex-end;color:#fff}
-
-/* PDF: mesma embalagem, sem recorte e com rótulo correspondente ao produto */
-.pdf-card-media{overflow:hidden!important}
-.pdf-galao-wrap{position:relative!important;width:min(86%,170px)!important;height:225px!important;max-width:100%!important;max-height:94%!important;aspect-ratio:1132/1536!important;display:flex!important;align-items:center!important;justify-content:center!important;flex:0 1 auto!important;z-index:3!important}
-.pdf-galao-real{width:100%!important;height:100%!important;max-width:100%!important;max-height:100%!important;object-fit:contain!important;display:block!important;clip-path:none!important;-webkit-clip-path:none!important;filter:drop-shadow(0 10px 12px rgba(0,0,0,.34))!important}
-.pdf-galao-label{position:absolute!important;left:15.5%!important;top:28.5%!important;width:69%!important;height:55%!important;box-sizing:border-box!important;border-radius:6px!important;background:linear-gradient(145deg,#02070d 0%,#071521 58%,#02080f 100%)!important;border:1px solid rgba(8,186,241,.72)!important;box-shadow:0 2px 8px rgba(0,0,0,.28)!important;color:#fff!important;display:flex!important;flex-direction:column!important;align-items:center!important;text-align:center!important;padding:5px 4px 4px!important;overflow:hidden!important;z-index:4!important;font-family:Montserrat,Arial,sans-serif!important}
-.pdf-label-logo{display:flex;align-items:center;gap:3px;font-size:6.5px;font-weight:900;line-height:1;color:#fff;white-space:nowrap}.pdf-label-logo sup{font-size:3px;top:-.6em;position:relative}.pdf-label-mark{color:#08baf1;font-size:8px;line-height:1;text-shadow:4px -3px 0 #08baf1,4px 3px 0 #08baf1}.pdf-label-tagline{font-size:2.7px;font-weight:700;letter-spacing:.25px;margin-top:1.5px;color:#a8d7e6;white-space:nowrap}.pdf-label-code{font-size:11px;font-weight:900;line-height:1.02;color:#08baf1;margin-top:7px;max-width:100%;white-space:nowrap}.pdf-label-name{font-size:4.3px;font-weight:800;line-height:1.16;color:#fff;margin-top:3px;text-transform:uppercase;max-width:94%;overflow:hidden;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical}.pdf-label-accent{width:62%;height:1.2px;background:linear-gradient(90deg,#0878a8,#08baf1);margin-top:4px;border-radius:2px}.pdf-label-volume{font-size:5px;font-weight:900;margin-top:auto;align-self:flex-end;color:#fff}
-@media(max-width:860px){.synthera-galao-wrap{width:150px!important;height:205px!important}.synthera-product .synthera-product-media{min-height:235px!important}}
+<style id="synthera-galao-cards">
+.synthera-galao-wrap{position:relative;width:100%;height:220px;display:flex;align-items:center;justify-content:center;overflow:visible;}
+.synthera-galao-img{width:auto!important;height:210px!important;max-width:100%;object-fit:contain!important;filter:drop-shadow(0 12px 14px rgba(0,0,0,.18));z-index:1;}
+.synthera-galao-label{position:absolute;z-index:2;width:34%;min-width:105px;max-width:150px;aspect-ratio:1/1.08;background:#050505;border-radius:6px;left:50%;top:56%;transform:translate(-50%,-50%);padding:8px 7px;color:#fff;text-align:center;box-shadow:0 3px 8px rgba(0,0,0,.28);font-family:Montserrat,Arial,sans-serif;display:flex;flex-direction:column;justify-content:flex-start;}
+.synthera-label-logo{font-size:8px;font-weight:900;display:flex;align-items:center;justify-content:center;gap:4px;white-space:nowrap;line-height:1;}
+.synthera-label-mark{font-size:13px;color:#08baf1;letter-spacing:-5px;width:15px;display:inline-block;}
+.synthera-label-tagline{font-size:3.5px;letter-spacing:.25px;margin-top:3px;color:#dce8ee;white-space:nowrap;}
+.synthera-label-code{font-size:20px;font-weight:900;line-height:1;margin-top:15px;letter-spacing:-.5px;}
+.synthera-label-code::first-letter{color:#fff;}
+.synthera-label-name{font-size:7px;font-weight:800;line-height:1.15;margin-top:7px;text-transform:uppercase;}
+.synthera-label-accent{height:2px;background:linear-gradient(90deg,#0b8fa3,#14d9ec);margin:7px auto 0;width:55%;border-radius:2px;}
+.synthera-label-volume{font-size:8px;font-weight:900;margin-top:auto;text-align:right;}
+@media(max-width:700px){.synthera-galao-wrap{height:175px}.synthera-galao-img{height:165px!important}.synthera-galao-label{width:35%;min-width:92px;padding:6px}.synthera-label-code{font-size:16px;margin-top:11px}.synthera-label-name{font-size:6px}.synthera-label-logo{font-size:7px}.synthera-label-tagline{font-size:3px}}
 </style>
 </head>
 <body>
@@ -1226,7 +1224,7 @@ window.renderLista = function(){
         <div class="synthera-product-inner">
           <div class="synthera-product-media">
             <div class="synthera-galao-wrap">
-              <img class="synthera-galao-img" src="${SYNTHERA_GALAO_TRANSPARENTE}" alt="${cleanName}"/>
+              <img class="synthera-galao-img" src="${SYNTHERA_GALAO_TRANSPARENTE}" alt="${esc(cleanName)}"/>
               <div class="synthera-galao-label">
                 <div class="synthera-label-logo"><span class="synthera-label-mark">●</span><span>SYNTHERA<sup>®</sup></span></div>
                 <div class="synthera-label-tagline">SOLUÇÕES EM LIMPEZA PROFISSIONAL</div>
