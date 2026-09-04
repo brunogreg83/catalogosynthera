@@ -150,7 +150,7 @@ window._fb = {
     return {total, migrados, erros};
   },
   listen(cb){
-    const q = query(collection(db, COL), orderBy("criadoEm","asc"));
+    const q = query(collection(db, COL));
     return onSnapshot(q, snap => {
       const docs = snap.docs.map(d => ({ id: d.id, ...d.data() }));
       cb(docs);
