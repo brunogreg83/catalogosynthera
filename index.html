@@ -620,7 +620,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
 <style id="synthera-galao-cards">
 .synthera-galao-wrap{position:relative;width:100%;height:220px;display:flex;align-items:center;justify-content:center;overflow:visible;}
-.synthera-galao-img{width:auto!important;height:210px!important;max-width:100%;object-fit:contain!important;filter:drop-shadow(0 12px 14px rgba(0,0,0,.18));z-index:1;}
+/* Todos os galões usam a mesma caixa de referência. A imagem nunca estica nem corta;
+   o object-fit:contain reduz automaticamente se o espaço disponível for menor. */
+.synthera-galao-img{width:210px!important;height:210px!important;max-width:100%;max-height:100%;object-fit:contain!important;object-position:center!important;filter:drop-shadow(0 12px 14px rgba(0,0,0,.18));z-index:1;flex:0 0 210px;}
 .synthera-galao-label{position:absolute;z-index:2;width:34%;min-width:105px;max-width:150px;aspect-ratio:1/1.08;background:#050505;border-radius:6px;left:50%;top:56%;transform:translate(-50%,-50%);padding:8px 7px;color:#fff;text-align:center;box-shadow:0 3px 8px rgba(0,0,0,.28);font-family:Montserrat,Arial,sans-serif;display:flex;flex-direction:column;justify-content:flex-start;}
 .synthera-label-logo{font-size:8px;font-weight:900;display:flex;align-items:center;justify-content:center;gap:4px;white-space:nowrap;line-height:1;}
 .synthera-label-mark{font-size:13px;color:#08baf1;letter-spacing:-5px;width:15px;display:inline-block;}
@@ -1730,6 +1732,13 @@ async function gerarPDF(){
   filter:none !important;
   opacity:1 !important;
   box-shadow:none !important;
+}
+@media(max-width:760px){
+  .product-card.synthera-product .synthera-galao-wrap{height:190px!important;}
+  .product-card.synthera-product .synthera-galao-img{
+    width:175px!important;height:175px!important;max-width:100%!important;max-height:100%!important;
+    flex-basis:175px!important;object-fit:contain!important;
+  }
 }
 .product-card.synthera-product .product-card-header{
   background:transparent !important;
