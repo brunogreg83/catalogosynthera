@@ -164,6 +164,7 @@ window._fb = {
       if(typeof window.showToast==='function') window.showToast(msg, "error");
       const el = document.getElementById("dbStatus");
       if(el){ el.className = "db-status error"; el.innerHTML = `&#9679; ${msg}`; }
+      if(typeof window.setFirebaseStatus === 'function') window.setFirebaseStatus(false);
     });
   }
 };
@@ -196,22 +197,26 @@ document.addEventListener("DOMContentLoaded", () => {
   setTimeout(() => clearInterval(poll), 3000);
 
   let first = true;
-  window._fb.cadastrarEstruturaSynthera().then(criados => {
-    if(criados > 0 && typeof window.showToast === 'function') {
-      window.showToast(`${criados} produtos Synthera cadastrados`, 'success');
-    }
-  }).catch(err => {
-    console.error('Erro ao cadastrar estrutura Synthera:', err);
-    if(typeof window.showToast === 'function') window.showToast('Não foi possível cadastrar a estrutura Synthera', 'error');
-  });
 
+  // Inicia a leitura do catálogo imediatamente. A criação da estrutura
+  // padrão fica em segundo plano para não bloquear a exibição dos produtos.
   window._fb.listen(docs => {
     tryRender(docs);
     if(first){
       first = false;
       const el = document.getElementById("dbStatus");
       if(el){ el.className = "db-status ok"; el.innerHTML = "&#9679; Firebase conectado"; }
+      if(typeof window.setFirebaseStatus === 'function') window.setFirebaseStatus(true);
     }
+  });
+
+  window._fb.cadastrarEstruturaSynthera().then(criados => {
+    if(criados > 0 && typeof window.showToast === 'function') {
+      window.showToast(`${criados} produtos Synthera cadastrados`, 'success');
+    }
+  }).catch(err => {
+    console.error('Erro ao cadastrar estrutura Synthera:', err);
+    // Não interrompe a leitura do catálogo se a estrutura padrão falhar.
   });
 });
 </script>
