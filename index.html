@@ -1726,7 +1726,7 @@ async function gerarPDF(){
         chunk.forEach((p,i)=>{
           const code=codeOf(p),title=nameOf(p),sub=subOf(p);
           const card=document.createElement("div");card.className="pdf-card"+(i%2?" reverse":"");
-          const media=fallbackGalao(title,sub,code);
+          const media=p.imagem ? `<img class="pdf-galao-real" src="${esc(p.imagem)}" alt="${esc(title)}">` : fallbackGalao(title,sub,code);
           const price=p.preco?String(p.preco):"CONSULTAR";
           card.innerHTML=`<div class="pdf-futuristic-bg" aria-hidden="true"></div><div class="pdf-card-inner"><div class="pdf-card-content">
             <div class="pdf-code">${esc(code||title)}</div><div class="pdf-name">${esc(title.toUpperCase())}</div><div class="pdf-sub">${esc(sub)}</div>
