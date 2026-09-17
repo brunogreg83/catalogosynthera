@@ -1457,8 +1457,19 @@ async function gerarPDF(){
     });
 
     const esc=v=>String(v??"").replace(/[&<>"']/g,m=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[m]));
-    const codeOf=p=>(String(p.nome||"").match(/^([A-Z]{3}\d{3})/)||[])[1]||"";
-    const nameOf=p=>String(p.nome||"").replace(/^[A-Z]{3}\d{3}\s*[—-]\s*/i,"").trim()||"Produto";
+    const isEspecialidade=p=>String(p.categoria||"").trim()==="Especialidades";
+    const codeOf=p=>{
+      const raw=String(p.nome||"");
+      if(isEspecialidade(p)) return (raw.match(/\b([A-Z]{1,5}\d{2,5})\b/i)||[])[1]||"";
+      return (raw.match(/^([A-Z]{3}\d{3})/)||[])[1]||"";
+    };
+    const nameOf=p=>{
+      const raw=String(p.nome||"");
+      if(isEspecialidade(p)){
+        return raw.replace(/^\s*Synthera\s+/i,"").replace(/^[A-Z]{1,5}\d{2,5}\s*[—-]\s*/i,"").trim()||"Produto";
+      }
+      return raw.replace(/^[A-Z]{3}\d{3}\s*[—-]\s*/i,"").trim()||"Produto";
+    };
     const subOf=p=>{
       const attrs=p.attrs||[];
       const raw=attrs.length?String(attrs[0].v||"").trim():"";
@@ -1473,7 +1484,7 @@ async function gerarPDF(){
       if(/ALVEJ|HIPOCLORITO/.test(n)) return "ALVEJANTE";
       return nameOf(p).toUpperCase();
     };
-    const catCode=cat=>(String(cat).match(/^([A-Z]{3})/)||[])[1]||"SYN";
+    const catCode=cat=>String(cat).trim()==="Especialidades"?"SYN":((String(cat).match(/^([A-Z]{3})/)||[])[1]||"SYN");
 
     function fallbackGalao(title,subtitle,code){
       return `<svg class="pdf-galao" viewBox="58 0 204 390" aria-label="Galão Synthera">
