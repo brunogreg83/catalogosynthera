@@ -767,6 +767,7 @@ document.addEventListener("DOMContentLoaded", () => {
             <option value="SKP - Cozinha">SKP - Cozinha</option>
             <option value="SAP - Preparação de Alimentos">SAP - Preparação de Alimentos</option>
             <option value="SLP - Lavanderia">SLP - Lavanderia</option>
+            <option value="Especialidades">Especialidades</option>
           </select>
         </div>
       </div>
@@ -1440,7 +1441,7 @@ async function gerarPDF(){
       });
     }
 
-    const order=["SGP - Governança","SCP - Limpeza Pesada","SKP - Cozinha","SAP - Preparação de Alimentos","SLP - Lavanderia"];
+    const order=["SGP - Governança","SCP - Limpeza Pesada","SKP - Cozinha","SAP - Preparação de Alimentos","SLP - Lavanderia","Especialidades"];
     const groups={};
     for(const p of prods){const cat=p.categoria||"SYN - Produtos";(groups[cat]??=[]).push(p);}
     const entries=Object.entries(groups).sort(([a],[b])=>{
